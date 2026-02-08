@@ -1,0 +1,7 @@
+{
+  oss: {
+    SSH_ENABLED: false,
+    GIT_IGNORED: true,
+    OSS_ENABLED: true,
+  }
+}
