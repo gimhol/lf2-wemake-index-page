@@ -40,15 +40,15 @@
     }
 
     .lang_btn_inner_span {
-      font-size      : 9px;
+      font-size      : 8px;
       line-height    : 9px;
       vertical-align : middle;
       display        : flex;
       align-items    : center;
       justify-content: center;
       border         : 1px solid white;
-      width          : 16px;
-      height         : 13px;
+      width          : 15px;
+      height         : 11px;
       position       : absolute;
       border-radius  : 3px;
       box-sizing     : border-box;
@@ -56,16 +56,16 @@
 
     .lang_btn_inner_span_f {
       z-index         : 1;
-      left            : 1px;
-      top             : 2px;
+      left            : 2px;
+      top             : 4px;
       color           : #10206C;
       background-color: white;
     }
 
     .lang_btn_inner_span_b {
       z-index: 0;
-      right  : 1px;
-      bottom : 2px;
+      right  : 2px;
+      bottom : 4px;
     }
 
   }

@@ -1,4 +1,6 @@
 import img_browser_mark_white from "@/assets/svg/browser.svg";
+import img_cards_view from "@/assets/svg/gallery-view.svg";
+import img_list_view from "@/assets/svg/database.svg";
 import windows_x64 from "@/assets/svg/windows_x64.svg";
 import { Info } from "@/base/Info";
 import { CollapseButton } from "@/components/button/CollapseButton";
@@ -14,8 +16,9 @@ import { useTranslation } from "react-i18next";
 import { MarkdownButton } from "../main/MarkdownModal";
 import csses from "./styles.module.scss";
 import { useInfoChildren } from "./useInfoChildren";
-
 type ListLike = 'cards' | 'list';
+import img_to_top from "@/assets/svg/arrow-to-top.svg"
+import img_to_bottom from "@/assets/svg/arrow-to-bottom.svg"
 function curr_list_like(v: string | undefined | null): ListLike {
   return v === 'cards' ? 'cards' : 'list'
 }
@@ -81,7 +84,7 @@ export function InfoView(props: IInfoViewProps) {
             gone={!(children?.length)}
             onClick={() => __set_listLike(__next_list_like)}
             title="Cards or List"
-            letter={__next_list_like.charAt(0).toUpperCase()} />
+            img={__next_list_like === 'cards' ? img_cards_view : img_list_view} />
           <MarkdownButton info={info} />
           <div className={csses.el_date}>
             {info.date}
@@ -104,10 +107,10 @@ export function InfoView(props: IInfoViewProps) {
         children.length ?
           <div className={csses.children_title_div} style={{ height: 0 }}>
             <span className={csses.children_title}>
-              <IconButton letter="⬆" title={`scroll ${info.children_title} to top`}
+              <IconButton img={img_to_top} size={8} title={`scroll ${info.children_title} to top`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: 0, behavior: 'smooth' })} />
               <span>{info.children_title}</span>
-              <IconButton letter="⬇"  title={`scroll ${info.children_title} to bottom`}
+              <IconButton img={img_to_bottom} size={8} title={`scroll ${info.children_title} to bottom`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: ref_el_children.current.scrollHeight, behavior: 'smooth' })} />
             </span>
           </div> : null
