@@ -2,7 +2,7 @@ import { Collapse } from "@/components/collapse/Collapse";
 import { EditorView } from "@/components/markdown/editor/EditorView";
 import { ctrl_a_bounding } from "@/components/mask/ctrl_a_bounding";
 import { useState } from "react";
-import { useTranslation } from "node_modules/react-i18next";
+import { useTranslation } from "react-i18next";
 import csses from "./ExtraDataFromView.module.scss"
 
 export function ExtraDataFromView() {

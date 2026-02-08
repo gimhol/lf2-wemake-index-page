@@ -1,6 +1,6 @@
 import { IconButton } from "@/components/button/IconButton";
 import classnames from "classnames";
-import { useTranslation } from "node_modules/react-i18next";
+import { useTranslation } from "react-i18next";
 import csses from "./styles.module.scss";
 
 export function LangButton(props: { whenClick?(next: 'zh' | 'en'): void }) {

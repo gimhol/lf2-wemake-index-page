@@ -12,7 +12,7 @@ import { useMovingBg } from "@/useMovingBg";
 import { submit_visit_event } from "@/utils/events";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "node_modules/react-i18next";
+import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { InfoView } from "../info";
 import { ExtraDataFromView } from "./ExtraDataFromView";

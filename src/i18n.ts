@@ -1,6 +1,6 @@
 import i18n from "i18next";
 import qs from "qs";
-import { initReactI18next } from "node_modules/react-i18next";
+import { initReactI18next } from "react-i18next";
 const zh = {
   "author": "作者",
   "date": "日期",

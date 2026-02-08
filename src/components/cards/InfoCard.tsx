@@ -3,7 +3,7 @@ import { Info } from "@/base/Info";
 import { MarkdownButton } from "@/pages/main/MarkdownModal";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "node_modules/react-i18next";
+import { useTranslation } from "react-i18next";
 import { IconButton } from "../button/IconButton";
 import { Link } from "../link";
 import { Viewer } from "../markdown/Viewer";

@@ -10,7 +10,7 @@ import { Viewer } from "@/components/markdown/Viewer";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
 import { useEffect, useRef } from "react";
-import { useTranslation } from "node_modules/react-i18next";
+import { useTranslation } from "react-i18next";
 import { MarkdownButton } from "../main/MarkdownModal";
 import csses from "./styles.module.scss";
 import { useInfoChildren } from "./useInfoChildren";
