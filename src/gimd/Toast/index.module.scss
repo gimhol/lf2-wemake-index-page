@@ -1,43 +1,44 @@
 .toast_list_container {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-  z-index: 1001;
-  display: flex;
+  position      : fixed;
+  top           : 0px;
+  left          : 0px;
+  right         : 0px;
+  bottom        : 0px;
+  z-index       : 1001;
+  display       : flex;
   flex-direction: column;
-  align-items: center;
-  padding: 30px;
+  align-items   : center;
+  padding       : 30px;
   pointer-events: none;
 }
 
 .toast_list_container .toast {
-  max-width: 100%;
-  pointer-events: all;
-  font-size: 12px;
-  background-color: white;
-  border-radius: 5px;
-  box-shadow:
+  max-width       : 100%;
+  pointer-events  : all;
+  font-size       : 12px;
+  color           : var(--toast-txt-color, black);
+  background-color: var(--toast-bg-color, white);
+  border-radius   : 5px;
+  box-shadow      :
     0.5px 2.8px 2.2px rgba(0, 0, 0, 0.02),
     1.1px 6.7px 5.3px rgba(0, 0, 0, 0.028),
     2.1px 12.5px 10px rgba(0, 0, 0, 0.035),
     3.8px 22.3px 17.9px rgba(0, 0, 0, 0.042),
     7.1px 41.8px 33.4px rgba(0, 0, 0, 0.05),
     17px 100px 80px rgba(0, 0, 0, 0.07);
-  user-select: none;
+  user-select  : none;
   margin-bottom: 5px;
-  opacity: 1;
-  transition: all 250ms;
-  box-sizing: border-box;
-  position: relative;
-  overflow: hidden;
-  padding: 5px;
-  height: 0px;
+  opacity      : 1;
+  transition   : all 250ms;
+  box-sizing   : border-box;
+  position     : relative;
+  overflow     : hidden;
+  padding      : 5px;
+  height       : 0px;
 }
 
 .toast_list_container .toast_dead {
-  opacity: 0;
+  opacity      : 0;
   margin-bottom: 0px;
 }
 

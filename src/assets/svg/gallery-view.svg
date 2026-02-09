@@ -1,1 +1,43 @@
-<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1770565306615" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4171" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M288 287.872V64H64v224l224-0.128z m112 672h224V736h-224v224z m-336 0h224V736H64v224z m0-336h224v-224H64v224z m336 0h224v-224h-224v224z m336-336H960V64h-224v223.872z m-112 0V64h-224v224l224-0.128zM960 623.872v-224h-224v224H960z m0 336V736h-224v224H960z" fill="#ffffff" p-id="4172"></path></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   t="1770565306615"
+   class="icon"
+   viewBox="0 0 1024 1024"
+   version="1.1"
+   p-id="4171"
+   width="200"
+   height="200"
+   id="svg1"
+   sodipodi:docname="gallery-view.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.0175"
+     inkscape:cx="44.857497"
+     inkscape:cy="95.910781"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="1072"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <path
+     d="M 319.72243,319.61255 V 127.44486 H 127.44486 v 192.27757 z m 96.13878,576.83272 H 608.13879 V 704.27757 H 415.86121 v 192.27757 z m -288.41635,0 H 319.72243 V 704.27757 H 127.44486 v 192.27757 z m 0,-288.41636 H 319.72243 V 415.75134 H 127.44486 Z m 288.41635,0 H 608.13879 V 415.75134 H 415.86121 Z M 704.27757,319.61255 H 896.55514 V 127.44486 H 704.27757 Z m -96.13878,0 V 127.44486 H 415.86121 V 319.72243 Z M 896.55514,608.02891 V 415.75134 H 704.27757 v 192.27757 z m 0,288.41636 V 704.27757 H 704.27757 v 192.27757 h 192.27757 z"
+     fill="#ffffff"
+     p-id="4172"
+     id="path1"
+     style="stroke-width:0.858382" />
+</svg>

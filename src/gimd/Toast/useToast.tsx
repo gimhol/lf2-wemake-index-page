@@ -10,7 +10,7 @@ export interface IUseToastOpts {
 export type IUseToastRet = readonly [
   (msg: string | ToastInfo) => void,
   React.ReactNode,
-  (text: string | Error | number | boolean) => void
+  (text: string | Error | number | boolean | undefined | unknown) => void
 ]
 
 export const _useToast = function useToast(opts?: null | IUseToastOpts): IUseToastRet {

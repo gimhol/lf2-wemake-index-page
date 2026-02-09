@@ -25,9 +25,11 @@ import { InfoView } from "../info";
 import { fetch_info_list } from "./fetch_info_list";
 import { ModFormView } from "./ModFormView";
 import csses from "./styles.module.scss";
+import Toast from "@/gimd/Toast";
 
 const time_str = Math.floor(Date.now() / 60000);
 export default function MainPage() {
+  const [toast, toast_ctx] = Toast.useToast()
   useEffect(() => { submit_visit_event(); })
   useMovingBg(document.documentElement)
   const { t, i18n } = useTranslation()
@@ -87,12 +89,13 @@ export default function MainPage() {
       }).catch(e => {
         if (ab.signal.aborted) return;
         console.warn(e)
+        toast({ id: '' + e, msg: '' + e })
       }).finally(() => {
         if (ab.signal.aborted) return;
         set_loading(false)
       })
     return () => ab.abort()
-  }, [i18n])
+  }, [i18n, toast])
 
   const [game_list_open, set_game_list_open] = useState(false);
 
@@ -126,6 +129,7 @@ export default function MainPage() {
 
   return <>
     <div className={csses.main_page}>
+      {toast_ctx}
       <div className={csses.head}>
         <IconButton
           className={csses.btn_toggle_game_list}

@@ -6,30 +6,37 @@
   height        : 100%;
   width         : 100%;
 
-  --padding-right: 10px;
+  --padding-t: 5px;
+  --padding-r: 5px;
+  --padding-b: 5px;
+  --padding-l: 5px;
 
   &>.head {
-    padding      : 0px var(--padding-right);
+    padding      : var(--padding-t) var(--padding-r) var(--padding-b) var(--padding-l);
     border-bottom: 1px var(--divider-color) dashed;
     display      : flex;
     align-items  : center;
     position     : relative;
+    gap          : 5px;
+
+    &>* {
+      flex-shrink: 0;
+    }
 
     .btn_toggle_game_list {
-      overflow: hidden;
-      width   : 0px;
+      display: none;
 
       @media screen and (min-width: 0px) and (max-width: 480px) {
-        width      : 24px;
-        display    : inline-flex;
+        display    : flex;
         flex-shrink: 0;
       }
     }
 
     .main_title {
+      padding  : 0px var(--title-padding-right) 0px var(--title-padding-left);
       flex     : 1;
       position : relative;
-      margin   : 5px 0px;
+      margin   : 0px 0px;
       font-size: 1.2em;
     }
 
@@ -55,7 +62,7 @@
       width         : 0px;
 
       .game_desc_zone {
-        padding      : 0px var(--padding-right);
+        padding      : 0px var(--title-padding-right);
         border-bottom: 1px var(--divider-color) dashed;
 
         .game_title {

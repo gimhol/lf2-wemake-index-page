@@ -8,11 +8,14 @@ import { Paths } from './Paths';
 import './style.scss';
 import './utils/events';
 import './utils/fingerprint';
+import Toast from './gimd/Toast';
 const router = createHashRouter(Paths.Routes);
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <GlobalValue.Provider>
-      <RouterProvider router={router} />
+      <Toast.Provider>
+        <RouterProvider router={router} />
+      </Toast.Provider>
     </GlobalValue.Provider>
   </StrictMode>,
 )

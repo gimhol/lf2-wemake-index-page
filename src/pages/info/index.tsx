@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { MarkdownButton } from "../main/MarkdownModal";
 import csses from "./styles.module.scss";
 import { useInfoChildren } from "./useInfoChildren";
+import Toast from "@/gimd/Toast";
 type ListLike = 'cards' | 'list';
 function curr_list_like(v: string | undefined | null): ListLike {
   return v === 'cards' ? 'cards' : 'list'
@@ -40,6 +41,7 @@ export function InfoView(props: IInfoViewProps) {
     listLike = curr_list_like(info?.type), whenListLike,
     ..._p
   } = props;
+  const [, toast_ctx, useAutoToast] = Toast.useToast()
   const [__open, __set_open] = usePropState(open, whenOpen)
   const [__listLike, __set_listLike] = usePropState(listLike, whenListLike)
 
@@ -57,15 +59,18 @@ export function InfoView(props: IInfoViewProps) {
   const dl_win_x64 = t('dl_win_x64')
   const ref_el_children = useRef<HTMLDivElement>(null);
   const has_content = !!(desc || desc_url || changelog || changelog_url)
-  const [children] = useInfoChildren(info)
+  const [children, , children_error] = useInfoChildren(info)
+  useAutoToast(children_error)
   const __next_list_like = next_list_like(__listLike)
   const cls_root = classnames(csses.info_view_root, className)
   const url = info?.url ?? children?.find(v => v.url)?.url;
   const url_type = info?.url ? info.url_type : children?.find(v => v.url)?.url_type;
   const tags = unavailable ? [t(unavailable_reason || 'unavailable')] : url_type ? [t(url_type)] : void 0;
-  if (!info) return;
+  
+  if (!info) return <>{toast_ctx}</>;
   return (
     <div className={cls_root} {..._p}>
+      {toast_ctx}
       <div className={csses.head}>
         <CollapseButton
           open={__open}
