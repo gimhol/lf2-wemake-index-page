@@ -191,14 +191,16 @@ export default function MainPage() {
           className={csses.main_right}
           open={window.innerWidth > 480} />
       </div>
+      {/*
       <div className={csses.foot}>
-        {/* <a className={styles.link}
+         <a className={styles.link}
           href="https://beian.miit.gov.cn/"
           target="_blank"
           rel="noreferrer">
           粤ICP备2021170807号-1
-        </a> */}
+        </a> 
       </div>
+      */}
     </div >
     <Loading big loading={loading} style={{ position: 'absolute', margin: 'auto auto' }} />
     <Mask
