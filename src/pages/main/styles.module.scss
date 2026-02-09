@@ -17,7 +17,7 @@
     display      : flex;
     align-items  : center;
     position     : relative;
-    gap          : 5px;
+    flex-wrap    : wrap;
 
     &>* {
       flex-shrink: 0;
@@ -33,13 +33,19 @@
     }
 
     .main_title {
-      padding  : 0px var(--title-padding-right) 0px var(--title-padding-left);
-      flex     : 1;
-      position : relative;
-      margin   : 0px 0px;
-      font-size: 1.2em;
+      padding    : 0px 5px;
+      flex       : 1;
+      position   : relative;
+      margin     : 0px 0px;
+      font-size  : 1.2em;
+      white-space: nowrap;
     }
 
+    .right_zone {
+      margin-left: auto;
+      display    : flex;
+      gap        : 8px;
+    }
 
   }
 
@@ -113,7 +119,6 @@
   overflow      : auto;
   display       : flex;
   flex-direction: column;
-  gap           : 5px;
   border-right  : 1px var(--divider-color) dashed;
   padding       : 5px;
   box-sizing    : border-box;
@@ -195,5 +200,4 @@
   overflow      : auto;
   display       : flex;
   flex-direction: column;
-  gap           : 5px;
 }

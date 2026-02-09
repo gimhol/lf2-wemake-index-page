@@ -139,48 +139,50 @@ export default function MainPage() {
         <h1 className={csses.main_title}>
           {t("main_title")}
         </h1>
-        <LangButton whenClick={next => games?.map(v => v.with_lang(next))} />
-        <Show yes={!sesson_id}>
-          <Dropdown
-            alignX={1}
-            anchorX={1}
-            menu={{
-              items: [{
-                children: t('github_login'),
-                href: `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`,
-                title: t('gitee_login')
-              },
-              {
-                children: t('gitee_login'),
-                href: `${API_BASE}user/gitee/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`,
-                title: t('gitee_login')
-              }]
-            }}>
+        <div className={csses.right_zone}>
+          <LangButton whenClick={next => games?.map(v => v.with_lang(next))} />
+          <Show yes={!sesson_id}>
+            <Dropdown
+              alignX={1}
+              anchorX={1}
+              menu={{
+                items: [{
+                  children: t('github_login'),
+                  href: `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`,
+                  title: t('gitee_login')
+                },
+                {
+                  children: t('gitee_login'),
+                  href: `${API_BASE}user/gitee/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`,
+                  title: t('gitee_login')
+                }]
+              }}>
+              <IconButton
+                title={t('login')}
+                img={img_login} />
+            </Dropdown>
+          </Show>
+          <Show yes={!!sesson_id}>
             <IconButton
-              title={t('login')}
-              img={img_login} />
-          </Dropdown>
-        </Show>
-        <Show yes={!!sesson_id}>
+              title={t('logout')}
+              img={img_logout}
+              onClick={() => set_global_value(prev => ({ ...prev, sesson_id: void 0 }))} />
+          </Show>
+          <Show yes={!!sesson_id}>
+            <IconButton
+              onClick={() => set_ss_open(true)}
+              title={t('submit_your_mod')}
+              img={img_upload} />
+          </Show>
           <IconButton
-            title={t('logout')}
-            img={img_logout}
-            onClick={() => set_global_value(prev => ({ ...prev, sesson_id: void 0 }))} />
-        </Show>
-        <Show yes={!!sesson_id}>
+            href="https://github.com/gimhol/little-fighter-2-WEMAKE"
+            title={t('goto_github')}
+            img={img_github} />
           <IconButton
-            onClick={() => set_ss_open(true)}
-            title={t('submit_your_mod')}
-            img={img_upload} />
-        </Show>
-        <IconButton
-          href="https://github.com/gimhol/little-fighter-2-WEMAKE"
-          title={t('goto_github')}
-          img={img_github} />
-        <IconButton
-          href="https://gim.ink"
-          title={t('goto_gimink')}
-          img={img_gimink} />
+            href="https://gim.ink"
+            title={t('goto_gimink')}
+            img={img_gimink} />
+        </div>
       </div>
       <div className={csses.main}>
         {game_list}

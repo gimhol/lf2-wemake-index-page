@@ -75,14 +75,19 @@
     display        : flex;
     align-items    : center;
     justify-content: center;
-    gap            : 5px;
+    gap            : 8px;
     margin-left    : auto;
   }
 
   .el_date {
-    opacity    : 0.75;
-    font-size  : 12px;
-    font-weight: normal;
+    opacity        : 0.75;
+    font-size      : 12px;
+    font-weight    : normal;
+    overflow       : visible;
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    width          : calc(var(--icon-button-width, 1.8rem) * 2 + 8);
   }
 
   .content_zone {
@@ -167,5 +172,5 @@
   display       : flex;
   flex-direction: column;
   flex          : 1;
-  gap           : 5px;
+  gap           : 8px;
 }
