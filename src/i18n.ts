@@ -33,6 +33,8 @@ const zh = {
   "login": "登录",
   "github_login": "Github授权登录",
   "gitee_login": "Gitee授权登录",
+  "logout": "登出",
+  "your_works": "你的作品",
 }
 const en = {
   "author": "author",
@@ -59,13 +61,15 @@ const en = {
   "edit_author_here": "Edit Author Here",
   "author_url": "Author URL",
   "edit_author_url_here": "Edit Author URL Here (Your blog or profile)",
-  "edit_your_extra_data_info": "Submit Your Extra Data",
+  "edit_your_extra_data_info": "Submit Your Mod",
   "base_info": "Base Info",
   "WIP": "🚧",
   "unpublished": "Unpublished",
   "login": "Log in",
   "github_login": "Login with GitHub",
   "gitee_login": "Login with Gitee",
+  "logout": "Logout",
+  "your_works": "Your Works",
 }
 const resources = {
   "zh": { translation: zh },

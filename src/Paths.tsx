@@ -5,7 +5,7 @@ export namespace Paths {
   export enum All {
     _ = '',
     main_page = '/',
-    main_page_with = '/:game_in_path'
+    main_page_with = '/:game_id'
   }
   export const Components: Record<All, React.ComponentType | null> = {
     [All._]: null,

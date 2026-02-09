@@ -3,9 +3,9 @@ import { EditorView } from "@/components/markdown/editor/EditorView";
 import { ctrl_a_bounding } from "@/components/mask/ctrl_a_bounding";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import csses from "./ExtraDataFromView.module.scss"
+import csses from "./ModFormView.module.scss";
 
-export function ExtraDataFromView() {
+export function ModFormView() {
   const { t } = useTranslation();
   const [tab, set_tab] = useState<'base_info' | 'changelog' | 'description'>('base_info');
   return (

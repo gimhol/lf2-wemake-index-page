@@ -1,4 +1,4 @@
-import { ScrollBar } from "@/ScrollBar";
+import { ScrollBar } from "../ScrollBar";
 import classNames from "classnames";
 import React, { useEffect, useRef } from "react";
 import styles from "./styles.module.scss";

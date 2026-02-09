@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import type { Info } from "@/base/Info";
 import { useEffect, useState } from "react";
 import { fetch_info_list } from "../main/fetch_info_list";
@@ -7,10 +8,9 @@ export function useInfoChildren(info: Info | undefined | null) {
   const [loading, set_loading] = useState(false);
   const [children, set_children] = useState<Info[]>(info?.children ?? []);
   useEffect(() => {
-    if (!info) { return; }
+    if (!info) { set_children([]); return; }
     const { children, children_url } = info;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (children?.length) { set_children(children ?? []); return; }
+    if (children?.length) { set_children(children); return; }
     if (!children_url) return;
     const ab = new AbortController();
     set_loading(true);

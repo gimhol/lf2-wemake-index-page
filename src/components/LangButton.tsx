@@ -1,7 +1,7 @@
 import { IconButton } from "@/components/button/IconButton";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
-import csses from "./styles.module.scss";
+import csses from "./LangButton.module.scss";
 
 export function LangButton(props: { whenClick?(next: 'zh' | 'en'): void }) {
   const { whenClick } = props;
@@ -18,11 +18,11 @@ export function LangButton(props: { whenClick?(next: 'zh' | 'en'): void }) {
       }}
       title={t('switch_lang')}>
       <div className={csses.lang_btn_inner}>
-        <span className={classnames(csses.lang_btn_inner_span, csses.lang_btn_inner_span_f)}>
-          {is_en ? '中' : 'En'}
+        <span className={classnames(csses.lang_span_l, is_en ? csses.lang_span_f : csses.lang_span_b)}>
+          中
         </span>
-        <span className={classnames(csses.lang_btn_inner_span, csses.lang_btn_inner_span_b)}>
-          {is_en ? 'En' : '中'}
+        <span className={classnames(csses.lang_span_r, is_en ? csses.lang_span_b : csses.lang_span_f)}>
+          En
         </span>
       </div>
     </IconButton>

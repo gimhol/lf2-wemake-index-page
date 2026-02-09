@@ -1,0 +1,74 @@
+.space {
+  display: inline-flex;
+
+  &.no_inline {
+    display: flex;
+  }
+
+  &.space_align_center {
+    text-align: center;
+  }
+
+  &.space_v {
+    flex-direction: column;
+  }
+
+  &.space_h {
+    flex-direction: row;
+  }
+
+  &.space_align_left {
+    text-align: left;
+  }
+
+  &.space_align_right {
+    text-align: right;
+  }
+
+  &.space_align_items_start {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  &.space_align_items_center {
+    display: flex;
+    align-items: center;
+  }
+
+  &.space_align_items_end {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  &.space_size_s>.space_item_h:not(:last-child) {
+    margin-right: 5px;
+  }
+
+  &.space_size_m>.space_item_h:not(:last-child) {
+    margin-right: 10px;
+  }
+
+  &.space_size_l>.space_item_h:not(:last-child) {
+    margin-right: 15px;
+  }
+
+  &.space_size_s>.space_item_v:not(:last-child) {
+    margin-bottom: 5px;
+  }
+
+  &.space_size_m>.space_item_v:not(:last-child) {
+    margin-bottom: 10px;
+  }
+
+  &.space_size_l>.space_item_v:not(:last-child) {
+    margin-bottom: 15px;
+  }
+
+  &>.space_item_h {
+    display: inline-block;
+  }
+
+  &>.space_item_v {
+    display: block;
+  }
+}

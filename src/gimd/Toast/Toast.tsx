@@ -1,7 +1,7 @@
-import { Space } from "@/pages/Main/Space";
-import { useState, useRef, useEffect, type PropsWithChildren } from "react";
-import { Badge } from "../Badge";
 import classnames from "classnames";
+import { useEffect, useRef, useState, type PropsWithChildren } from "react";
+import { Badge } from "../Badge";
+import { Space } from "../Space";
 import type { ToastInfo } from "./ToastInfo";
 import styles from "./index.module.scss";
 import type { IUseToastOpts, IUseToastRet } from "./useToast";

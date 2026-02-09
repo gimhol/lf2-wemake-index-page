@@ -1,0 +1,44 @@
+.lang_btn_inner {
+  position: relative;
+  width   : 24px;
+  height  : 24px;
+}
+
+.lang_span {
+  font-size      : 8px;
+  line-height    : 9px;
+  vertical-align : middle;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  border         : 1px solid white;
+  width          : 15px;
+  height         : 11px;
+  position       : absolute;
+  border-radius  : 3px;
+  box-sizing     : border-box;
+  transition     : all 200ms;
+}
+
+.lang_span_l {
+  @extend .lang_span;
+  left: 2px;
+}
+
+.lang_span_r {
+  @extend .lang_span;
+  right: 2px;
+}
+
+.lang_span_f {
+  z-index         : 1;
+  top             : 5px;
+  color           : #10206C;
+  background-color: white;
+}
+
+.lang_span_b {
+  @extend .lang_span;
+  z-index: 0;
+  top    : 9px;
+}
