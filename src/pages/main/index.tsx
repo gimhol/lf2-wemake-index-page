@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import img_gimink from "@/assets/svg/gimink.svg";
 import img_github from "@/assets/svg/github.svg";
+import img_login from "@/assets/svg/login.svg";
 import img_menu from "@/assets/svg/menu.svg";
 import img_upload from "@/assets/svg/upload.svg";
 import { Info } from "@/base/Info";
@@ -19,6 +20,7 @@ import { ExtraDataFromView } from "./ExtraDataFromView";
 import { fetch_info_list } from "./fetch_info_list";
 import { LangButton } from "./LangButton";
 import csses from "./styles.module.scss";
+import { Dropdown } from "@/gimd/Dropdown";
 
 const time_str = Math.floor(Date.now() / 60000);
 export default function MainPage() {
@@ -107,6 +109,22 @@ export default function MainPage() {
           set_actived_game(next_actived_game)
           set_games(next_games)
         }} />
+        <Dropdown menu={{
+          items: [{
+            children: t('github_login'),
+            href: `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(location.toString())}`,
+            title: t('gitee_login'),
+          },
+          {
+            children: t('gitee_login'),
+            href: `${API_BASE}user/gitee/oauth?route_mode=hash&redirect=${encodeURIComponent(location.toString())}`,
+            title: t('gitee_login'),
+          }]
+        }}>
+          <IconButton
+            title={t('login')}
+            img={img_login} />
+        </Dropdown>
         <IconButton
           onClick={() => set_ss_open(true)}
           title={t('submit_extra_data')}

@@ -1,0 +1,10 @@
+.tag {
+  padding: 3px 6px;
+  border-radius: 3px;
+  border: 1px solid #88888855;
+  color: gray;
+  user-select: none;
+  &.closable {
+    padding-right: 2px;
+  }
+}

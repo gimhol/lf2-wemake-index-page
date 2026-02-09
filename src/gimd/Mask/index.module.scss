@@ -1,0 +1,45 @@
+.mask_bg {
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  transition: background-color 250ms, opacity 250ms;
+  z-index: 1000;
+  user-select: none;
+  outline: none;
+}
+
+.mask_bg_open {
+  background-color: #0005;
+  opacity: 1;
+}
+
+.mask_bg_close {
+  background-color: #0000;
+  opacity: 0;
+}
+
+.mask_bg_transparent {
+  background-color: transparent;
+}
+
+.mask_no_pointer_event {
+  pointer-events: none;
+}
+
+.mask_no_pointer_event>* {
+  pointer-events: all;
+}
+
+.mask_bg_gone {
+  max-width: 0px;
+  max-height: 0px;
+  width: 0px;
+  height: 0px;
+  overflow: hidden;
+}
+
+.mask_bg_gone {
+  display: none;
+}

@@ -1,0 +1,32 @@
+.badge {
+  background-color: var(--bg-color-danger, red);
+  color           : white;
+  display         : inline-flex;
+  align-items     : center;
+  justify-content : center;
+  box-sizing      : border-box;
+}
+
+.badge.badge_size_s {
+  padding      : 3px;
+  font-size    : 10px;
+  border-radius: 8px;
+  min-width    : 16px;
+  height       : 16px;
+}
+
+.badge.badge_size_m {
+  padding      : 3px;
+  font-size    : 10px;
+  border-radius: 8px;
+  min-width    : 16px;
+  height       : 16px;
+}
+
+.badge.badge_size_l {
+  padding      : 3px;
+  font-size    : 10px;
+  border-radius: 8px;
+  min-width    : 16px;
+  height       : 16px;
+}

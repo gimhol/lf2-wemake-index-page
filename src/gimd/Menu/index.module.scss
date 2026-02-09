@@ -1,0 +1,19 @@
+.menu {
+  user-select: none;
+  position: fixed;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow:
+    rgba(0, 0, 0, 0.04) 0px 0px 4px 0px,
+    rgba(0, 0, 0, 0.08) 0px 8px 16px 0px,
+    rgba(255, 255, 255, 0.08) 0px 0px 0px 1px inset;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.menu_item {
+  text-align: left;
+  box-sizing: border-box;
+}

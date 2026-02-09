@@ -1,0 +1,138 @@
+.text {
+  display: inline;
+
+  &.text_secondary {
+    _keep: _;
+  }
+
+  &.text_default {
+    _keep: _;
+  }
+
+  &.text_link:hover {
+    text-decoration: underline;
+    cursor         : pointer;
+  }
+
+  &.text_delete_line {
+    text-decoration: line-through;
+  }
+
+  &.text_no_wrap {
+    white-space: nowrap;
+    word-break : keep-all;
+  }
+
+  &.text_disabled {
+    opacity: 0.5;
+  }
+}
+
+span.text.span_text_size_s,
+span.text.span_text_size_m,
+span.text.span_text_size_l {
+  _keep: _;
+}
+
+span.text.span_text_line_height_s,
+span.text.span_text_line_height_m,
+span.text.span_text_line_height_l,
+h1.text.h1_text_line_height_l,
+h1.text.h1_text_line_height_m,
+h1.text.h1_text_line_height_s,
+h2.text.h2_text_line_height_l,
+h2.text.h2_text_line_height_m,
+h2.text.h2_text_line_height_s,
+h3.text.h3_text_line_height_l,
+h3.text.h3_text_line_height_m,
+h3.text.h3_text_line_height_s,
+h4.text.h4_text_line_height_l,
+h4.text.h4_text_line_height_m,
+h4.text.h4_text_line_height_s,
+h5.text.h5_text_line_height_l,
+h5.text.h5_text_line_height_m,
+h5.text.h5_text_line_height_s,
+h6.text.h6_text_line_height_l,
+h6.text.h6_text_line_height_m,
+h6.text.h6_text_line_height_s {
+  _keep: _;
+}
+
+h1.text.h1_text_size_s {
+  font-size  : 2em;
+  font-weight: bold;
+}
+
+h1.text.h1_text_size_m {
+  font-size  : 2em;
+  font-weight: bold;
+}
+
+h1.text.h1_text_size_l {
+  font-size  : 2em;
+  font-weight: bold;
+}
+
+
+h2.text.h2_text_size_s {
+  font-size  : 1.5em;
+  font-weight: bold;
+}
+
+h2.text.h2_text_size_m {
+  font-size  : 1.5em;
+  font-weight: bold;
+}
+
+h2.text.h2_text_size_l {
+  font-size  : 1.5em;
+  font-weight: bold;
+}
+
+h3.text.h3_text_size_s {
+  _keep: _;
+}
+
+h3.text.h3_text_size_m {
+  _keep: _;
+}
+
+h3.text.h3_text_size_l {
+  _keep: _;
+}
+
+h4.text.h4_text_size_s {
+  _keep: _;
+}
+
+h4.text.h4_text_size_m {
+  _keep: _;
+}
+
+h4.text.h4_text_size_l {
+  _keep: _;
+}
+
+h5.text.h5_text_size_s {
+  _keep: _;
+}
+
+h5.text.h5_text_size_m {
+  _keep: _;
+}
+
+h5.text.h5_text_size_l {
+  _keep: _;
+}
+
+h6.text.h6_text_size_s {
+  _keep: _;
+}
+
+h6.text.h6_text_size_m {
+  _keep: _;
+}
+
+h6.text.h6_text_size_l {
+  _keep: _;
+}

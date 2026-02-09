@@ -30,6 +30,9 @@ const zh = {
   "base_info": "基本信息",
   "WIP": "🚧",
   "unpublished": "未发布",
+  "login": "登录",
+  "github_login": "Github授权登录",
+  "gitee_login": "Gitee授权登录",
 }
 const en = {
   "author": "author",
@@ -60,6 +63,9 @@ const en = {
   "base_info": "Base Info",
   "WIP": "🚧",
   "unpublished": "Unpublished",
+  "login": "Log in",
+  "github_login": "Login with GitHub",
+  "gitee_login": "Login with Gitee",
 }
 const resources = {
   "zh": { translation: zh },

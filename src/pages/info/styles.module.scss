@@ -89,6 +89,10 @@
     margin-left: 29px;
     box-sizing : border-box;
 
+    @media screen and (min-width: 0px) and (max-width: 480px) {
+      margin-left: 0px;
+    }
+
     &>* {
       padding-left: 0px;
     }

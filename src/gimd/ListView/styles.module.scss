@@ -1,0 +1,48 @@
+@import url(../ScrollView/styles.module.scss);
+
+.list_view {
+  border-right: 1px solid #88888888;
+
+  &.vertical {
+    max-height: 100%;
+    min-width : 150px;
+  }
+
+  &.horizontal {
+    max-width : 100%;
+    min-height: 150px;
+  }
+
+  .viewport {
+    &.vertical {
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    &.horizontal {
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+  }
+
+
+  .content {
+    display: flex;
+
+    &.vertical {
+      flex-direction: column;
+      width         : 100%;
+    }
+
+    &.horizontal {
+      flex-direction: row;
+      height        : 100%;
+    }
+
+    .item {
+      display: block;
+    }
+  }
+
+
+}

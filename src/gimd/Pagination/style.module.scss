@@ -1,0 +1,17 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.pagination>*:not(:last-child) {
+  margin-right: 5px;
+}
+
+.pagination .btn_page {
+  transition: opacity 200ms;
+}
+
+.pagination .btn_page_current {
+  opacity: 0.5;
+}

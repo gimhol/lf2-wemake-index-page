@@ -1,0 +1,175 @@
+.btn {
+  background : none;
+  outline    : none;
+  border     : none;
+  color      : #40454e;
+  transition : color 200ms;
+  position   : relative;
+  white-space: nowrap;
+
+  &:hover {
+    cursor: pointer;
+    color : white;
+  }
+
+  &:disabled {
+    color : #2240454e;
+    cursor: default;
+    filter: grayscale(1);
+  }
+
+  &>.btn_inner {
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    position       : relative;
+    z-index        : 1;
+    white-space    : nowrap;
+    fill           : red
+  }
+
+  &>.back_decorator {
+    z-index: 0;
+  }
+}
+
+
+.btn_kind_underline {
+  
+  & .back_decorator {
+    background-color: #00000044;
+    bottom          : 0px;
+    left            : 2px;
+    right           : 2px;
+    height          : 1px;
+    position        : absolute;
+    transition      : all 200ms;
+  }
+
+  &:hover:not(:disabled) .back_decorator {
+    background-color: #00000088;
+    height          : 100%;
+    border-radius   : 2px;
+    left            : 0px;
+    right           : 0px;
+  }
+
+  &:active .back_decorator {
+    background-color: #000000FF;
+  }
+
+  &:disabled .back_decorator {
+    background-color: #2240454e;
+  }
+
+  &.btn_size_s {
+    padding: 0px 2px;
+  }
+
+  &.btn_size_m {
+    padding: 5px 10px;
+  }
+
+  &.btn_size_l {
+    padding: 10px 15px;
+  }
+}
+
+.btn_kind_icon {
+  padding        : 0px;
+  display        : inline-flex;
+  align-self     : center;
+  justify-content: center;
+
+  &>span {
+    display   : inline-block;
+    text-align: center;
+  }
+
+  & .back_decorator {
+    left      : 0px;
+    right     : 0px;
+    bottom    : 0px;
+    height    : 0px;
+    position  : absolute;
+    transition: all 200ms;
+  }
+
+  &:hover:not(:disabled) .back_decorator {
+    background-color: #00000088;
+    height          : 100%;
+    border-radius   : 2px;
+    left            : 0px;
+    right           : 0px;
+  }
+
+  &:active .back_decorator {
+    background-color: #000000FF;
+  }
+
+  &:disabled .back_decorator {
+    background-color: #2240454e;
+  }
+
+  &.btn_size_s {
+    height     : 15px;
+    width      : 15px;
+    line-height: 15px;
+  }
+
+  &.btn_size_m {
+    height     : 37px;
+    width      : 37px;
+    line-height: 37px;
+  }
+
+  &.btn_size_l {
+    height     : 37px;
+    width      : 37px;
+    line-height: 37px;
+  }
+}
+
+
+.btn_kind_normal {
+  .back_decorator {
+    bottom    : 0px;
+    left      : 2px;
+    right     : 2px;
+    height    : 1px;
+    position  : absolute;
+    transition: all 200ms;
+  }
+
+  &:hover:not(:disabled) .back_decorator {
+    background-color: #00000088;
+    height          : 100%;
+    border-radius   : 2px;
+    left            : 0px;
+    right           : 0px;
+  }
+
+  &:active .back_decorator {
+    background-color: #000000FF;
+  }
+
+  &:disabled .back_decorator {
+    background-color: #2240454e;
+  }
+
+  &.btn_size_s {
+    padding: 0px 2px;
+  }
+
+  &.btn_size_m {
+    padding: 5px 10px;
+  }
+
+  &.btn_size_l {
+    padding: 10px 15px;
+  }
+}
+
+.btn_delete_line {
+  filter: grayscale(1);
+}
