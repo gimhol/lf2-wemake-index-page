@@ -46,8 +46,6 @@ export default function MainPage() {
 
   const set_location = useCallback((opts: { game?: string }) => {
     const { game } = opts
-    // eslint-disable-next-line no-debugger
-    if (game) debugger;
     const pathname = typeof game === 'string' ?
       Paths.All.main_page_with.replace(':game_id', game) :
       void 0;
