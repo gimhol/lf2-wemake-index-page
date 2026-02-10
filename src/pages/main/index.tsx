@@ -180,7 +180,7 @@ export default function MainPage() {
                 // 没搞懂为什么此处 window.location.toString() 没有立刻变化，故在onClik才获取地址 -Gim
                 items: [{
                   children: t('github_login'),
-                  title: t('gitee_login'), 
+                  title: t('gitee_login'),
                   onClick: () => document.location = `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
                 },
                 {

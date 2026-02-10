@@ -25,7 +25,7 @@ export function ModFormView() {
             {t("changelog")}
           </button>
         </div>
-        <div style={{ flex: 1 }}>
+        <div className={csses.right_zone}>
           <Collapse
             open={'base_info' == tab}
             className={csses.collapse}
@@ -67,7 +67,6 @@ export function ModFormView() {
           </Collapse>
         </div>
       </div>
-
     </div>
   );
 }
