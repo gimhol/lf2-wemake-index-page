@@ -1,0 +1,41 @@
+@import url(../../theme/common.module.scss);
+
+.file_list {
+  display       : flex;
+  flex-direction: column;
+  overflow      : auto;
+}
+
+.file_raw {
+  display    : flex;
+  align-items: stretch;
+  cursor     : default;
+  transition : all 200ms;
+  box-sizing : border-box;
+
+  &:not(:last-child) {
+    border-bottom-style: dashed;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--divider-color);
+  }
+
+  div {
+    display    : flex;
+    align-items: stretch;
+  }
+
+  .mid_zone {
+    flex       : 1;
+    align-items: center;
+  }
+
+
+}
+
+.file_raw:hover:not(.disbaled) {
+  background-color: rgba(255, 255, 255, 0.144);
+}
+
+.file_raw.disbaled {
+  opacity: 0.5;
+}
