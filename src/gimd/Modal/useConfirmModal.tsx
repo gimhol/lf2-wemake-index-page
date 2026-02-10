@@ -8,7 +8,7 @@ export function useConfirmModal(props: Omit<IModalProps, 'open' | 'onClose'>) {
     <Modal
       {...props}
       open={open}
-      onClose={() => setOpen(false)} />
+      onChange={() => setOpen(false)} />
   );
   return [show, ctx] as const;
 }

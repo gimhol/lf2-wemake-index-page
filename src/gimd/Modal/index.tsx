@@ -78,9 +78,9 @@ export function Modal(props: IModalProps) {
     ..._p
   } = props;
   const onCancel = async (e: React.MouseEvent | KeyboardEvent) =>
-    await _onCancel?.(e) !== true && autoClose && _p.onClose?.()
+    await _onCancel?.(e) !== true && autoClose && _p.onChange?.()
   const onConfirm = async (e: React.MouseEvent | KeyboardEvent) =>
-    await _onOk?.(e) !== true && autoClose && _p.onClose?.()
+    await _onOk?.(e) !== true && autoClose && _p.onChange?.()
 
   const _mask_class_name = classnames(className, mask_cn)
   const _modal_class_name = classnames(styles.modal_root, modal_cn)

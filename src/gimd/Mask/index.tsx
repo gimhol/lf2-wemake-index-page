@@ -12,9 +12,9 @@ const State = {
 type State = typeof State[keyof typeof State]
 
 
-interface IBackgroundProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+interface IBackgroundProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   open?: boolean;
-  onClose?: () => void;
+  onChange?: (open?: boolean) => void;
   closeOnMask?: boolean;
   clickable?: boolean;
   transparent?: boolean;
@@ -24,7 +24,7 @@ interface IBackgroundProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'c
 function Background(props: IBackgroundProps) {
   const {
     open,
-    onClose,
+    onChange: onClose,
     closeOnMask = true,
     clickable = true,
     transparent,

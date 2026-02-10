@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import devices from 'current-device';
-import { useCallback, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import useShortcut, { type TShortcutCombines } from '../hooks/useShortcut';
 import Anchor from '../SEO/Anchor';
 import Show from '../Show';
@@ -39,15 +39,12 @@ export default function Button(props: IButtonProps) {
     ..._p
   } = props;
 
-  const ref_on_click = useRef(onClick);
-  ref_on_click.current = onClick;
-
-  const _on_click = useCallback((e: React.MouseEvent | KeyboardEvent) => {
-    ref_on_click.current?.(e);
+  const _on_click = (e: React.MouseEvent | KeyboardEvent) => {
+    onClick?.(e);
     if (e.defaultPrevented || no_jump) return;
     if (open && typeof open === 'string') window.open(open);
     if (href && typeof href === 'string') document.location.href = href;
-  }, [open, href, no_jump]);
+  }
 
   const [shortcut_str] = useShortcut(shortcut, _on_click, disabled || !shortcut)
 

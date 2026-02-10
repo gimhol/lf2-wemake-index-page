@@ -1,7 +1,8 @@
-import React, { cloneElement, isValidElement, type PropsWithChildren, useCallback, useMemo, useRef, useState } from "react";
+import { usePropState } from "@/utils/usePropState";
+import devices from "current-device";
+import React, { cloneElement, isValidElement, type PropsWithChildren, useMemo, useRef, useState } from "react";
 import Button, { type IButtonProps } from "../Button";
 import Menu, { type IMenuItem, type IMenuProps } from "../Menu";
-import devices from "current-device";
 const default_triggers = devices.desktop() ? ['hover'] : ['click'];
 export type Trigger = 'hover' | 'click' | 'contextMenu'
 export interface IOption<Value> extends Omit<IMenuItem, 'value'> {
@@ -38,44 +39,31 @@ export function Dropdown(props: DropdownProps) {
     style,
   } = props;
   const ref_open_reason = useRef<Trigger | undefined>(void 0)
-  const [_open, _set_open] = useState(false);
-
-  const ref_open = useRef(__open ?? _open)
-  const open = ref_open.current = __open ?? _open;
-  const set_open = useCallback((action: React.SetStateAction<boolean>) => {
-    if (!__onChange)
-      return _set_open(action);
-    else if (typeof action === 'function')
-      __onChange(action(ref_open.current))
-    else
-      __onChange(action)
-  }, [__onChange])
-
+  const [open, set_open] = usePropState(__open, __onChange)
   const [[x, y], set_x_y] = useState<[number, number]>(() => [0, 0])
   const ref_leave_inner_timer_id = useRef(0);
   let inner: React.ReactNode;
+
   if (isValidElement<React.HTMLAttributes<HTMLElement>>(children)) {
     const { props: { onPointerEnter, onClick, onContextMenu, onPointerLeave } } = children;
-    const inner_props: React.HTMLAttributes<HTMLElement> = {
-      ...children.props
-    }
+    const innper_props = { ...children.props }
     const fire = (trigger: Trigger, fn?: React.PointerEventHandler | React.MouseEventHandler<HTMLElement>) => (e: React.PointerEvent<HTMLElement>) => {
       fn?.(e)
-      set_open(prev => {
-        if (!prev) {
+      set_open((() => {
+        if (!open) {
           const { x, y, width, height } = (e.target as HTMLElement).getBoundingClientRect()
           set_x_y([x + width * alignX, y + height * alignY])
           ref_open_reason.current = trigger
         }
-        return !prev
-      })
+        return !open
+      })())
       window.clearTimeout(ref_leave_inner_timer_id.current)
       e.stopPropagation()
       e.preventDefault()
     }
     if (!triggers.length || triggers.indexOf('hover') >= 0) {
-      inner_props.onPointerEnter = fire('hover', onPointerEnter)
-      inner_props.onPointerLeave = e => {
+      innper_props.onPointerEnter = fire('hover', onPointerEnter)
+      innper_props.onPointerLeave = e => {
         onPointerLeave?.(e);
         ref_leave_inner_timer_id.current = window.setTimeout(() => {
           set_open(false)
@@ -83,10 +71,11 @@ export function Dropdown(props: DropdownProps) {
       }
     }
     if (triggers.indexOf('click') >= 0)
-      inner_props.onClick = fire('click', onClick)
+      innper_props.onClick = fire('click', onClick)
     if (triggers.indexOf('contextMenu') >= 0)
-      inner_props.onContextMenu = fire('contextMenu', onContextMenu)
-    inner = cloneElement(children, inner_props);
+      innper_props.onContextMenu = fire('contextMenu', onContextMenu)
+
+    inner = cloneElement(children, innper_props);
   } else {
     inner = children;
   }
@@ -98,6 +87,8 @@ export function Dropdown(props: DropdownProps) {
         y={y}
         anchorX={anchorX}
         anchorY={anchorY}
+        onXChange={() => { }}
+        onYChange={() => { }}
         size={size}
         style={style}
         onPointerEnter={() => {
@@ -109,7 +100,7 @@ export function Dropdown(props: DropdownProps) {
         }}
         open={open}
         forceRender={forceRender}
-        onClose={() => set_open(false)}
+        onChange={() => set_open(false)}
         {...menu}
       />
     </>

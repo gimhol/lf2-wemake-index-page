@@ -11,9 +11,12 @@ import { Loading } from "@/components/loading/LoadingImg";
 import { Mask } from "@/components/mask";
 import { Dropdown } from "@/gimd/Dropdown";
 import Show from "@/gimd/Show";
+import Toast from "@/gimd/Toast";
 import { useGlobalValue } from "@/GlobalStore/useGlobalValue";
+import { useMovingBg } from "@/hooks/useMovingBg";
+import { ApiHttp } from "@/network/ApiHttp";
+import * as KnownError from "@/network/KnownError";
 import { Paths } from "@/Paths";
-import { useMovingBg } from "@/useMovingBg";
 import { submit_visit_event } from "@/utils/events";
 import { LocationParams } from "@/utils/LocationParams";
 import classnames from "classnames";
@@ -22,10 +25,10 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { LangButton } from "../../components/LangButton";
 import { InfoView } from "../info";
+import { YoursPage } from "../yours";
 import { fetch_info_list } from "./fetch_info_list";
 import { ModFormView } from "./ModFormView";
 import csses from "./styles.module.scss";
-import Toast from "@/gimd/Toast";
 
 const time_str = Math.floor(Date.now() / 60000);
 export default function MainPage() {
@@ -40,7 +43,7 @@ export default function MainPage() {
   const location = useLocation();
   const { game_id } = useParams();
   const { global_value, set_global_value } = useGlobalValue();
-  const { sesson_id } = global_value
+  const { session_id } = global_value
   const { search, hash } = useMemo(() => ({
     search: LocationParams.parse(location.search.substring(1)),
     hash: LocationParams.parse(location.hash.substring(1))
@@ -63,17 +66,45 @@ export default function MainPage() {
   useEffect(() => {
     const session = search.get_string('session')
     if (session) return;
-    if (!game_id || (!sesson_id && game_id === 'yours')) {
+    if (!game_id || (!session_id && game_id === 'yours')) {
       set_location({ game: games?.find(v => v)?.id })
     }
-  }, [sesson_id, search, game_id, set_location, games])
+  }, [session_id, search, game_id, set_location, games])
 
   useEffect(() => {
     const session = search.get_string('session')
     if (!session) return;
-    set_global_value({ sesson_id: session })
+    set_global_value(prev => ({ ...prev, session_id: session }))
     set_location({})
-  }, [set_location, search, set_global_value])
+
+  }, [set_location, search, set_global_value, toast])
+
+  useEffect(() => {
+    const c = new AbortController()
+    ApiHttp.post<any, any>(`user/info`, void 0, void 0, {
+      headers: { authorization: session_id },
+      signal: c.signal
+    }).then(r => {
+      if (c.signal.aborted) return;
+      set_global_value(prev => ({
+        ...prev,
+        session_id: session_id,
+        admin: r.data.admin,
+        user_id: r.data.id,
+        username: r.data.username,
+        nickname: r.data.nickname,
+      }))
+      set_location({})
+    })
+      .catch(ApiHttp.ignoreAbort)
+      .catch(e => {
+        KnownError.is(e)
+      }).catch((e) => {
+        toast(e)
+      })
+    return () => c.abort()
+  }, [session_id])
+
 
   const actived = useMemo(() => games?.find(v => v.id === game_id), [game_id, games])
 
@@ -101,7 +132,7 @@ export default function MainPage() {
 
   const game_list = useMemo(() => {
     return (
-      <Show yes={!!games?.length || sesson_id}>
+      <Show yes={!!games?.length || session_id}>
         <div className={classnames(csses.game_list, csses.scrollview)}>
           {games?.map((v, idx) => {
             const cls_name = (game_id ? game_id === v.id : idx == 0) ? csses.game_item_actived : csses.game_item
@@ -114,7 +145,7 @@ export default function MainPage() {
               </button>
             )
           })}
-          <Show yes={!!sesson_id}>
+          <Show yes={!!session_id}>
             <button className={csses.game_item} onClick={() => {
               set_location({ game: 'yours' });
               set_game_list_open(false)
@@ -125,7 +156,7 @@ export default function MainPage() {
         </div>
       </Show>
     )
-  }, [games, game_id, sesson_id, t, set_location])
+  }, [games, game_id, session_id, t, set_location])
 
   return <>
     <div className={csses.main_page}>
@@ -141,20 +172,21 @@ export default function MainPage() {
         </h1>
         <div className={csses.right_zone}>
           <LangButton whenClick={next => games?.map(v => v.with_lang(next))} />
-          <Show yes={!sesson_id}>
+          <Show yes={!session_id}>
             <Dropdown
               alignX={1}
               anchorX={1}
               menu={{
+                // 没搞懂为什么此处 window.location.toString() 没有立刻变化，故在onClik才获取地址 -Gim
                 items: [{
                   children: t('github_login'),
-                  href: `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`,
-                  title: t('gitee_login')
+                  title: t('gitee_login'), 
+                  onClick: () => document.location = `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
                 },
                 {
                   children: t('gitee_login'),
-                  href: `${API_BASE}user/gitee/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`,
-                  title: t('gitee_login')
+                  title: t('gitee_login'),
+                  onClick: () => document.location = `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
                 }]
               }}>
               <IconButton
@@ -162,13 +194,13 @@ export default function MainPage() {
                 img={img_login} />
             </Dropdown>
           </Show>
-          <Show yes={!!sesson_id}>
+          <Show yes={!!session_id}>
             <IconButton
               title={t('logout')}
               img={img_logout}
-              onClick={() => set_global_value(prev => ({ ...prev, sesson_id: void 0 }))} />
+              onClick={() => set_global_value(prev => ({ ...prev, session_id: '' }))} />
           </Show>
-          <Show yes={!!sesson_id}>
+          <Show yes={!!session_id}>
             <IconButton
               onClick={() => set_ss_open(true)}
               title={t('submit_your_mod')}
@@ -186,19 +218,24 @@ export default function MainPage() {
       </div>
       <div className={csses.main}>
         {game_list}
-        <InfoView
-          info={actived}
-          className={csses.main_right}
-          open={window.innerWidth > 480} />
+        {game_id === 'yours' ?
+          <YoursPage /> :
+          <InfoView
+            info={actived}
+            className={csses.main_right}
+            open={window.innerWidth > 480} />}
+
       </div>
+      {/* 
       <div className={csses.foot}>
-        {/* <a className={styles.link}
+        <a className={styles.link}
           href="https://beian.miit.gov.cn/"
           target="_blank"
           rel="noreferrer">
           粤ICP备2021170807号-1
-        </a> */}
+        </a> 
       </div>
+      */}
     </div >
     <Loading big loading={loading} style={{ position: 'absolute', margin: 'auto auto' }} />
     <Mask
