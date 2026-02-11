@@ -4,7 +4,6 @@ import img_github from "@/assets/svg/github.svg";
 import img_login from "@/assets/svg/login.svg";
 import img_logout from "@/assets/svg/logout.svg";
 import img_menu from "@/assets/svg/menu.svg";
-import img_upload from "@/assets/svg/upload.svg";
 import { Info } from "@/base/Info";
 import { IconButton } from "@/components/button/IconButton";
 import { Loading } from "@/components/loading/LoadingImg";
@@ -22,7 +21,7 @@ import { LocationParams } from "@/utils/LocationParams";
 import classnames from "classnames";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useNavigate } from "react-router";
 import { LangButton } from "../../components/LangButton";
 import { InfoView } from "../info";
 import { YoursPage } from "../yours";
@@ -38,16 +37,13 @@ export default function MainPage() {
   const { t, i18n } = useTranslation()
   const [games, set_games] = useState<Info[]>()
   const [loading, set_loading] = useState(false);
-  const [ss_open, set_ss_open] = useState(false)
   const nav = useNavigate();
-  const location = useLocation();
-  const { game_id } = useParams();
   const { global_value, set_global_value } = useGlobalValue();
   const { session_id } = global_value
-  const { search, hash } = useMemo(() => ({
-    search: LocationParams.parse(location.search.substring(1)),
-    hash: LocationParams.parse(location.hash.substring(1))
-  }), [location])
+  const {
+    search, hash,
+    params: { raw: { game_id } }
+  } = LocationParams.useAll()
 
   const set_location = useCallback((opts: { game?: string }) => {
     const { game } = opts
@@ -103,7 +99,7 @@ export default function MainPage() {
         toast(e)
       })
     return () => c.abort()
-  }, [session_id])
+  }, [session_id, set_global_value, set_location, toast])
 
 
   const actived = useMemo(() => games?.find(v => v.id === game_id), [game_id, games])
@@ -186,7 +182,7 @@ export default function MainPage() {
                 {
                   children: t('gitee_login'),
                   title: t('gitee_login'),
-                  onClick: () => document.location = `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
+                  onClick: () => document.location = `${API_BASE}user/gitee/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
                 }]
               }}>
               <IconButton
@@ -199,12 +195,6 @@ export default function MainPage() {
               title={t('logout')}
               img={img_logout}
               onClick={() => set_global_value(prev => ({ ...prev, session_id: '' }))} />
-          </Show>
-          <Show yes={!!session_id}>
-            <IconButton
-              onClick={() => set_ss_open(true)}
-              title={t('submit_your_mod')}
-              img={img_upload} />
           </Show>
           <IconButton
             href="https://github.com/gimhol/little-fighter-2-WEMAKE"
@@ -224,18 +214,7 @@ export default function MainPage() {
             info={actived}
             className={csses.main_right}
             open={window.innerWidth > 480} />}
-
       </div>
-      {/* 
-      <div className={csses.foot}>
-        <a className={styles.link}
-          href="https://beian.miit.gov.cn/"
-          target="_blank"
-          rel="noreferrer">
-          粤ICP备2021170807号-1
-        </a> 
-      </div>
-      */}
     </div >
     <Loading big loading={loading} style={{ position: 'absolute', margin: 'auto auto' }} />
     <Mask
@@ -246,13 +225,7 @@ export default function MainPage() {
       onClose={() => set_game_list_open(false)}>
       {game_list}
     </Mask>
-    <Mask container={() => document.body} open={ss_open} onClose={() => set_ss_open(false)}>
-      <ModFormView />
-      <IconButton
-        style={{ position: 'absolute', right: 10, top: 10 }}
-        letter='✖︎'
-        onClick={() => set_ss_open(false)} />
-    </Mask>
+
   </>
 }
 

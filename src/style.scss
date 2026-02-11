@@ -1,5 +1,6 @@
 :root {
-  font-family             : system-ui, Avenir, Helvetica, Arial, sans-serif;
+  // font-family             : Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata", "Courier New", monospace;
+  font-family             : Consolas, system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-synthesis          : none;
   text-rendering          : optimizeLegibility;
   -webkit-font-smoothing  : antialiased;
@@ -8,6 +9,7 @@
   --link-color            : rgb(176, 185, 231);
   --link-color-hover      : #FFFFFFFF;
   --txt-color             : #8393e4FF;
+  --input-color           : rgb(176, 185, 231);
   --primary-color         : #10206C;
   --primary-color-hover   : #213492;
   --primary-color-actived : #1b2a75;

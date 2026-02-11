@@ -5,4 +5,5 @@ export interface ToastInfo {
   count?: number;
   badge?: boolean;
   badge_color?: string;
+  type?: string;
 }

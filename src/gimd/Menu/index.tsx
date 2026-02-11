@@ -15,8 +15,7 @@ export interface IMenuProps extends Omit<IMaskProps, 'children'> {
   size?: IButtonProps['size'];
   anchorX?: number,
   anchorY?: number,
-  onXChange?(v: number): void,
-  onYChange?(v: number): void,
+  afterColse?(): void,
 }
 const empty_items: IMenuItem[] = [];
 export default function Menu(props: IMenuProps) {
@@ -27,15 +26,14 @@ export default function Menu(props: IMenuProps) {
     anchorX = 0,
     anchorY = 0,
     open: __open, onChange,
-    x: __x, onXChange,
-    y: __y, onYChange,
+    afterColse,
+    x,
+    y,
     size = 'm',
     ..._p
   } = props;
 
   const [open, set_open] = usePropState(__open, onChange);
-  const [x, set_x] = usePropState(__x, onXChange);
-  const [y, set_y] = usePropState(__y, onYChange);
   const ref_origin = useRef<[number, number]>([anchorX, anchorY]);
   const ref_menu = useRef<HTMLDivElement | null>(null);
   const follow = useCallback(() => {
@@ -54,12 +52,6 @@ export default function Menu(props: IMenuProps) {
     if (onChange) onChange()
     else set_open(false)
   }, void 0, open);
-
-  useEventListener(window, 'pointerdown', e => {
-    set_x(5 + e.pageX)
-    set_y(5 + e.pageY)
-    follow();
-  }, void 0, (__x === void 0 && __y === void 0));
 
   useEffect(() => {
     if (!open) return;
@@ -84,6 +76,7 @@ export default function Menu(props: IMenuProps) {
       clickable={clickable}
       open={open}
       forceRender={forceRender}
+      afterColse={afterColse}
       {..._p}>
 
       <div className={menu_classname} ref={ref_menu}>

@@ -7,6 +7,7 @@ import { ctrl_a_bounding } from "./ctrl_a_bounding";
 export interface IMaskProps extends React.HTMLAttributes<HTMLDivElement> {
   open?: boolean;
   onClose?(): void;
+  afterClose?(): void;
   closeOnMask?: boolean;
   container?: Element | (() => Element);
 }
@@ -14,7 +15,7 @@ let _mask_count = 0;
 export function Mask(props: IMaskProps) {
   const {
     style, open, onClose, className, closeOnMask = true,
-    onClick, onKeyDown, container, ..._p
+    onClick, onKeyDown, afterClose, container, ..._p
   } = props;
   const ref_el = useRef<HTMLDivElement>(null)
   const cls_root = classnames(csses.mask, className)
@@ -33,9 +34,12 @@ export function Mask(props: IMaskProps) {
     }
     document.getElementById('root')!.style.filter = _mask_count ? `blur(${_mask_count * 5}px)` : ''
     if (open) return () => { _mask_count-- };
-    const tid = setTimeout(() => set_gone(true), 1000);
+    const tid = setTimeout(() => {
+      afterClose?.();
+      set_gone(true)
+    }, 1000);
     return () => clearTimeout(tid)
-  }, [open])
+  }, [open, afterClose])
 
   const inner = (
     <div {..._p}

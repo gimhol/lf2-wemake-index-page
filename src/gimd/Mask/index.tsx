@@ -15,6 +15,7 @@ type State = typeof State[keyof typeof State]
 interface IBackgroundProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   open?: boolean;
   onChange?: (open?: boolean) => void;
+  afterColse?(): void;
   closeOnMask?: boolean;
   clickable?: boolean;
   transparent?: boolean;
@@ -31,6 +32,7 @@ function Background(props: IBackgroundProps) {
     children,
     forceRender = false,
     className,
+    afterColse,
     ..._p
   } = props;
   const [status, setStatus] = useState<State>(State.closed)
@@ -54,12 +56,15 @@ function Background(props: IBackgroundProps) {
         case State.closing:
         default: {
           setStatus(State.closing);
-          const tid = window.setTimeout(() => setStatus(State.closed), 250)
+          const tid = window.setTimeout(() => {
+            afterColse?.()
+            setStatus(State.closed)
+          }, 250)
           return () => window.clearTimeout(tid);
         }
       }
     }
-  }, [open, status])
+  }, [afterColse, open, status])
 
   const _className = useMemo(() => classnames(
     styles.mask_bg,

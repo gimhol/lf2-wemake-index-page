@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:l": "vite -- --api=local",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -25,6 +26,7 @@
     "ali-oss": "^6.23.0",
     "classnames": "^2.5.1",
     "current-device": "^0.10.2",
+    "dayjs": "^1.11.19",
     "marked": "^17.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

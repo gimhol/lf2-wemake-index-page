@@ -2,9 +2,9 @@ import classnames from "classnames";
 import { useEffect, useRef, useState, type PropsWithChildren } from "react";
 import { Badge } from "../Badge";
 import { Space } from "../Space";
-import type { ToastInfo } from "./ToastInfo";
+import type { ToastInfo } from "./_ToastInfo";
 import styles from "./index.module.scss";
-import type { IUseToastOpts, IUseToastRet } from "./useToast";
+import type { IUseToastOpts, IUseToastRet } from "./_useToast";
 
 export interface IToastProps {
   info: ToastInfo;
@@ -40,7 +40,7 @@ export function Toast(props: IToastProps) {
   }, [info, onDead])
 
   return (
-    <div ref={eleRef} className={classnames(styles.toast, dead && styles.toast_dead)}>
+    <div ref={eleRef} className={classnames(styles.toast, dead && styles.toast_dead, styles['' + info.type])}>
       <Space _ref={innerRef} size='s' className={styles.toast_inner} align='center'>
         {msg}{info.badge !== false && info.count ? <Badge label={info.count} color={info.badge_color} /> : void 0}
       </Space>
@@ -55,6 +55,10 @@ Toast.show = (_msg: string | ToastInfo): void => void 0
 Toast.Provider = (_props: PropsWithChildren): React.ReactNode => void 0
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-Toast.useToast = (_opts?: IUseToastOpts): IUseToastRet => [() => { }, <></>, () => { },]
+Toast.useToast = (_opts?: IUseToastOpts): IUseToastRet => [
+  Object.assign(() => { }, {
+    success: () => { },
+    error: () => { }
+  }), <></>, () => { },]
 
 

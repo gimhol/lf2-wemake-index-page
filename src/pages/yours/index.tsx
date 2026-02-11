@@ -1,208 +1,295 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import { IconButton } from "@/components/button/IconButton"
+import { Loading } from "@/components/loading/LoadingImg"
 import Toast from "@/gimd/Toast"
-import { context } from "@/GlobalStore/context"
-import { useOSS } from "@/hooks/useOSS"
-import type OSS from "ali-oss"
+import { ApiHttp } from "@/network/ApiHttp"
+import { interrupt_event } from "@/utils/interrupt_event"
 import classnames from "classnames"
-import { useContext, useEffect, useState } from "react"
+import dayjs from "dayjs"
+import { Fragment, useEffect, useRef, useState } from "react"
+import { FileRow } from "./FileRow"
 import csses from "./styles.module.scss"
+import img_create_dir from "@/assets/svg/create_dir.svg"
+import img_create_file from "@/assets/svg/create_file.svg"
+import { Mask } from "@/components/mask"
+import { ModFormView } from "../main/ModFormView"
+interface IFileInfo {
+  id?: number;
+  create_time?: string;
+  modify_time?: string;
+  owner_id?: number;
+  name?: string;
+  deleted?: number;
+  parent?: number;
+  path?: string;
+  type?: string;
+}
 
 export function YoursPage() {
   const [toast, toast_ctx] = Toast.useToast()
-  const { global_value: { user_id, username, nickname } } = useContext(context)
-  const [oss, { dir: root_dir }] = useOSS();
-  const [cur_dir, set_dir] = useState(root_dir);
-  const [prefixes, set_prefixes] = useState<string[]>([]);
-  const [objects, set_objects] = useState<OSS.ObjectMeta[]>([]);
+  const [dirs, set_dirs] = useState<IFileInfo[]>([]);
   const [pending, set_pending] = useState(false);
+  const [files, set_files] = useState<IFileInfo[]>([]);
+  const [new_dir, set_new_dir] = useState(0);
+  const dir: IFileInfo | undefined = dirs.at(dirs.length - 1)
+  const ref_dragging = useRef<IFileInfo | undefined>(void 0);
+  const [dragover, set_dragover] = useState<number | undefined>(void 0);
+  const [, set_editing_mod_form] = useState<IFileInfo | undefined>(void 0)
+  const [mod_form_open, set_mod_form_open] = useState(false)
 
   useEffect(() => {
-    if (!root_dir || !oss) return;
-    let cancelled = false
     set_pending(true)
-    oss.listV2({ prefix: root_dir + '/', delimiter: '/' }).then((r) => {
-      if (cancelled) return;
-      set_dir(root_dir + '/')
-      set_objects(r.objects ?? [])
-      set_prefixes(r.prefixes ?? [])
+    const ab = new AbortController();
+    ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, {}, { signal: ab.signal })
+      .then(r => {
+        if (ab.signal.aborted) return;
+        set_files(r.data ?? [])
+      }).catch(e => {
+        if (ab.signal.aborted) return;
+        toast(e)
+      }).finally(() => {
+        if (ab.signal.aborted) return;
+        set_pending(false)
+      })
+    return () => { ab.abort() }
+  }, [toast])
+
+  const add_dir = (parent: number = 0, type?: string) => {
+    set_pending(true)
+    ApiHttp.post(`${API_BASE}lf2wmods/create`, null, {
+      name: '' + Date.now(), parent, type
+    }).then((r) => {
+      set_new_dir(r.data);
+      return ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, { parent })
+    }).then(r => {
+      set_files(r.data ?? [])
+    }).catch(e => {
+      toast(e)
     }).finally(() => {
-      if (cancelled) return;
       set_pending(false)
     })
-    return () => { cancelled = true }
-  }, [oss, root_dir])
-
-  const on_click_add = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (!oss) return;
-    const now = Date.now()
-    const name = `info.json`
+  }
+  const del_file = (target: IFileInfo) => {
     set_pending(true)
-    oss.put(`${root_dir}/${now}/${name}`, new Blob(["HELLO"], { type: 'application/json; charset=utf-8' }), {
-      mime: "application/json",
-      headers: {
-        "Content-Type": 'application/json',
-        "Content-Disposition": `attachment;filename="${encodeURIComponent(name)}"`,
-        "x-oss-meta-user-id": '' + user_id,
-        "x-oss-meta-username": '' + username,
-        "x-oss-meta-nickname": '' + nickname,
-      }
+    ApiHttp.delete(`${API_BASE}lf2wmods/delete`, { id: target.id }).then((r) => {
+      toast.success(`deleted count: ${r.data}`)
+      return ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, { parent: target.parent })
+    }).then(r => {
+      set_files(r.data ?? [])
+    }).catch(e => {
+      toast(e)
+    }).finally(() => {
+      set_pending(false)
+    })
+  }
+  const open_file = (target: IFileInfo) => {
+    if (target.id === dir?.id) return;
+    if (target.type === 'mod') {
+      set_mod_form_open(true)
+      set_editing_mod_form(target);
+      return
+    }
+
+    set_pending(true)
+    ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, { parent: target.id })
+      .then(r => {
+        set_dirs([...dirs, target])
+        set_files(r.data ?? [])
+      }).catch(e => {
+        toast(e)
+      }).finally(() => {
+        set_pending(false)
+      })
+  }
+  const open_dir = (id?: number) => {
+    if (id === dir?.id) return;
+    set_pending(true)
+    ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, { parent: id })
+      .then(r => {
+        if (!id) {
+          set_dirs([])
+        } else {
+          set_dirs(prev => {
+            const idx = prev.findIndex(v => v.id === id)
+            return prev.slice(0, idx + 1)
+          })
+        }
+        set_files(r.data ?? [])
+      }).catch(e => {
+        toast(e)
+      }).finally(() => {
+        set_pending(false)
+      })
+  }
+  const onDragOver = (e: React.DragEvent, me: IFileInfo) => {
+    if (pending) interrupt_event(e)
+    const dragging = ref_dragging.current
+    if (!dragging || dragging.id == me.id || dragging.parent == me.id) return;
+    interrupt_event(e);
+    set_dragover(me.id);
+  }
+  const onDrop = (e: React.DragEvent, me: IFileInfo) => {
+    if (pending) interrupt_event(e)
+    const dragging = ref_dragging.current
+    if (!dragging || dragging.id == me.id || dragging.parent == me.id) return;
+    interrupt_event(e);
+    set_dragover(void 0);
+    set_pending(true)
+    ApiHttp.post(`${API_BASE}lf2wmods/move`, null, {
+      id: dragging.id,
+      parent: dragover,
     }).then(() => {
-      return oss.listV2({ prefix: cur_dir, delimiter: '/' })
-    }).then((r) => {
-      set_objects(r.objects ?? [])
-      set_prefixes(r.prefixes ?? [])
+      return true
     }).catch(e => {
-      console.warn('e:', e)
       toast(e)
-    }).finally(() => {
-      set_pending(false)
-    })
-  }
-  const on_click_back = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const l = cur_dir.split('/').filter(Boolean)
-    l.pop()
-    open_dir(l.join('/') + '/')
-  }
-  const del_obj = (obj: OSS.ObjectMeta) => {
-    if (!oss) return;
-    set_pending(true)
-    oss.delete(obj.name).then((r) => {
-      if (!r) return;
-      return oss.listV2({ prefix: cur_dir, delimiter: '/' })
+      return false
+    }).then(ok => {
+      if (!ok) return;
+      return ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, { parent: dir?.id })
     }).then(r => {
-      if (!r) return;
-      toast('delete!')
-      set_objects(r.objects ?? [])
-      set_prefixes(r.prefixes ?? [])
+      if (r) set_files(r.data ?? [])
     }).catch(e => {
-      console.warn('e:', e)
       toast(e)
+    }).finally(() => {
+      set_pending(false)
     }).finally(() => {
       set_pending(false)
     })
   }
-  const del_dir = (prefix: string) => {
-    if (!oss) return;
-    set_pending(true)
 
-    oss.listV2({ prefix }).then(r => {
-      if (!r.objects) return void 0
-      const names = r.objects?.map(v => v.name)
-      if (!names?.length) return void 0
-      return oss.deleteMulti(names)
-    }).then((r) => {
-      if (!r) return;
-      toast('delete!')
-      return oss.listV2({ prefix: cur_dir, delimiter: '/' })
-    }).then(r => {
-      if (!r) return;
-      set_objects(r.objects ?? [])
-      set_prefixes(r.prefixes ?? [])
-    }).catch(e => {
-      console.warn('e:', e)
-      toast(e)
-    }).finally(() => {
-      set_pending(false)
-    })
-  }
-  const open_dir = (prefix: string) => {
-    if (!oss) return;
-    set_pending(true)
-    oss.listV2({ prefix, delimiter: '/' }).then((r) => {
-      set_dir(prefix)
-      set_objects(r.objects ?? [])
-      set_prefixes(r.prefixes ?? [])
-    }).finally(() => {
-      set_pending(false)
-    })
-  }
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, alignItems: 'stretch' }}>
+    <div className={csses.mine_page}>
       {toast_ctx}
-      <div style={{ display: 'flex', alignItems: 'stretch' }}>
-        <IconButton letter="←" disabled={pending || cur_dir === root_dir + '/'} onClick={on_click_back} />
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-          {cur_dir.substring(root_dir.length + 1)}
+      <div className={csses.file_list_head}>
+        <IconButton
+          letter="←"
+          disabled={pending || !dirs.length}
+          onClick={e => {
+            interrupt_event(e)
+            open_dir(dir?.parent)
+          }} />
+        <div className={classnames(csses.breadcrumb, csses.noscrollbar)}>
+          <Fragment >
+            <button onClick={(e) => {
+              interrupt_event(e)
+              open_dir()
+            }}>
+              home
+            </button>
+            <div>/</div>
+          </Fragment>
+          {
+            dirs.map((me, idx, arr) => {
+              return (
+                <Fragment key={me.id}>
+                  <button
+                    className={classnames(csses.breadcrumb_item, dragover == me.id ? csses.dragover : void 0)}
+                    disabled={arr.length == idx + 1}
+                    onClick={(e) => {
+                      interrupt_event(e);
+                      open_dir(me.id)
+                    }}
+                    onDragOver={e => onDragOver(e, me)}
+                    onDrop={e => onDrop(e, me)}>
+                    {me.name}
+                  </button>
+                  <div>/</div>
+                </Fragment>
+              )
+            })
+          }
         </div>
-        <IconButton letter="+" disabled={pending} onClick={on_click_add} />
+        <Loading loading={pending} style={{ alignSelf: 'center' }} />
+        <IconButton
+          img={img_create_dir}
+          disabled={pending}
+          onClick={e => {
+            interrupt_event(e)
+            add_dir(dir?.id)
+          }} />
+        <IconButton
+          img={img_create_file}
+          disabled={pending}
+          onClick={e => {
+            interrupt_event(e)
+            add_dir(dir?.id, 'mod')
+          }} />
       </div>
-      <div className={classnames(csses.file_list, csses.scrollview)}>
-        {prefixes.map(v => {
-          return (
-            <FileRow
-              disabled={pending}
-              key={v}
-              icon='📂'
-              name={v.substring(root_dir.length + 1, v.length - 1)}
-              onOpen={() => open_dir(v)}
-              onDel={() => del_dir(v)} />
-          )
-        })}
-        {objects.map(v => {
-          if (v.name === cur_dir) return;
-          return (
-            <FileRow
-              disabled={pending}
-              key={v.name}
-              icon='📄'
-              name={v.name.substring(cur_dir.length)}
-              onOpen={() => { }}
-              onDel={() => del_obj(v)} />
-          )
-        })}
+      <div className={classnames(csses.file_list, csses.scrollview)} draggable={false}>
+        {!pending && !files.length ? <div style={{ margin: 'auto' }}>empty</div> : null}
+        {
+          files.map(me => {
+            return (
+              <FileRow
+                disabled={pending}
+                key={'' + me.id + me.name + me.create_time + me.modify_time}
+                icon={me.type == 'mod' ? '📄' : '📂'}
+                name={me.name}
+                className={classnames(dragover == me.id ? csses.dragover : void 0)}
+                modify_time={me.modify_time ? dayjs(me.modify_time).format('YYYY-MM-DD HH:mm:ss.SSS') : void 0}
+                create_time={me.create_time ? dayjs(me.create_time).format('YYYY-MM-DD HH:mm:ss.SSS') : void 0}
+                renameing={new_dir == me.id}
+                draggable
+                onDragStart={(e) => {
+                  if (pending) interrupt_event(e)
+                  ref_dragging.current = me;
+                }}
+                onDragEnd={(e) => {
+                  if (pending) interrupt_event(e)
+                  ref_dragging.current = void 0;
+                  set_dragover(void 0)
+                }}
+                onDragOver={e => onDragOver(e, me)}
+                onDrop={e => onDrop(e, me)}
+                onNameChanged={async (name) => {
+                  if (name === me.name) {
+                    if (new_dir == me.id && me.type == 'mod') {
+                      set_mod_form_open(true)
+                      set_editing_mod_form(me);
+                    }
+                    set_new_dir(0)
+                    return true;
+                  }
+                  set_pending(true)
+                  const ok = await ApiHttp.post(`${API_BASE}lf2wmods/save`, null, {
+                    id: me.id,
+                    name: name
+                  }).then(() => {
+                    toast.success('done')
+                    me.name = name;
+                    if (new_dir == me.id && me.type == 'mod') {
+                      set_mod_form_open(true)
+                      set_editing_mod_form(me);
+                    }
+                    set_new_dir(0)
+                    return true
+                  }).catch(e => {
+                    set_new_dir(0)
+                    console.log(e)
+                    toast(e)
+                    return false
+                  }).finally(() => {
+                    set_pending(false)
+                  })
+                  return ok;
+                }}
+                onOpen={() => open_file(me)}
+                onDel={() => del_file(me)} />
+            )
+          })}
+        <Mask
+          container={() => document.body}
+          open={mod_form_open}
+          onClose={() => set_mod_form_open(false)}
+          afterClose={() => set_editing_mod_form(void 0)}>
+          <ModFormView />
+          <IconButton
+            style={{ position: 'absolute', right: 10, top: 10 }}
+            letter='✖︎'
+            onClick={() => set_mod_form_open(false)} />
+        </Mask>
       </div>
     </div >
   )
-}
-interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
-  name?: string;
-  onDel?(): void;
-  onOpen?(): void;
-  deletable?: boolean;
-  icon?: string;
-  disabled?: boolean;
-}
-function FileRow(props: IFileRowProps) {
-  const { name, deletable = true, disabled, onOpen, onDel, icon, ..._p } = props
-  return (
-    <div className={classnames(csses.file_raw, disabled ? csses.disbaled : void 0)} {..._p}
-      onDoubleClick={e => {
-        e.stopPropagation();
-        e.preventDefault();
-        if (disabled) return;
-        onOpen?.()
-      }} >
-      <IconButton
-        onClick={(e) => {
-          interrupt(e)
-          if (disabled) return;
-          onOpen?.()
-        }}
-        letter={icon}
-        onDoubleClick={interrupt} />
-      <div className={csses.mid_zone}>
-        {name}
-      </div>
-      <div className={csses.right_zone}>
-        {
-          deletable ?
-            <button
-              onDoubleClick={interrupt}
-              onClick={e => {
-                interrupt(e);
-                if (disabled) return;
-                onDel?.()
-              }}>🗑️</button> : null
-        }
-      </div>
-    </div>
-  )
-}
-const interrupt = (e: React.UIEvent) => {
-  e.stopPropagation(); e.preventDefault()
 }

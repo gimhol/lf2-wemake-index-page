@@ -1,19 +1,49 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import qs from "qs";
 import { useMemo } from "react";
-import { useParams } from "react-router-dom";
+import * as rrd from "react-router-dom";
 
+function useParams() {
+  const params = rrd.useParams();
+  return useMemo(() => new LocationParams(params, params), [params])
+}
+function useAll() {
+  const location = rrd.useLocation();
+  const params = rrd.useParams();
+  return useMemo(() => ({
+    search: LocationParams.parse(location.search),
+    hash: LocationParams.parse(location.hash),
+    params: new LocationParams(params, params),
+  }), [location, params])
+}
+
+type QSParseOpts = qs.IParseOptions<qs.BooleanOptional> & { decoder?: never | undefined }
 export class LocationParams {
-  private map = new Map<string, any>();
-  readonly raw: { [key: string]: unknown; };
-  static parse(...args: Parameters<typeof qs.parse>) { return new LocationParams(qs.parse(...args)) }
-  static useParams() {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const params = useParams();
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useMemo(() => new LocationParams(params), [params])
+  static readonly useParams = useParams
+  static readonly useAll = useAll
+  static parse(src: string, opts?: QSParseOpts) {
+    let type: '#' | '?' | '&' | undefined;
+    let str = src;
+    const letter = src[0]
+    switch (letter) {
+      case '#': case '?': case '&':
+        type = letter;
+        str = src.substring(1);
+        break;
+    }
+    return new LocationParams(src, qs.parse(str, opts), type)
   }
-  private constructor(raw: ReturnType<typeof qs.parse>) { this.raw = raw }
+
+  private readonly map = new Map<string, any>();
+  readonly src: any;
+  readonly raw: { [key: string]: unknown; };
+  readonly type: '#' | '?' | '&' | ''
+
+  constructor(src: any, raw: ReturnType<typeof qs.parse>, type: '#' | '?' | '&' | '' = '') {
+    this.src = src;
+    this.type = type;
+    this.raw = raw;
+  }
   private save_cache<T>(cache_key: string, value: T) {
     this.map.set(cache_key, value);
     return value
@@ -85,6 +115,6 @@ export class LocationParams {
     return qs.stringify(this.raw, { arrayFormat: 'comma', encode: true })
   }
   clone(): LocationParams {
-    return new LocationParams({ ...this.raw })
+    return new LocationParams(this.src, { ...this.raw }, this.type)
   }
 }

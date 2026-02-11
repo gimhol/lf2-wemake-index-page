@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
-import { Toast } from "./Toast";
-import { _useToast } from "./useToast";
+import { Toast } from "./_Toast";
+import { _useToast } from "./_useToast";
 
 export function _Provider(props: PropsWithChildren) {
   const [toast, toastCtx] = _useToast();
