@@ -5,7 +5,7 @@ import { interrupt_event } from "@/utils/interrupt_event"
 import classnames from "classnames"
 import { useState, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
-import csses from "./styles.module.scss"
+import csses from "./FileRow.module.scss"
 
 export interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
   name?: string;
@@ -51,7 +51,7 @@ export function FileRow(props: IFileRowProps) {
         }]
       }}>
       <div
-        className={classnames(csses.file_raw, disabled ? csses.disbaled : void 0, className)}
+        className={classnames(csses.file_list_item, disabled ? csses.disbaled : void 0, className)}
         draggable={draggable && !renaming}
         {..._p}
         onDoubleClick={e => {

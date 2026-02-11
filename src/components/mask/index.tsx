@@ -47,6 +47,7 @@ export function Mask(props: IMaskProps) {
       tabIndex={-1}
       style={sty_root}
       className={cls_root}
+      autoFocus
       onKeyDown={e => {
         if (onKeyDown) return onKeyDown?.(e);
         if (e.key.toLowerCase() === 'escape') {

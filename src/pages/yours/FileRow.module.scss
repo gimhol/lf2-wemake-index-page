@@ -1,0 +1,84 @@
+._transparent_border {
+  border: 1px transparent solid;
+}
+
+._bottom_dash_line {
+  border-bottom-style: dashed;
+  border-bottom-width: 1px;
+  border-bottom-color: var(--divider-color, black);
+}
+
+.file_list_item.dragover {
+  border: 1px solid whitesmoke;
+}
+
+.file_list_item {
+  @extend ._transparent_border;
+  display    : flex;
+  align-items: stretch;
+  cursor     : default;
+  transition : all 200ms;
+  box-sizing : border-box;
+
+  &:not(:last-child) {
+    @extend ._bottom_dash_line;
+  }
+
+  .mid_zone {
+    flex       : 1;
+    align-items: center;
+    overflow   : hidden;
+    width      : 0;
+    color      : var(--input-color, black);
+
+
+    >input {
+      flex               : 1;
+      outline            : none;
+      border             : none;
+      background         : none;
+      color              : var(--input-color, black);
+      border-bottom-color: var(--txt-color, black);
+      border-bottom-style: solid;
+      border-bottom-width: 1px;
+
+      border-top-width: 1px;
+      border-top-color: transparent;
+      border-top-style: solid;
+      border-top-width: 1px;
+
+      padding    : 0px;
+      align-self : stretch;
+      font-size  : 1rem;
+      font-family: inherit;
+      box-sizing : border-box;
+    }
+
+    .file_name {
+      display      : inline-block;
+      flex         : 1;
+      width        : 0;
+      overflow     : hidden;
+      text-overflow: ellipsis;
+      white-space  : pre;
+      word-break   : keep-all;
+      word-wrap    : normal;
+      user-select  : none;
+    }
+
+    .time_view {
+      flex-direction: column;
+      align-items   : flex-end;
+      font-size     : 9px;
+      opacity       : 0.5;
+    }
+  }
+}
+
+.file_list_item:hover:not(.disbaled) {
+  background-color: rgba(255, 255, 255, 0.144);
+}
+
+.file_list_item.disbaled {
+  opacity: 0.5;
+}

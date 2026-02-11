@@ -35,7 +35,7 @@ export function YoursPage() {
   const dir: IFileInfo | undefined = dirs.at(dirs.length - 1)
   const ref_dragging = useRef<IFileInfo | undefined>(void 0);
   const [dragover, set_dragover] = useState<number | undefined>(void 0);
-  const [, set_editing_mod_form] = useState<IFileInfo | undefined>(void 0)
+  const [editing_mod, set_editing_mod] = useState<IFileInfo | undefined>(void 0)
   const [mod_form_open, set_mod_form_open] = useState(false)
 
   useEffect(() => {
@@ -87,7 +87,7 @@ export function YoursPage() {
     if (target.id === dir?.id) return;
     if (target.type === 'mod') {
       set_mod_form_open(true)
-      set_editing_mod_form(target);
+      set_editing_mod(target);
       return
     }
 
@@ -249,7 +249,7 @@ export function YoursPage() {
                   if (name === me.name) {
                     if (new_dir == me.id && me.type == 'mod') {
                       set_mod_form_open(true)
-                      set_editing_mod_form(me);
+                      set_editing_mod(me);
                     }
                     set_new_dir(0)
                     return true;
@@ -263,7 +263,7 @@ export function YoursPage() {
                     me.name = name;
                     if (new_dir == me.id && me.type == 'mod') {
                       set_mod_form_open(true)
-                      set_editing_mod_form(me);
+                      set_editing_mod(me);
                     }
                     set_new_dir(0)
                     return true
@@ -285,8 +285,8 @@ export function YoursPage() {
           container={() => document.body}
           open={mod_form_open}
           onClose={() => set_mod_form_open(false)}
-          afterClose={() => set_editing_mod_form(void 0)}>
-          <ModFormView />
+          afterClose={() => set_editing_mod(void 0)}>
+          <ModFormView mod_id={editing_mod?.id} />
           <IconButton
             style={{ position: 'absolute', right: 10, top: 10 }}
             letter='✖︎'
