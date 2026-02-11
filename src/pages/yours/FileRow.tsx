@@ -25,11 +25,10 @@ export function FileRow(props: IFileRowProps) {
   const { t } = useTranslation()
   const {
     name: __name,
-    deletable = true,
     renameable = true,
     onNameChanged,
     renameing,
-    className,
+    className, draggable,
     disabled, onOpen, onDel, icon, modify_time, create_time, ..._p } = props;
   const [renaming, set_renaming] = useState(renameing);
   const [name, set_name] = useState(__name);
@@ -51,7 +50,10 @@ export function FileRow(props: IFileRowProps) {
           onClick: onDel,
         }]
       }}>
-      <div className={classnames(csses.file_raw, disabled ? csses.disbaled : void 0, className)} {..._p}
+      <div
+        className={classnames(csses.file_raw, disabled ? csses.disbaled : void 0, className)}
+        draggable={draggable && !renaming}
+        {..._p}
         onDoubleClick={e => {
           e.stopPropagation();
           e.preventDefault();
@@ -76,7 +78,15 @@ export function FileRow(props: IFileRowProps) {
                   if (name && !filename_ok(name)) return;
                   set_name(e.target.value)
                 }}
+                draggable={false}
                 autoFocus
+                onMouseDownCapture={e => e.stopPropagation()}
+                onMouseMoveCapture={e => e.stopPropagation()}
+                onMouseUpCapture={e => e.stopPropagation()}
+                onPointerDownCapture={e => e.stopPropagation()}
+                onPointerMoveCapture={e => e.stopPropagation()}
+                onPointerUpCapture={e => e.stopPropagation()}
+                onDoubleClick={e => interrupt_event(e)}
                 onFocus={(e) => e.target.select()}
                 onBlur={() => {
                   const _name = name?.trim().replace(/\.*$/, '') || __name
@@ -113,16 +123,7 @@ export function FileRow(props: IFileRowProps) {
           </div>
         </div>
         <div className={csses.right_zone}>
-          {/* {
-            deletable ?
-              <button
-                onDoubleClick={interrupt_event}
-                onClick={e => {
-                  interrupt_event(e);
-                  if (disabled) return;
-                  onDel?.()
-                }}>🗑️</button> : null
-          } */}
+
         </div>
       </div>
     </Dropdown>

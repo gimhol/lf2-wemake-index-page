@@ -122,17 +122,17 @@ export function YoursPage() {
         set_pending(false)
       })
   }
-  const onDragOver = (e: React.DragEvent, me: IFileInfo) => {
+  const onDragOver = (e: React.DragEvent, me?: IFileInfo) => {
     if (pending) interrupt_event(e)
     const dragging = ref_dragging.current
-    if (!dragging || dragging.id == me.id || dragging.parent == me.id) return;
+    if (!dragging || dragging.id == me?.id || dragging.parent == me?.id) return;
     interrupt_event(e);
-    set_dragover(me.id);
+    set_dragover(me?.id || 0);
   }
-  const onDrop = (e: React.DragEvent, me: IFileInfo) => {
+  const onDrop = (e: React.DragEvent, me?: IFileInfo) => {
     if (pending) interrupt_event(e)
     const dragging = ref_dragging.current
-    if (!dragging || dragging.id == me.id || dragging.parent == me.id) return;
+    if (!dragging || dragging.id == me?.id || dragging.parent == me?.id) return;
     interrupt_event(e);
     set_dragover(void 0);
     set_pending(true)
@@ -174,7 +174,10 @@ export function YoursPage() {
             <button onClick={(e) => {
               interrupt_event(e)
               open_dir()
-            }}>
+            }}
+              className={classnames(csses.breadcrumb_item, dragover == 0 ? csses.dragover : void 0)}
+              onDragOver={e => onDragOver(e)}
+              onDrop={e => onDrop(e)}>
               home
             </button>
             <div>/</div>

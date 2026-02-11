@@ -18,6 +18,7 @@ export class Info {
   static readonly PLAY_IN_BROWSER = 'play_in_browser';
   static readonly DOWNLOAD = 'download';
   readonly parent: Info | null = null;
+  src: string | null;
   raw: any;
   cur: any;
   id: any;
@@ -41,7 +42,8 @@ export class Info {
   private _children?: Info[];
   lang: string;
 
-  constructor(raw: any, lang: string, parent: Info | null = null) {
+  constructor(raw: any, lang: string, parent: Info | null, src: string | null) {
+    this.src = src;
     this.parent = parent;
     this.lang = lang;
     this.raw = raw;
@@ -76,7 +78,7 @@ export class Info {
     return '' + raw;
   }
   with_lang(lang: string): Info {
-    const ret = new Info(this.raw, lang, this.parent);
+    const ret = new Info(this.raw, lang, this.parent, this.src);
     ret.children = this.children?.map(v => v.with_lang(lang));
     return ret;
   }
@@ -132,7 +134,8 @@ export const mod_info_props: Record<keyof Info, InfoProp | undefined> = {
   raw: undefined,
   cur: undefined,
   id: undefined,
-  
+  src: void 0,
+
   title: { type: 'string', },
   author: { type: 'string', },
   author_url: { type: 'string', },

@@ -26,7 +26,6 @@ import { LangButton } from "../../components/LangButton";
 import { InfoView } from "../info";
 import { YoursPage } from "../yours";
 import { fetch_info_list } from "./fetch_info_list";
-import { ModFormView } from "./ModFormView";
 import csses from "./styles.module.scss";
 
 const time_str = Math.floor(Date.now() / 60000);
