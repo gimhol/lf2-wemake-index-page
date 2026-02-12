@@ -16,7 +16,7 @@ export interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
   onDel?(): void;
   onOpen?(): void;
   deletable?: boolean;
-  icon?: string;
+  icon?: ReactNode;
   disabled?: boolean;
   renameing?: boolean;
 
@@ -66,7 +66,7 @@ export function FileRow(props: IFileRowProps) {
             if (disabled) return;
             onOpen?.()
           }}
-          letter={icon}
+          icon={icon}
           onDoubleClick={interrupt_event} />
         <div className={csses.mid_zone}>
           {

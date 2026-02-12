@@ -1,0 +1,28 @@
+.pic_root {
+  position       : relative;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+
+  .fallback {
+    position      : absolute;
+    top           : 50%;
+    left          : 50%;
+    translate     : -50% -50%;
+    pointer-events: none;
+  }
+
+  .loading {
+    transform     : scale(0.8);
+    display       : inline;
+    position      : absolute;
+    top           : 10px;
+    left          : 50%;
+    translate     : -50% -50%;
+    pointer-events: none;
+  }
+
+  .img {
+    display: inline;
+  }
+}

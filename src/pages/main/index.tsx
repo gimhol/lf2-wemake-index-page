@@ -71,7 +71,6 @@ export default function MainPage() {
     if (!session) return;
     set_global_value(prev => ({ ...prev, session_id: session }))
     set_location({})
-
   }, [set_location, search, set_global_value, toast])
 
   useEffect(() => {
@@ -154,7 +153,9 @@ export default function MainPage() {
   }, [games, game_id, session_id, t, set_location])
 
   return <>
-    <div className={csses.main_page}>
+    <div className={csses.main_page}
+      onDragOver={e => { e.stopPropagation(); e.preventDefault() }}
+      onDrop={e => { e.stopPropagation(); e.preventDefault() }}>
       {toast_ctx}
       <div className={csses.head}>
         <IconButton

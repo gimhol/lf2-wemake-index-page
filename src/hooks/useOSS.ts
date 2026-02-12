@@ -5,11 +5,9 @@ import { useContext, useEffect, useMemo } from "react";
 
 export function useOSS() {
   const { global_value: { session_id, sts }, set_global_value } = useContext(context);
-
   useEffect(() => {
     if (!session_id) return;
     const c = new AbortController();
-
     ApiHttp.post(`${API_BASE}lf2wmods/oss_sts`, void 0, void 0, { ...c })
       .then(r => set_global_value(prev => ({ ...prev, sts: r.data })))
       .catch(ApiHttp.ignoreAbort)

@@ -4,14 +4,7 @@ export interface IGlobalValue {
   user_id: number,
   username: string,
   nickname: string,
-  sts: {
-    accessKeyId: string,
-    accessKeySecret: string,
-    expiration: string,
-    securityToken: string
-    bucket: string
-    dir: string
-  }
+  sts: IOSSStsInfo,
 }
 export const create_global_value = (): IGlobalValue => {
   const ret: IGlobalValue = {
@@ -26,7 +19,8 @@ export const create_global_value = (): IGlobalValue => {
       expiration: "",
       securityToken: "",
       bucket: "",
-      dir: ""
+      dir: "",
+      base: ""
     }
   };
   return ret;

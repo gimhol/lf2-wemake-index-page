@@ -26,7 +26,6 @@ export class LoadingImg {
     if (!img) return;
     img.style.objectPosition = "0px 0px";
     img.draggable = false;
-    img.style.left = img.style.right = img.style.top = img.style.bottom = "0";
     img.style.opacity = this._visible ? "1" : "0"
     this.update_img();
   }

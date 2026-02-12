@@ -1,32 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
+import { addModFile } from "@/api/addModFile"
+import { listModFiles, type IFileInfo } from "@/api/listModFiles"
+import img_create_dir from "@/assets/svg/create_dir.svg"
+import img_create_file from "@/assets/svg/create_file.svg"
 import { IconButton } from "@/components/button/IconButton"
 import { Loading } from "@/components/loading/LoadingImg"
+import { Mask } from "@/components/mask"
 import Toast from "@/gimd/Toast"
 import { ApiHttp } from "@/network/ApiHttp"
 import { interrupt_event } from "@/utils/interrupt_event"
-import classnames from "classnames"
+import { default as classnames, default as classNames } from "classnames"
 import dayjs from "dayjs"
 import { Fragment, useEffect, useRef, useState } from "react"
-import { FileRow } from "./FileRow"
-import csses from "./styles.module.scss"
-import img_create_dir from "@/assets/svg/create_dir.svg"
-import img_create_file from "@/assets/svg/create_file.svg"
-import { Mask } from "@/components/mask"
+import Viewer from 'viewerjs'
+import 'viewerjs/dist/viewer.min.css'
 import { ModFormView } from "../main/ModFormView"
-interface IFileInfo {
-  id?: number;
-  create_time?: string;
-  modify_time?: string;
-  owner_id?: number;
-  name?: string;
-  deleted?: number;
-  parent?: number;
-  path?: string;
-  type?: string;
-}
-
-export function YoursPage() {
+import { FileRow } from "./FileRow"
+import { get_icon } from "./get_icon"
+import csses from "./styles.module.scss"
+import { useOSS } from "@/hooks/useOSS"
+import { ossUploadModFiles } from "@/hooks/ossUploadModFiles"
+export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [toast, toast_ctx] = Toast.useToast()
   const [dirs, set_dirs] = useState<IFileInfo[]>([]);
   const [pending, set_pending] = useState(false);
@@ -37,14 +32,19 @@ export function YoursPage() {
   const [dragover, set_dragover] = useState<number | undefined>(void 0);
   const [editing_mod, set_editing_mod] = useState<IFileInfo | undefined>(void 0)
   const [mod_form_open, set_mod_form_open] = useState(false)
+  const ref_root = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref_root.current
+    if (!el) return;
+  }, [])
 
   useEffect(() => {
     set_pending(true)
     const ab = new AbortController();
-    ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, {}, { signal: ab.signal })
+    listModFiles({}, { signal: ab.signal })
       .then(r => {
         if (ab.signal.aborted) return;
-        set_files(r.data ?? [])
+        set_files(r ?? [])
       }).catch(e => {
         if (ab.signal.aborted) return;
         toast(e)
@@ -55,15 +55,13 @@ export function YoursPage() {
     return () => { ab.abort() }
   }, [toast])
 
-  const add_dir = (parent: number = 0, type?: string) => {
+  const add_dir = (parent: number = 0, type?: 'mod') => {
     set_pending(true)
-    ApiHttp.post(`${API_BASE}lf2wmods/create`, null, {
-      name: '' + Date.now(), parent, type
-    }).then((r) => {
-      set_new_dir(r.data);
-      return ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, { parent })
+    addModFile({ name: '' + Date.now(), parent, type }).then((r) => {
+      set_new_dir(r);
+      return listModFiles({ parent })
     }).then(r => {
-      set_files(r.data ?? [])
+      set_files(r ?? [])
     }).catch(e => {
       toast(e)
     }).finally(() => {
@@ -74,92 +72,149 @@ export function YoursPage() {
     set_pending(true)
     ApiHttp.delete(`${API_BASE}lf2wmods/delete`, { id: target.id }).then((r) => {
       toast.success(`deleted count: ${r.data}`)
-      return ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, { parent: target.parent })
+      return listModFiles({ parent: target.parent })
     }).then(r => {
-      set_files(r.data ?? [])
+      set_files(r ?? [])
     }).catch(e => {
       toast(e)
     }).finally(() => {
       set_pending(false)
     })
+  }
+  const open_any = (target: IFileInfo) => {
+    if (target.type == 'mod' || !target.type) {
+      open_dir(target)
+    } else if (target.type === 'file') {
+      open_file(target)
+    } else {
+      alert('failed! type=' + target.type)
+    }
   }
   const open_file = (target: IFileInfo) => {
-    if (target.id === dir?.id) return;
-    if (target.type === 'mod') {
-      set_mod_form_open(true)
-      set_editing_mod(target);
-      return
+    if (target.content_type?.startsWith('image/') && target.url) {
+      const img = document.createElement('img')
+      img.src = target.url;
+      img.width = 10;
+      img.height = 10;
+      new Viewer(img)
+      img.click()
     }
-
-    set_pending(true)
-    ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, { parent: target.id })
-      .then(r => {
-        set_dirs([...dirs, target])
-        set_files(r.data ?? [])
-      }).catch(e => {
-        toast(e)
-      }).finally(() => {
-        set_pending(false)
-      })
   }
-  const open_dir = (id?: number) => {
-    if (id === dir?.id) return;
+  const open_dir = (target?: IFileInfo) => {
     set_pending(true)
-    ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, { parent: id })
+    listModFiles({ parent: target?.id })
       .then(r => {
-        if (!id) {
-          set_dirs([])
-        } else {
-          set_dirs(prev => {
-            const idx = prev.findIndex(v => v.id === id)
-            return prev.slice(0, idx + 1)
-          })
+        set_files(r ?? [])
+        if (!target) {
+          set_dirs([]);
+          return
         }
-        set_files(r.data ?? [])
+        const mine_idx = dirs.findIndex(v => v.id === target.id)
+        if (mine_idx >= 0) {
+          set_dirs(dirs.slice(0, mine_idx + 1));
+          return;
+        }
+        if (target.parent === 0) {
+          set_dirs([target]);
+          return;
+        }
+        const praent_idx = dirs.findIndex(v => v.id === target.parent)
+        if (praent_idx >= 0) {
+          const next = dirs.slice(0, praent_idx + 1)
+          next.push(target)
+          set_dirs(next);
+          return;
+        }
       }).catch(e => {
         toast(e)
       }).finally(() => {
         set_pending(false)
       })
   }
-  const onDragOver = (e: React.DragEvent, me?: IFileInfo) => {
-    if (pending) interrupt_event(e)
+  const onDragOver = (e: React.DragEvent, me: IFileInfo) => {
+    const not_allow = () => { e.stopPropagation() }
+    if (pending || typeof me.id !== 'number') return not_allow();
+    switch (me.type) {
+      case 'dir': case 'mod': case null: case void 0: break
+      default: return not_allow();
+    }
     const dragging = ref_dragging.current
-    if (!dragging || dragging.id == me?.id || dragging.parent == me?.id) return;
-    interrupt_event(e);
-    set_dragover(me?.id || 0);
+    if (dragging) {
+      if (dragging.id == me.id) return not_allow();
+      if (dragging.parent == me.id) return not_allow();
+      set_dragover(me.id);
+      interrupt_event(e);
+      return;
+    }
+    if (e.dataTransfer.types.includes('Files')) {
+      set_dragover(me.id);
+      interrupt_event(e);
+      return;
+    }
+    not_allow()
+    return;
   }
-  const onDrop = (e: React.DragEvent, me?: IFileInfo) => {
-    if (pending) interrupt_event(e)
+  const [oss, sts] = useOSS();
+  const onDrop = (e: React.DragEvent, me: IFileInfo) => {
+    console.log(e.dataTransfer.types.join(','))
+    const not_allow = () => {
+      set_dragover(void 0);
+      e.stopPropagation();
+      e.preventDefault()
+    }
+    if (pending || typeof me.id !== 'number') return not_allow()
     const dragging = ref_dragging.current
-    if (!dragging || dragging.id == me?.id || dragging.parent == me?.id) return;
-    interrupt_event(e);
-    set_dragover(void 0);
-    set_pending(true)
-    ApiHttp.post(`${API_BASE}lf2wmods/move`, null, {
-      id: dragging.id,
-      parent: dragover,
-    }).then(() => {
-      return true
-    }).catch(e => {
-      toast(e)
-      return false
-    }).then(ok => {
-      if (!ok) return;
-      return ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, { parent: dir?.id })
-    }).then(r => {
-      if (r) set_files(r.data ?? [])
-    }).catch(e => {
-      toast(e)
-    }).finally(() => {
-      set_pending(false)
-    }).finally(() => {
-      set_pending(false)
-    })
+    if (dragging) {
+      if (dragging.id == me.id || dragging.parent == me.id)
+        return not_allow();
+      interrupt_event(e);
+      set_dragover(void 0);
+      set_pending(true);
+      ApiHttp.post(`${API_BASE}lf2wmods/move`, null, {
+        id: dragging.id,
+        parent: dragover,
+      }).then(() => {
+        return true
+      }).catch(e => {
+        toast(e)
+        return false
+      }).then(ok => {
+        if (!ok) return;
+        return listModFiles({ parent: dir?.id })
+      }).then(r => {
+        if (r) set_files(r ?? [])
+      }).catch(e => {
+        toast(e)
+      }).finally(() => {
+        set_pending(false)
+      })
+    } else if (e.dataTransfer.types.includes('Files')) {
+      set_dragover(void 0);
+      set_pending(true);
+      ossUploadModFiles({
+        mod_id: me.id,
+        files: Array.from(e.dataTransfer.files),
+        oss,
+        sts
+      }).then(() => {
+        return (dir?.id !== me.id) || (!dir != !me.id)
+      }).catch(e => {
+        toast.error(e)
+        return false
+      }).then(ok => {
+        if (!ok) return
+        return listModFiles({ parent: me.parent })
+      }).then((r) => {
+        if (r) set_files(r)
+      }).catch(e => {
+        toast.error(e)
+      }).finally(() => {
+        set_pending(false)
+      })
+    }
   }
-
   return (
-    <div className={csses.mine_page}>
+    <div {...props} className={classNames(csses.mine_page, props.className)} style={props.style} ref={ref_root} >
       {toast_ctx}
       <div className={csses.file_list_head}>
         <IconButton
@@ -167,7 +222,7 @@ export function YoursPage() {
           disabled={pending || !dirs.length}
           onClick={e => {
             interrupt_event(e)
-            open_dir(dir?.parent)
+            open_dir(dirs[dirs.length - 2])
           }} />
         <div className={classnames(csses.breadcrumb, csses.noscrollbar)}>
           <Fragment >
@@ -176,8 +231,8 @@ export function YoursPage() {
               open_dir()
             }}
               className={classnames(csses.breadcrumb_item, dragover == 0 ? csses.dragover : void 0)}
-              onDragOver={e => onDragOver(e)}
-              onDrop={e => onDrop(e)}>
+              onDragOver={e => onDragOver(e, { id: 0 })}
+              onDrop={e => onDrop(e, { id: 0 })}>
               home
             </button>
             <div>/</div>
@@ -191,7 +246,7 @@ export function YoursPage() {
                     disabled={arr.length == idx + 1}
                     onClick={(e) => {
                       interrupt_event(e);
-                      open_dir(me.id)
+                      open_dir(me)
                     }}
                     onDragOver={e => onDragOver(e, me)}
                     onDrop={e => onDrop(e, me)}>
@@ -227,7 +282,7 @@ export function YoursPage() {
               <FileRow
                 disabled={pending}
                 key={'' + me.id + me.name + me.create_time + me.modify_time}
-                icon={me.type == 'mod' ? '📄' : '📂'}
+                icon={get_icon(me)}
                 name={me.name}
                 className={classnames(dragover == me.id ? csses.dragover : void 0)}
                 modify_time={me.modify_time ? dayjs(me.modify_time).format('YYYY-MM-DD HH:mm:ss.SSS') : void 0}
@@ -277,7 +332,7 @@ export function YoursPage() {
                   })
                   return ok;
                 }}
-                onOpen={() => open_file(me)}
+                onOpen={() => open_any(me)}
                 onDel={() => del_file(me)} />
             )
           })}
@@ -293,6 +348,7 @@ export function YoursPage() {
             onClick={() => set_mod_form_open(false)} />
         </Mask>
       </div>
-    </div >
+    </div>
   )
 }
+

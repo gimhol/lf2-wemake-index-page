@@ -1,19 +1,21 @@
 import { EditorView } from "@/components/markdown/editor/EditorView";
 import Toast from "@/gimd/Toast";
-import { useOSS } from "@/hooks/useOSS";
-import { read_blob_as_md5 } from "@/utils/read_blob_as_md5";
+import { useOSSUploadModImages } from "@/hooks/useOSSUploadModImages";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import csses from "./ModFormView.module.scss";
 export interface IModFormViewProps {
   mod_id?: number;
 }
+
+
+
 export function ModFormView(props: IModFormViewProps) {
   const { mod_id } = props;
   const { t } = useTranslation();
-  const [oss, { dir }] = useOSS();
   const [tab, set_tab] = useState<'base_info' | 'changelog' | 'description'>('base_info');
   const [toast, toast_ctx] = Toast.useToast()
+  const upload_images = useOSSUploadModImages({ mod_id, toast })
   return (
     <div className={csses.mod_form_view}>
       {toast_ctx}
@@ -56,33 +58,13 @@ export function ModFormView(props: IModFormViewProps) {
             </div>
           </div>
           <div className={csses.md_editor} style={{ display: tab === 'description' ? void 0 : 'none' }}>
-            <EditorView placeholder={t("edit_description_here")} />
+            <EditorView
+              uploadImages={upload_images}
+              placeholder={t("edit_description_here")} />
           </div>
           <div className={csses.md_editor} style={{ display: tab === 'changelog' ? void 0 : 'none' }}>
             <EditorView
-              uploadImages={(oss && mod_id) ? async (files) => {
-                const too_large = files.some(v => v.size > 5 * 1024 * 1024)
-                if (too_large) {
-                  const err = new Error('image file size must be <= 5MB')
-                  toast.error(err.message)
-                  return Promise.reject(err)
-                }
-                return Promise.all(files.map(async f => {
-                  const md5 = await read_blob_as_md5(f);
-                  const encoded_name = encodeURIComponent(f.name)
-                  const r = await oss.put(`${dir}/${mod_id}/${md5}`, f, {
-                    mime: "image",
-                    headers: {
-                      "Content-Type": f.type,
-                      'Content-Disposition': `attachment;filename=${encoded_name};filename*=UTF-8''${encoded_name}`
-                    }
-                  });
-                  return {
-                    url: r.url, alt: f.name, title: f.name
-                  };
-                }
-                ))
-              } : void 0}
+              uploadImages={upload_images}
               placeholder={t("edit_changelog_here")} />
           </div>
         </div>
