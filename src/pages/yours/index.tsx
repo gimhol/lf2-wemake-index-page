@@ -392,6 +392,7 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
 
                   set_pending(true)
                   if (oss_name && oss) {
+                    return false;
                     // const response = { 'content-disposition': get_content_disposition(name) }
                     // const ok = await oss.signatureUrl(oss_name, { response }).then(() => {
                     //   return true
