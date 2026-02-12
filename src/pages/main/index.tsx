@@ -155,7 +155,7 @@ export default function MainPage() {
   return <>
     <div className={csses.main_page}
       onDragOver={e => { e.stopPropagation(); e.preventDefault() }}
-      onDrop={e => { e.stopPropagation(); e.preventDefault() }}>
+      onDrop={e => { e.stopPropagation(); e.preventDefault() }} >
       {toast_ctx}
       <div className={csses.head}>
         <IconButton

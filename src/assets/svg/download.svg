@@ -8,7 +8,7 @@
    width="200"
    height="200"
    id="svg1"
-   sodipodi:docname="upload.svg"
+   sodipodi:docname="download.svg"
    inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -35,9 +35,7 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="svg1" />
   <path
-     d="m 864.11895,776.08922 v 88.02973 H 159.88105 V 644.04461 h 88.02973 V 776.08922 H 776.08922 V 644.04461 h 88.02973 z M 556.01487,321.28357 V 688.05948 H 467.98513 V 321.28357 L 306.5826,482.64208 247.91078,423.97026 512,159.88105 776.08922,423.97026 717.4174,482.64208 Z"
-     fill="#ffffff"
-     p-id="4541"
-     id="path1"
-     style="stroke-width:0.687732" />
+     id="path3"
+     style="fill:#ffffff;stroke-width:0.618339"
+     d="M 472.43063,195.40912 V 525.1808 L 327.307,380.10212 274.55684,432.85228 512,670.29544 749.44316,432.85228 696.693,380.10212 551.56937,525.1808 V 195.40912 Z M 195.40912,630.71708 v 197.8738 H 828.59088 V 749.44316 630.71708 H 749.44316 V 749.44316 H 274.55684 V 630.71708 Z" />
 </svg>

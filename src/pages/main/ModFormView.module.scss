@@ -36,8 +36,9 @@
     }
 
     .form_row {
-      display   : flex;
-      box-sizing: border-box;
+      display    : flex;
+      box-sizing : border-box;
+      align-items: center;
 
       &>*:nth-child(1) {
         width: 120px;
@@ -46,6 +47,11 @@
       &>*:nth-child(2) {
         flex: 1;
       }
+    }
+
+    .upload_result {
+      display: flex;
+      gap    : 10px
     }
 
     .base_info {
@@ -91,8 +97,6 @@
     display : flex;
     flex    : 1;
     overflow: hidden;
-
-
 
     .txt_input {
       border          : none;

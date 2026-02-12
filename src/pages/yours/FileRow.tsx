@@ -6,7 +6,8 @@ import classnames from "classnames"
 import { useState, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import csses from "./FileRow.module.scss"
-
+import img_download from "@/assets/svg/download.svg"
+import { open_link } from "@/utils/open_link"
 export interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
   name?: string;
   modify_time?: ReactNode;
@@ -19,7 +20,10 @@ export interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: ReactNode;
   disabled?: boolean;
   renameing?: boolean;
-  size?: ReactNode;
+  desc?: ReactNode;
+  owner?: ReactNode;
+  download?: string;
+  actions?: ReactNode;
 }
 export function FileRow(props: IFileRowProps) {
   const { t } = useTranslation()
@@ -28,7 +32,7 @@ export function FileRow(props: IFileRowProps) {
     renameable = true,
     onNameChanged,
     renameing,
-    className, draggable, size,
+    className, draggable, desc, owner, download, actions,
     disabled, onOpen, onDel, icon, modify_time, create_time, ..._p } = props;
   const [renaming, set_renaming] = useState(renameing);
   const [name, set_name] = useState(__name);
@@ -59,13 +63,11 @@ export function FileRow(props: IFileRowProps) {
           e.preventDefault();
           if (disabled) return;
           onOpen?.()
-        }} >
+        }}>
         <IconButton
-          onClick={(e) => {
-            interrupt_event(e)
-            if (disabled) return;
-            onOpen?.()
-          }}
+          disabled={disabled}
+          className={classnames(csses.icon_btn)}
+          onClick={(e) => { interrupt_event(e); onOpen?.() }}
           icon={icon}
           onDoubleClick={interrupt_event} />
         <div className={csses.mid_zone}>
@@ -117,10 +119,25 @@ export function FileRow(props: IFileRowProps) {
                 {name}
               </div>
           }
-          <div className={csses.time_view}>
-            {size ? <span>size: {size}</span> : 'dir'}
-            <span>create: {create_time}</span>
-            <span>update: {modify_time}</span>
+          {actions}
+          {download ?
+            <IconButton
+              draggable={false}
+              disabled={disabled}
+              img={img_download}
+              title={download}
+              onDragStart={e => interrupt_event(e)}
+              onClick={(e) => { interrupt_event(e); open_link(download) }}
+              onDoubleClick={(e) => { interrupt_event(e); }} /> : null}
+        </div>
+        <div className={csses.right_zone}>
+          <div className={csses.desc_view}>
+            {owner ? <div>{owner}</div> : ''}
+            {desc ? <div>{desc}</div> : ''}
+          </div>
+          <div className={csses.desc_view}>
+            <div>Create: {create_time}</div>
+            <div>Update: {modify_time}</div>
           </div>
         </div>
       </div>

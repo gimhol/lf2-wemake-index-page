@@ -22,7 +22,13 @@ import { ModFormView } from "../main/ModFormView"
 import { FileRow } from "./FileRow"
 import { get_icon } from "./get_icon"
 import csses from "./styles.module.scss"
+import { OwnerName } from "./OwnerName"
+import { VideoModal } from "./VideoModal"
+import img_edit from "@/assets/svg/edit.svg"
+import img_preview from "@/assets/svg/preview.svg"
+import { useTranslation } from "react-i18next"
 export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
+  const { t } = useTranslation()
   const [toast, toast_ctx] = Toast.useToast()
   const [dirs, set_dirs] = useState<IFileInfo[]>([]);
   const [pending, set_pending] = useState(false);
@@ -92,14 +98,31 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       alert('failed! type=' + target.type)
     }
   }
+  const open_image = (target: IFileInfo) => {
+
+    const imgs = files.map(file => {
+      if (!file.content_type?.startsWith('image/')) return;
+      if (!file.url) return;
+      const img = document.createElement('img')
+      img.src = file.url; img.width = 1; img.height = 1;
+      return img
+    }).filter(Boolean) as HTMLImageElement[]
+    const idx = imgs.findIndex(v => v?.src === target.url)
+    const div = document.createElement('div')
+    div.append(...imgs)
+    new Viewer(div)
+    imgs[idx].click()
+  }
+  const edit_mod_info = (target: IFileInfo) => {
+    set_mod_form_open(true)
+    set_editing_mod(target);
+  }
   const open_file = (target: IFileInfo) => {
     if (target.content_type?.startsWith('image/') && target.url) {
-      const img = document.createElement('img')
-      img.src = target.url;
-      img.width = 10;
-      img.height = 10;
-      new Viewer(img)
-      img.click()
+      open_image(target)
+    } else if (target.content_type?.startsWith('video/') && target.url) {
+      set_viewing_video(target.url)
+      set_viewing_video_open(true)
     }
   }
   const open_dir = (target?: IFileInfo) => {
@@ -158,7 +181,6 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   }
   const [oss, sts] = useOSS();
   const onDrop = (e: React.DragEvent, me: IFileInfo) => {
-    console.log(e.dataTransfer.types.join(','))
     const not_allow = () => {
       set_dragover(void 0);
       e.stopPropagation();
@@ -216,9 +238,17 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       })
     }
   }
+  const [viewing_video, set_viewing_video] = useState<string>()
+  const [viewing_video_open, set_viewing_video_open] = useState<boolean>()
   return (
     <div {...props} className={classNames(csses.mine_page, props.className)} style={props.style} ref={ref_root} >
       {toast_ctx}
+      <VideoModal
+        open={!!(viewing_video_open && viewing_video)}
+        src={viewing_video}
+        onClose={() => set_viewing_video_open(void 0)}
+        afterClose={() => set_viewing_video(void 0)} />
+
       <div className={csses.file_list_head}>
         <IconButton
           letter="←"
@@ -229,10 +259,12 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
           }} />
         <div className={classnames(csses.breadcrumb, csses.noscrollbar)}>
           <Fragment >
-            <button onClick={(e) => {
-              interrupt_event(e)
-              open_dir()
-            }}
+            <button
+              title={t('return_to_home_dir')}
+              onClick={(e) => {
+                interrupt_event(e)
+                open_dir()
+              }}
               className={classnames(csses.breadcrumb_item, dragover == 0 ? csses.dragover : void 0)}
               onDragOver={e => onDragOver(e, { id: 0 })}
               onDrop={e => onDrop(e, { id: 0 })}>
@@ -246,6 +278,7 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 <Fragment key={me.id}>
                   <button
                     className={classnames(csses.breadcrumb_item, dragover == me.id ? csses.dragover : void 0)}
+                    title={t('goto_dir_$1').replace('$1', me.name!)}
                     disabled={arr.length == idx + 1}
                     onClick={(e) => {
                       interrupt_event(e);
@@ -265,6 +298,7 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         <IconButton
           img={img_create_dir}
           disabled={pending}
+          title={t("create_dir")}
           onClick={e => {
             interrupt_event(e)
             add_dir(dir?.id)
@@ -272,6 +306,7 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         <IconButton
           img={img_create_file}
           disabled={pending}
+          title={t("create_mod_info")}
           onClick={e => {
             interrupt_event(e)
             add_dir(dir?.id, 'mod')
@@ -292,7 +327,7 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 create_time={me.create_time ? dayjs(me.create_time).format('YYYY-MM-DD HH:mm:ss.SSS') : void 0}
                 renameing={new_dir == me.id}
                 draggable
-                size={me.size ? file_size_txt(me.size) : void 0}
+                desc={me.size ? `Size: ${file_size_txt(me.size)}` : `Type: ${me.type ?? 'dir'}`}
                 onDragStart={(e) => {
                   if (pending) interrupt_event(e)
                   ref_dragging.current = me;
@@ -302,13 +337,32 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                   ref_dragging.current = void 0;
                   set_dragover(void 0)
                 }}
+                owner={<OwnerName owner_id={me.owner_id} />}
+                download={me.type == 'file' ? me.url : void 0}
+                actions={<>
+                  {me.type !== 'mod' ? null :
+                    <IconButton
+                      img={img_edit}
+                      title={t('edit_mod_info')}
+                      disabled={pending}
+                      onClick={(e) => { interrupt_event(e); edit_mod_info(me) }}
+                      onDoubleClick={(e) => { interrupt_event(e) }} />
+                  }
+                  {me.type !== 'mod' ? null :
+                    <IconButton
+                      img={img_preview}
+                      title={t('preview_mod_info')}
+                      disabled={pending}
+                      onClick={(e) => { interrupt_event(e); edit_mod_info(me) }}
+                      onDoubleClick={(e) => { interrupt_event(e) }} />
+                  }
+                </>}
                 onDragOver={e => onDragOver(e, me)}
                 onDrop={e => onDrop(e, me)}
                 onNameChanged={async (name) => {
                   if (name === me.name) {
                     if (new_dir == me.id && me.type == 'mod') {
-                      set_mod_form_open(true)
-                      set_editing_mod(me);
+                      edit_mod_info(me)
                     }
                     set_new_dir(0)
                     return true;
@@ -321,8 +375,7 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                     toast.success('done')
                     me.name = name;
                     if (new_dir == me.id && me.type == 'mod') {
-                      set_mod_form_open(true)
-                      set_editing_mod(me);
+                      edit_mod_info(me)
                     }
                     set_new_dir(0)
                     return true
@@ -364,4 +417,5 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     </div>
   )
 }
+
 
