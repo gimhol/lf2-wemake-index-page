@@ -64,6 +64,18 @@
   display       : flex;
   flex-direction: column;
   overflow      : auto;
+  flex          : 1;
+
+  &:not(:last-child) {
+    @extend ._bottom_dash_line;
+  }
+}
+
+.file_list_foot {
+  display       : flex;
+  flex-direction: column;
+  padding       : 5px;
+  gap           : 5px;
 }
 
 .dragover {

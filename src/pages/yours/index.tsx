@@ -8,7 +8,10 @@ import { IconButton } from "@/components/button/IconButton"
 import { Loading } from "@/components/loading/LoadingImg"
 import { Mask } from "@/components/mask"
 import Toast from "@/gimd/Toast"
+import { ossUploadModFiles } from "@/hooks/ossUploadModFiles"
+import { useOSS } from "@/hooks/useOSS"
 import { ApiHttp } from "@/network/ApiHttp"
+import { file_size_txt } from "@/utils/file_size_txt"
 import { interrupt_event } from "@/utils/interrupt_event"
 import { default as classnames, default as classNames } from "classnames"
 import dayjs from "dayjs"
@@ -19,8 +22,6 @@ import { ModFormView } from "../main/ModFormView"
 import { FileRow } from "./FileRow"
 import { get_icon } from "./get_icon"
 import csses from "./styles.module.scss"
-import { useOSS } from "@/hooks/useOSS"
-import { ossUploadModFiles } from "@/hooks/ossUploadModFiles"
 export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [toast, toast_ctx] = Toast.useToast()
   const [dirs, set_dirs] = useState<IFileInfo[]>([]);
@@ -32,7 +33,8 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [dragover, set_dragover] = useState<number | undefined>(void 0);
   const [editing_mod, set_editing_mod] = useState<IFileInfo | undefined>(void 0)
   const [mod_form_open, set_mod_form_open] = useState(false)
-  const ref_root = useRef<HTMLDivElement>(null)
+  const ref_root = useRef<HTMLDivElement>(null);
+  const [progress, set_progress] = useState<[string, number, number]>()
   useEffect(() => {
     const el = ref_root.current
     if (!el) return;
@@ -195,7 +197,8 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         mod_id: me.id,
         files: Array.from(e.dataTransfer.files),
         oss,
-        sts
+        sts,
+        progress: (progress, info) => set_progress((progress >= 1 || !info) ? void 0 : [info.file.name, progress, info.fileSize])
       }).then(() => {
         return (dir?.id !== me.id) || (!dir != !me.id)
       }).catch(e => {
@@ -348,6 +351,15 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
             onClick={() => set_mod_form_open(false)} />
         </Mask>
       </div>
+      {
+        progress ?
+          <div className={csses.file_list_foot}>
+            <div>uploading: {progress[0]}</div>
+            <div>progress: {(100 * progress[1]).toFixed(2)}%</div>
+            <div>size: {file_size_txt(progress[2])}</div>
+          </div> : null
+      }
+
     </div>
   )
 }

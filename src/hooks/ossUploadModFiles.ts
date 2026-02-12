@@ -1,23 +1,19 @@
 import { addModFile } from "@/api/addModFile";
 import { read_blob_as_md5 } from "@/utils/read_blob_as_md5";
-import type OSS from "ali-oss";
-import { ossUploadFiles } from "./ossUploadFiles";
+import { ossUploadFiles, type IOssUploadImagesOpts } from "./ossUploadFiles";
 
-export interface IOssUploadModFilesOpts {
+export interface IOssUploadModFilesOpts extends Omit<IOssUploadImagesOpts, 'getObjectName'> {
   mod_id?: number;
-  sts?: IOSSStsInfo;
-  oss?: OSS | null;
-  files?: File[];
 }
 export async function ossUploadModFiles(opts: IOssUploadModFilesOpts) {
-  const { mod_id, files, oss, sts } = opts;
-  if (!mod_id) throw new Error('mod_id not set');
+  const { mod_id, ..._p } = opts;
+  if (typeof mod_id !== 'number') throw new Error('mod_id not set');
   const getObjectName = async (f: File, sts: IOSSStsInfo) => {
-    if (!mod_id) throw new Error('mod_id not set')
+    if (typeof mod_id !== 'number') throw new Error('mod_id not set')
     const md5 = await read_blob_as_md5(f);
     return `${sts.dir}/${mod_id}/${md5}`
   }
-  const r = await ossUploadFiles({ oss, sts, files, getObjectName });
+  const r = await ossUploadFiles({ ..._p, getObjectName });
   for (const { file, result } of r.list) {
     await addModFile({
       overwrite: 1,

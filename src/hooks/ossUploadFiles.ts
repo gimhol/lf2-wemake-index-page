@@ -3,7 +3,7 @@ export interface IOSSUploadImagesResult {
   sts: IOSSStsInfo;
   list: {
     file: File;
-    result: OSS.PutObjectResult
+    result: OSS.MultipartUploadResult
   }[]
 }
 
@@ -12,6 +12,7 @@ export interface IOssUploadImagesOpts {
   oss?: OSS | null;
   files?: File[];
   getObjectName?: (file: File, sts: IOSSStsInfo) => Promise<string>;
+  progress?(percentage: number, info: { file: File, fileSize: number } | null): void;
 }
 
 const limits: { [x in string]?: { max_size: number } } = {
@@ -21,10 +22,11 @@ const limits: { [x in string]?: { max_size: number } } = {
   'image/webp': { max_size: 5 * 1024 * 1024 },
   'video/mp4': { max_size: 100 * 1024 * 1024 },
   'application/x-zip-compressed': { max_size: 100 * 1024 * 1024 },
-  'application/zip': { max_size: 100 * 1024 * 1024 }
+  'application/zip': { max_size: 100 * 1024 * 1024 },
+  'application/json': { max_size: 5 * 1024 * 1024 },
 }
 export async function ossUploadFiles(opts: IOssUploadImagesOpts) {
-  const { sts, oss, files, getObjectName } = opts;
+  const { sts, oss, files, getObjectName, progress } = opts;
   if (!sts) return Promise.reject(new Error(`sts got ${sts}`));
   if (!oss) return Promise.reject(new Error(`oss got ${sts}`));
   if (!files?.length) return Promise.reject(new Error(`files.length got ${files?.length}`));
@@ -43,13 +45,16 @@ export async function ossUploadFiles(opts: IOssUploadImagesOpts) {
   for (const file of files) {
     const ename = encodeURIComponent(file.name);
     const ossName = await getObjectName(file, sts);
-    const result = await oss.put(`/${ossName}`, file, {
+    const result = await oss.multipartUpload(`/${ossName}`, file, {
       headers: {
         "Content-Type": file.type,
         'Content-Disposition': `attachment;filename=${ename};filename*=UTF-8''${ename}`
-      }
+      },
+      progress
     });
     ret.list.push({ file, result });
   }
   return ret;
 }
+
+
