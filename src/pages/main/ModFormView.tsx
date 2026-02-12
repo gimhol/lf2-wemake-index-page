@@ -21,7 +21,7 @@ export function ModFormView(props: IModFormViewProps) {
   const [cover_progress, set_cover_progress] = useState<[number, number]>()
   const [data_progress, set_data_progress] = useState<[number, number]>()
   const [cover_upload_result, set_cover_upload_result] = useState<IUploadFileResult[]>([])
-  const [data_upload_result, set_data_upload_result] = useState<IUploadFileResult[]>([])
+  const [, set_data_upload_result] = useState<IUploadFileResult[]>([])
   return (
     <div className={csses.mod_form_view}>
       {toast_ctx}{mod_id}
