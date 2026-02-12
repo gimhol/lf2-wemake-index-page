@@ -16,7 +16,7 @@
           "Support for AI script functionality may be added in future updates, ",
           "and such AI scripts will likely need to be written in TypeScript/JavaScript instead of ActionScript."
         ],
-        "children": "conversion-tool.info-list.json"
+        "children_url": "conversion-tool.info-list.json"
       },
       "zh": {
         "short_title": "转换工具",

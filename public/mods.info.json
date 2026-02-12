@@ -20,7 +20,7 @@
         "Support for AI script functionality may be added in future updates, ",
         "and such AI scripts will likely need to be written in TypeScript/JavaScript instead of ActionScript."
       ],
-      "children": "mods.info-list.json"
+      "children_url": "mods.info-list.json"
     },
     "zh": {
       "short_title": "模组",

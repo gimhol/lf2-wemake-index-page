@@ -13,7 +13,7 @@
         "The original author, Marti Wong, has now launched ['Little Fighter 2 Remastered'](https://lf2.net/). <br>",
         "Please purchase it on [Steam](https://store.steampowered.com/app/3249650) to support the original author.**"
       ],
-      "children": "origin-game.info-list.json"
+      "children_url": "origin-game.info-list.json"
     },
     "zh": {
       "short_title": "原版",

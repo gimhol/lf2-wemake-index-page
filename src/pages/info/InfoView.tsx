@@ -56,7 +56,7 @@ export function InfoView(props: IInfoViewProps) {
   }, [info])
 
   const { t } = useTranslation()
-  const { children_title, date, unavailable, unavailable_reason, desc, desc_url, title, changelog, changelog_url } = info ?? {};
+  const { children_title, date, unavailable, desc, desc_url, title, changelog, changelog_url } = info ?? {};
   const win_x64_url = info?.get_download_url('win_x64')
   const open_in_browser = t('open_in_browser')
   const dl_win_x64 = t('dl_win_x64')
@@ -68,7 +68,7 @@ export function InfoView(props: IInfoViewProps) {
   const cls_root = classnames(csses.info_view_root, className)
   const url = info?.url ?? children?.find(v => v.url)?.url;
   const url_type = info?.url ? info.url_type : children?.find(v => v.url)?.url_type;
-  const tags = unavailable ? [t(unavailable_reason || 'unavailable')] : url_type ? [t(url_type)] : void 0;
+  const tags = unavailable ? [t(unavailable)] : url_type ? [t(url_type)] : void 0;
 
   if (!info) return <>{toast_ctx}</>;
   return (

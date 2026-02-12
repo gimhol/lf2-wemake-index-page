@@ -8,7 +8,7 @@
       "desc": [
         "RN-LF2"
       ],
-      "children": "rn-lf2.info-list.json"
+      "children_url": "rn-lf2.info-list.json"
     },
     "zh": "",
     "zh-hans": "zh",

@@ -10,7 +10,6 @@ import img_publish from "@/assets/svg/publish.svg"
 import img_unpublish from "@/assets/svg/unpublish.svg"
 import { IconButton } from "@/components/button/IconButton"
 import { Loading } from "@/components/loading/LoadingImg"
-import { Mask } from "@/components/mask"
 import Toast from "@/gimd/Toast"
 import { useGlobalValue } from "@/GlobalStore/useGlobalValue"
 import { get_content_disposition } from "@/hooks/ossUploadFiles"
@@ -29,7 +28,7 @@ import Viewer from 'viewerjs'
 import 'viewerjs/dist/viewer.min.css'
 import { FileRow } from "./FileRow"
 import { get_icon } from "./get_icon"
-import { ModFormView } from "./ModFormView"
+import { ModFormModal } from "./ModFormModal"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
 import { VideoModal } from "./VideoModal"
@@ -44,8 +43,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const dir: IFileInfo | undefined = dirs.at(dirs.length - 1)
   const ref_dragging = useRef<IFileInfo | undefined>(void 0);
   const [dragover, set_dragover] = useState<number | undefined>(void 0);
-  const [editing_mod, set_editing_mod] = useState<IFileInfo | undefined>(void 0)
-  const [mod_form_open, set_mod_form_open] = useState(false)
+  const [editing_mod, set_editing_mod] = useState<{ open?: boolean, data?: IFileInfo }>({})
   const ref_root = useRef<HTMLDivElement>(null);
   const [progress, set_progress] = useState<[string, number, number]>()
   const { global_value: { session_id } } = useGlobalValue();
@@ -127,8 +125,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     imgs[idx].click()
   }
   const edit_mod_info = (target: IFileInfo) => {
-    set_mod_form_open(true)
-    set_editing_mod(target);
+    set_editing_mod({ open: true, data: target });
   }
   const open_file = (target: IFileInfo) => {
     if (target.content_type?.startsWith('image/') && target.url) {
@@ -442,17 +439,11 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 onDel={() => del_file(me)} />
             )
           })}
-        <Mask
-          container={() => document.body}
-          open={mod_form_open}
-          onClose={() => set_mod_form_open(false)}
-          afterClose={() => set_editing_mod(void 0)}>
-          <ModFormView mod_id={editing_mod?.id} />
-          <IconButton
-            style={{ position: 'absolute', right: 10, top: 10 }}
-            letter='✖︎'
-            onClick={() => set_mod_form_open(false)} />
-        </Mask>
+        <ModFormModal
+          mod_id={editing_mod?.data?.id}
+          open={editing_mod?.open}
+          onClose={() => set_editing_mod(p => ({ ...p, open: false }))}
+          afterClose={() => set_editing_mod({})} />
       </div>
       {
         progress ?
