@@ -6,6 +6,7 @@ import img_logout from "@/assets/svg/logout.svg";
 import img_menu from "@/assets/svg/menu.svg";
 import { Info } from "@/base/Info";
 import { IconButton } from "@/components/button/IconButton";
+import { LangButton } from "@/components/LangButton";
 import { Loading } from "@/components/loading/LoadingImg";
 import { Mask } from "@/components/mask";
 import { Dropdown } from "@/gimd/Dropdown";
@@ -21,14 +22,13 @@ import { LocationParams } from "@/utils/LocationParams";
 import classnames from "classnames";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
-import { LangButton } from "../../components/LangButton";
-import { InfoView } from "../info";
-import { YoursPage } from "../yours";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import { fetch_info_list } from "./fetch_info_list";
+import { main_context } from "./main_context";
 import csses from "./styles.module.scss";
 
 const time_str = Math.floor(Date.now() / 60000);
+
 export default function MainPage() {
   const [toast, toast_ctx] = Toast.useToast()
   useEffect(() => { submit_visit_event(); })
@@ -43,11 +43,11 @@ export default function MainPage() {
     search, hash,
     params: { raw: { game_id } }
   } = LocationParams.useAll()
-
+  const { pathname } = useLocation()
   const set_location = useCallback((opts: { game?: string }) => {
     const { game } = opts
     const pathname = typeof game === 'string' ?
-      Paths.All.main_page_with.replace(':game_id', game) :
+      Paths.All.info.replace(':game_id', game) :
       void 0;
     const next_search = search.clone();
     next_search.delele('session');
@@ -61,10 +61,11 @@ export default function MainPage() {
   useEffect(() => {
     const session = search.get_string('session')
     if (session) return;
+    if (pathname === Paths.All.yours) return;
     if (!game_id || (!session_id && game_id === 'yours')) {
       set_location({ game: games?.find(v => v)?.id })
     }
-  }, [session_id, search, game_id, set_location, games])
+  }, [session_id, search, game_id, set_location, games, pathname])
 
   useEffect(() => {
     const session = search.get_string('session')
@@ -99,9 +100,7 @@ export default function MainPage() {
     return () => c.abort()
   }, [session_id, set_global_value, set_location, toast])
 
-
   const actived = useMemo(() => games?.find(v => v.id === game_id), [game_id, games])
-
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     set_loading(true)
@@ -208,12 +207,9 @@ export default function MainPage() {
       </div>
       <div className={csses.main}>
         {game_list}
-        {game_id === 'yours' ?
-          <YoursPage /> :
-          <InfoView
-            info={actived}
-            className={csses.main_right}
-            open={window.innerWidth > 480} />}
+        <main_context.Provider value={{ info: actived }}>
+          <Outlet />
+        </main_context.Provider>
       </div>
     </div >
     <Loading big loading={loading} style={{ position: 'absolute', margin: 'auto auto' }} />
@@ -225,7 +221,6 @@ export default function MainPage() {
       onClose={() => set_game_list_open(false)}>
       {game_list}
     </Mask>
-
   </>
 }
 

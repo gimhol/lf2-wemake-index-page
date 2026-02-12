@@ -12,6 +12,7 @@ import { IconButton } from "@/components/button/IconButton"
 import { Loading } from "@/components/loading/LoadingImg"
 import { Mask } from "@/components/mask"
 import Toast from "@/gimd/Toast"
+import { get_content_disposition } from "@/hooks/ossUploadFiles"
 import { ossUploadModFiles } from "@/hooks/ossUploadModFiles"
 import { useOSS } from "@/hooks/useOSS"
 import { ApiHttp } from "@/network/ApiHttp"
@@ -23,14 +24,14 @@ import { Fragment, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import Viewer from 'viewerjs'
 import 'viewerjs/dist/viewer.min.css'
-import { ModFormView } from "../main/ModFormView"
+import { ModFormView } from "./ModFormView"
 import { FileRow } from "./FileRow"
 import { get_icon } from "./get_icon"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
 import { VideoModal } from "./VideoModal"
 
-export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
+export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const { t } = useTranslation()
   const [toast, toast_ctx] = Toast.useToast()
   const [dirs, set_dirs] = useState<IFileInfo[]>([]);
@@ -392,16 +393,19 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
 
                   set_pending(true)
                   if (oss_name && oss) {
-                    return false;
-                    // const response = { 'content-disposition': get_content_disposition(name) }
-                    // const ok = await oss.signatureUrl(oss_name, { response }).then(() => {
-                    //   return true
-                    // }).catch(e => {
-                    //   set_pending(false)
-                    //   toast.error(e)
-                    //   return false
-                    // })
-                    // if (!ok) return ok
+                    const content_disposition = get_content_disposition(name);
+                    console.log('oss_name:', oss_name)
+                    console.log('content_disposition:', content_disposition)
+                    const meta: any = { ['content-disposition']: content_disposition }
+                    const ok = await oss.putMeta(oss_name, meta, {})
+                      .then(() => {
+                        return true
+                      }).catch(e => {
+                        set_pending(false)
+                        toast.error(e)
+                        return false
+                      })
+                    if (!ok) return ok
                   }
 
                   const ok = await ApiHttp.post(`${API_BASE}lf2wmods/save`, null, {

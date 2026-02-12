@@ -1,21 +1,27 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import React from "react"
 import type { RouteObject } from "react-router"
+import { Loading } from "./components/loading/LoadingImg"
 export namespace Paths {
   export enum All {
     _ = '',
-    main_page = '/',
-    main_page_with = '/:game_id'
+    main = '/',
+    yours = '/yours',
+    info = '/:game_id',
   }
   export const Components: Record<All, React.ComponentType | null> = {
     [All._]: null,
-    [All.main_page]: React.lazy(() => import("./pages/main")),
-    [All.main_page_with]: React.lazy(() => import("./pages/main"))
+    [All.main]: React.lazy(() => import("./pages/main")),
+    [All.yours]: React.lazy(() => import("./pages/yours")),
+    [All.info]: React.lazy(() => import("./pages/info")),
   }
   export const Relations: { [x in All]?: All[] } = {
     [All._]: [
-      All.main_page,
-      All.main_page_with
+      All.main
+    ],
+    [All.main]: [
+      All.yours,
+      All.info
     ]
   }
   export const gen_route_obj = (path: All, parent?: All): RouteObject => {
@@ -30,7 +36,7 @@ export namespace Paths {
     const ret: RouteObject = {
       path: str_path,
       element: (
-        <React.Suspense>
+        <React.Suspense fallback={<Loading loading={true} />}>
           <Component />
         </React.Suspense>
       )

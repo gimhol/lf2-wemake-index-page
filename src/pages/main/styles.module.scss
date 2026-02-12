@@ -61,38 +61,7 @@
       }
     }
 
-    .main_right {
-      flex          : 1;
-      display       : flex;
-      flex-direction: column;
-      width         : 0px;
 
-      .game_desc_zone {
-        padding      : 0px var(--title-padding-right);
-        border-bottom: 1px var(--divider-color) dashed;
-
-        .game_title {
-          display      : flex;
-          flex-wrap    : wrap;
-          cursor       : pointer;
-          user-select  : none;
-          margin-bottom: 5px;
-          margin-top   : 5px;
-        }
-
-        .game_desc {
-          font-size: 12px;
-
-          p {
-            margin: 0px;
-          }
-        }
-
-        .btn_span {
-          font-weight: 900
-        }
-      }
-    }
 
   }
 

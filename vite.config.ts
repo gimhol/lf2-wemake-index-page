@@ -37,7 +37,7 @@ export default defineConfig({
     extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx', '.json', '.svg']
   },
   build: {
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1000
   },
   plugins: [
     svgr({ include: "**/*.svg?react" }),
