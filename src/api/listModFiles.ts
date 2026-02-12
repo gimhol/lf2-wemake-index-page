@@ -12,6 +12,7 @@ export interface IFileInfo {
   content_type?: string;
   url?: string;
   size?: number;
+  oss_name?: string;
 }
 
 export interface IListModFilesBody {

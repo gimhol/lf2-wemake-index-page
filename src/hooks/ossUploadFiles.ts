@@ -50,18 +50,21 @@ export async function ossUploadFiles(opts: IOssUploadImagesOpts) {
 
   const ret: IOSSUploadImagesResult = { sts, list: [] };
   for (const file of files) {
-    const ename = encodeURIComponent(file.name);
     const ossName = await getObjectName(file, sts);
     const result = await oss.multipartUpload(`/${ossName}`, file, {
       headers: {
         "Content-Type": file.type,
-        'Content-Disposition': `attachment;filename=${ename};filename*=UTF-8''${ename}`
+        'Content-Disposition': get_content_disposition(file.name)
       },
       progress
     });
     ret.list.push({ file, result });
   }
   return ret;
+}
+export function get_content_disposition(file_name: string) {
+  const ename = encodeURIComponent(file_name);
+  return `attachment;filename=${ename};filename*=UTF-8''${ename}`
 }
 
 

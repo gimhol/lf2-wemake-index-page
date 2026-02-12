@@ -92,7 +92,7 @@ export function FileRow(props: IFileRowProps) {
                 onFocus={(e) => e.target.select()}
                 onBlur={() => {
                   const _name = name?.trim().replace(/\.*$/, '') || __name
-                  if (_name) onNameChanged?.(_name).then(ok => {
+                  if (_name) onNameChanged?.(_name).catch(() => false).then(ok => {
                     if (!ok) set_name(__name)
                   })
                   set_name(_name)

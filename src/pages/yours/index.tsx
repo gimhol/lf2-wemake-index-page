@@ -4,6 +4,10 @@ import { addModFile } from "@/api/addModFile"
 import { listModFiles, type IFileInfo } from "@/api/listModFiles"
 import img_create_dir from "@/assets/svg/create_dir.svg"
 import img_create_file from "@/assets/svg/create_file.svg"
+import img_edit from "@/assets/svg/edit.svg"
+import img_preview from "@/assets/svg/preview.svg"
+import img_publish from "@/assets/svg/publish.svg"
+import img_unpublish from "@/assets/svg/unpublish.svg"
 import { IconButton } from "@/components/button/IconButton"
 import { Loading } from "@/components/loading/LoadingImg"
 import { Mask } from "@/components/mask"
@@ -16,17 +20,16 @@ import { interrupt_event } from "@/utils/interrupt_event"
 import { default as classnames, default as classNames } from "classnames"
 import dayjs from "dayjs"
 import { Fragment, useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import Viewer from 'viewerjs'
 import 'viewerjs/dist/viewer.min.css'
 import { ModFormView } from "../main/ModFormView"
 import { FileRow } from "./FileRow"
 import { get_icon } from "./get_icon"
-import csses from "./styles.module.scss"
 import { OwnerName } from "./OwnerName"
+import csses from "./styles.module.scss"
 import { VideoModal } from "./VideoModal"
-import img_edit from "@/assets/svg/edit.svg"
-import img_preview from "@/assets/svg/preview.svg"
-import { useTranslation } from "react-i18next"
+
 export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const { t } = useTranslation()
   const [toast, toast_ctx] = Toast.useToast()
@@ -356,6 +359,22 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                       onClick={(e) => { interrupt_event(e); edit_mod_info(me) }}
                       onDoubleClick={(e) => { interrupt_event(e) }} />
                   }
+                  {me.type !== 'mod' ? null :
+                    <IconButton
+                      img={img_publish}
+                      title={t('publish')}
+                      disabled={pending}
+                      onClick={(e) => { interrupt_event(e); edit_mod_info(me) }}
+                      onDoubleClick={(e) => { interrupt_event(e) }} />
+                  }
+                  {me.type !== 'mod' ? null :
+                    <IconButton
+                      img={img_unpublish}
+                      title={t('unpublish')}
+                      disabled={pending}
+                      onClick={(e) => { interrupt_event(e); edit_mod_info(me) }}
+                      onDoubleClick={(e) => { interrupt_event(e) }} />
+                  }
                 </>}
                 onDragOver={e => onDragOver(e, me)}
                 onDrop={e => onDrop(e, me)}
@@ -367,7 +386,23 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                     set_new_dir(0)
                     return true;
                   }
+                  const { oss_name } = me;
+                  if (oss_name && !oss)
+                    return false;
+
                   set_pending(true)
+                  if (oss_name && oss) {
+                    // const response = { 'content-disposition': get_content_disposition(name) }
+                    // const ok = await oss.signatureUrl(oss_name, { response }).then(() => {
+                    //   return true
+                    // }).catch(e => {
+                    //   set_pending(false)
+                    //   toast.error(e)
+                    //   return false
+                    // })
+                    // if (!ok) return ok
+                  }
+
                   const ok = await ApiHttp.post(`${API_BASE}lf2wmods/save`, null, {
                     id: me.id,
                     name: name
