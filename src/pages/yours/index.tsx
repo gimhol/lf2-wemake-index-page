@@ -292,6 +292,7 @@ export function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 create_time={me.create_time ? dayjs(me.create_time).format('YYYY-MM-DD HH:mm:ss.SSS') : void 0}
                 renameing={new_dir == me.id}
                 draggable
+                size={me.size ? file_size_txt(me.size) : void 0}
                 onDragStart={(e) => {
                   if (pending) interrupt_event(e)
                   ref_dragging.current = me;

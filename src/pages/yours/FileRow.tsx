@@ -19,7 +19,7 @@ export interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: ReactNode;
   disabled?: boolean;
   renameing?: boolean;
-
+  size?: ReactNode;
 }
 export function FileRow(props: IFileRowProps) {
   const { t } = useTranslation()
@@ -28,7 +28,7 @@ export function FileRow(props: IFileRowProps) {
     renameable = true,
     onNameChanged,
     renameing,
-    className, draggable,
+    className, draggable, size,
     disabled, onOpen, onDel, icon, modify_time, create_time, ..._p } = props;
   const [renaming, set_renaming] = useState(renameing);
   const [name, set_name] = useState(__name);
@@ -118,12 +118,10 @@ export function FileRow(props: IFileRowProps) {
               </div>
           }
           <div className={csses.time_view}>
+            {size ? <span>size: {size}</span> : 'dir'}
             <span>create: {create_time}</span>
             <span>update: {modify_time}</span>
           </div>
-        </div>
-        <div className={csses.right_zone}>
-
         </div>
       </div>
     </Dropdown>

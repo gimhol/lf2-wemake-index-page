@@ -11,6 +11,7 @@ export interface IFileInfo {
   type?: 'dir' | 'mod' | 'file';
   content_type?: string;
   url?: string;
+  size?: number;
 }
 
 export interface IListModFilesBody {
