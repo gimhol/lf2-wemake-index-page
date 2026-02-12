@@ -1,6 +1,7 @@
 import windows_x64 from "@/assets/svg/windows_x64.svg";
 import { Info } from "@/base/Info";
 import { MarkdownButton } from "@/pages/main/MarkdownModal";
+import { submit_click_event } from "@/utils/events";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,7 +12,6 @@ import { Mask } from "../mask";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import { DetailCard } from "./DetailCard";
 import csses from "./InfoCard.module.scss";
-import { submit_click_event } from "@/utils/events";
 
 export interface IInfoCardProps extends ICardBaseProps {
   info: Info
@@ -21,12 +21,12 @@ export function InfoCard(props: IInfoCardProps) {
   const { t } = useTranslation()
   const dl_win_x64 = t('dl_win_x64')
   const { info } = props;
-  const { url, url_type, cover, unavailable } = info;
+  const { url, url_type, cover_url, unavailable } = info;
   const win_x64_url = info.get_download_url('win_x64');
   const ref_el = useRef<HTMLDivElement>(null)
   const [detail_style, set_detail_style] = useState<React.CSSProperties>({})
   const [detail_open, set_detail_open] = useState(false)
-  const title_suffix = unavailable ? t('unavailable') : url_type ? t(url_type) : void 0;
+  const title_suffix = t(unavailable || url_type || '');
   useEffect(() => {
     if (!detail_open) return void 0
     setTimeout(() => set_detail_style({}), 50)
@@ -70,17 +70,17 @@ export function InfoCard(props: IInfoCardProps) {
         </div>
         <div className={csses.info_card_main}>
           {
-            !cover ? null : <img className={classnames(csses.pic_zone)} draggable={false} src={cover} />
+            !cover_url ? null : <img className={classnames(csses.pic_zone)} draggable={false} src={cover_url} />
           }
           {
             !(info.desc || info.desc_url || info.changelog || info.changelog_url) ? null :
-              <div className={classnames(cover ? csses.info_zone_half : csses.info_zone, csses.scrollview)}>
+              <div className={classnames(cover_url ? csses.info_zone_half : csses.info_zone, csses.scrollview)}>
                 <Viewer plain content={info.desc} url={info.desc_url} whenLoaded={v => info.set_desc(v)} />
                 <Viewer plain content={info.changelog} url={info.changelog_url} whenLoaded={v => info.set_changelog(v)} />
               </div>
           }
           {
-            (cover || info.desc || info.desc_url || info.changelog || info.changelog_url) ? null :
+            (cover_url || info.desc || info.desc_url || info.changelog || info.changelog_url) ? null :
               <div className={classnames(csses.no_content)}>{t('no_content')}</div>
           }
         </div>

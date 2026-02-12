@@ -68,7 +68,7 @@ export function InfoView(props: IInfoViewProps) {
   const cls_root = classnames(csses.info_view_root, className)
   const url = info?.url ?? children?.find(v => v.url)?.url;
   const url_type = info?.url ? info.url_type : children?.find(v => v.url)?.url_type;
-  const tags = unavailable ? [t(unavailable)] : url_type ? [t(url_type)] : void 0;
+  const tags = [t(unavailable || url_type || '')].filter(Boolean);
 
   if (!info) return <>{toast_ctx}</>;
   return (
