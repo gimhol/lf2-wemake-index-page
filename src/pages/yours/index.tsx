@@ -12,21 +12,24 @@ import { IconButton } from "@/components/button/IconButton"
 import { Loading } from "@/components/loading/LoadingImg"
 import { Mask } from "@/components/mask"
 import Toast from "@/gimd/Toast"
+import { useGlobalValue } from "@/GlobalStore/useGlobalValue"
 import { get_content_disposition } from "@/hooks/ossUploadFiles"
 import { ossUploadModFiles } from "@/hooks/ossUploadModFiles"
 import { useOSS } from "@/hooks/useOSS"
 import { ApiHttp } from "@/network/ApiHttp"
+import { Paths } from "@/Paths"
 import { file_size_txt } from "@/utils/file_size_txt"
 import { interrupt_event } from "@/utils/interrupt_event"
 import { default as classnames, default as classNames } from "classnames"
 import dayjs from "dayjs"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router"
 import Viewer from 'viewerjs'
 import 'viewerjs/dist/viewer.min.css'
-import { ModFormView } from "./ModFormView"
 import { FileRow } from "./FileRow"
 import { get_icon } from "./get_icon"
+import { ModFormView } from "./ModFormView"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
 import { VideoModal } from "./VideoModal"
@@ -45,6 +48,12 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [mod_form_open, set_mod_form_open] = useState(false)
   const ref_root = useRef<HTMLDivElement>(null);
   const [progress, set_progress] = useState<[string, number, number]>()
+  const { global_value: { session_id } } = useGlobalValue();
+  const nav = useNavigate()
+  useEffect(() => {
+    if (!session_id) nav(Paths.All.main)
+  }, [session_id, nav])
+
   useEffect(() => {
     const el = ref_root.current
     if (!el) return;

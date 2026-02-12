@@ -10,10 +10,12 @@ export interface IMaskProps extends React.HTMLAttributes<HTMLDivElement> {
   afterClose?(): void;
   closeOnMask?: boolean;
   container?: Element | (() => Element);
+  container_blur?: boolean
 }
 let _mask_count = 0;
 export function Mask(props: IMaskProps) {
   const {
+    container_blur = true,
     style, open, onClose, className, closeOnMask = true,
     onClick, onKeyDown, afterClose, container, ..._p
   } = props;
@@ -32,14 +34,15 @@ export function Mask(props: IMaskProps) {
       _mask_count++;
       ref_el.current?.focus();
     }
-    document.getElementById('root')!.style.filter = _mask_count ? `blur(${_mask_count * 5}px)` : ''
+    if (container_blur)
+      document.getElementById('root')!.style.filter = _mask_count ? `blur(${_mask_count * 5}px)` : ''
     if (open) return () => { _mask_count-- };
     const tid = setTimeout(() => {
       afterClose?.();
       set_gone(true)
     }, 1000);
     return () => clearTimeout(tid)
-  }, [open, afterClose])
+  }, [open, afterClose, container_blur])
 
   const inner = (
     <div {..._p}

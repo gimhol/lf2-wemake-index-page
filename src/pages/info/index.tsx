@@ -5,6 +5,7 @@ import csses from "./index.module.scss"
 
 export default function InfoViewPage() {
   const { info } = useContext(main_context)
+  
   return (
     <InfoView
       info={info}
