@@ -37,11 +37,12 @@ import { VideoModal } from "./VideoModal"
 
 export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const { t } = useTranslation()
+  const [oss, sts] = useOSS();
+  const [viewing_video, set_viewing_video] = useState<string>()
+  const [viewing_video_open, set_viewing_video_open] = useState<boolean>()
   const [toast, toast_ctx] = Toast.useToast()
-
   const [path, set_path] = useState<IFileInfo[]>([]);
   const dir: IFileInfo | undefined = path.at(path.length - 1)
-
   const [pending, set_pending] = useState(false);
   const [files, set_files] = useState<IFileInfo[]>([]);
   const [new_dir, set_new_dir] = useState(0);
@@ -50,7 +51,8 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [editing_mod, set_editing_mod] = useState<{ open?: boolean, data?: IFileInfo }>({})
   const ref_root = useRef<HTMLDivElement>(null);
   const [progress, set_progress] = useState<[string, number, number]>()
-  const { value: { session_id } } = useContext(GlobalStore.context);
+  const ctx = useContext(GlobalStore.context);
+  const { value: { session_id } } = ctx;
   const nav = useNavigate();
   const { search } = LocationParams.useAll()
 
@@ -186,7 +188,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     not_allow()
     return;
   }
-  const [oss, sts] = useOSS();
   const onDrop = (e: React.DragEvent, me: IFileInfo) => {
     const not_allow = () => {
       set_dragover(void 0);
@@ -245,8 +246,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       })
     }
   }
-  const [viewing_video, set_viewing_video] = useState<string>()
-  const [viewing_video_open, set_viewing_video_open] = useState<boolean>()
   return (
     <div {...props} className={classNames(csses.mine_page, props.className)} style={props.style} ref={ref_root} >
       {toast_ctx}
@@ -399,6 +398,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                     const content_disposition = get_content_disposition(name);
                     console.log('oss_name:', oss_name)
                     console.log('content_disposition:', content_disposition)
+                    console.log('oss.debugging_options.endpoint:', oss.debugging_options.endpoint)
                     const meta: any = { ['content-disposition']: content_disposition }
                     const ok = await oss.putMeta(oss_name, meta, {})
                       .then(() => {

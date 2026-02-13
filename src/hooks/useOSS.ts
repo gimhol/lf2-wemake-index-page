@@ -6,21 +6,31 @@ import { useContext, useEffect, useMemo } from "react";
 
 export function useOSS() {
   const { value: { session_id, sts }, set_value, dispatch } = useContext(GlobalStore.context);
-  const is_sts_exists = !!sts
+
   useEffect(() => {
-    if (!session_id || is_sts_exists) return;
+    if (!session_id) {
+      console.log('getSTSToken session_id:', session_id)
+      return;
+    }
     const c = new AbortController();
-    getSTSToken({ signal: c.signal })
-      .then(sts => dispatch({ type: 'merge', value: { sts } }))
-      .catch(ApiHttp.ignoreAbort)
-      .catch(ApiHttp.ignore401)
-      .catch(e => console.error(e, e?.cause));
-    return () => c.abort();
-  }, [dispatch, session_id, is_sts_exists]);
+    console.log('getSTSToken')
+    getSTSToken()
+      .then(sts => {
+        console.log('getSTSToken ok, sts:', sts)
+        dispatch({ type: 'merge', value: { sts } })
+      })
+      .catch(e => {
+        console.log('getSTSToken failed:', e)
+        ApiHttp.ignore401(e)
+      });
+    return () => {
+      c.abort(new Error('useEffect leave'))
+    };
+  }, [dispatch, session_id]);
 
   const oss = useMemo(() => {
     if (!sts?.securityToken) return;
-    return new OSS({
+    const options: OSS.Options = {
       endpoint: 'oss-cn-guangzhou.aliyuncs.com',
       region: "oss-cn-guangzhou",
       accessKeyId: sts.accessKeyId,
@@ -37,7 +47,9 @@ export function useOSS() {
         };
       },
       refreshSTSTokenInterval: 300000,
-    })
+    }
+    const oss = new OSS(options);
+    return Object.assign(oss, { debugging_options: options })
   }, [sts, set_value])
 
   return [oss, sts] as const;

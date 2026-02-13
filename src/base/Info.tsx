@@ -6,7 +6,8 @@ export interface InfoProp {
   max?: number;
   placeholder?: 'string'
 }
-interface IInfo {
+export type TInfoType = "cards" | "list"
+export interface IInfo {
   id?: string;
   title?: string;
   short_title?: string;
@@ -19,7 +20,8 @@ interface IInfo {
   children_title?: string;
   children_url?: string;
   children?: IInfo[];
-  i18n?: { [x in string]: IInfo }
+  type?: TInfoType;
+  i18n?: { [x in string]: IInfo };
 }
 export class Info implements IInfo {
   static readonly OPEN_IN_BROWSER = 'open_in_browser';
@@ -76,9 +78,9 @@ export class Info implements IInfo {
   set cover_url(v: string | undefined) { this.set_str('cover_url', v) }
   get cover_url(): string | undefined { return this.get_str('cover_url') }
   set_cover_url(v: string) { this.cover_url = v; return this; }
-  set type(v: string | undefined) { this.set_str('type', v) }
-  get type(): string | undefined { return this.get_str('type') }
-  set_type(v: string) { this.type = v; return this; }
+  set type(v: TInfoType | undefined) { this.set_str<TInfoType>('type', v) }
+  get type(): TInfoType | undefined { return this.get_str<TInfoType>('type') }
+  set_type(v: TInfoType) { this.type = v; return this; }
   set unavailable(v: string | undefined) { this.set_str('unavailable', v) }
   get unavailable(): string | undefined { return this.get_str('unavailable') }
   set_unavailable(v: string) { this.unavailable = v; return this; }
@@ -105,14 +107,14 @@ export class Info implements IInfo {
   get children() { return this._children; }
   set children(v: Info[] | undefined) { this._children = v; }
 
-  private get_str(name: keyof this): string | undefined {
+  private get_str<T extends string = string>(name: keyof this): T | undefined {
     const raw = this.raw.i18n[this.lang][name] || this.raw.i18n[''][name] || this.raw[name];
     if (raw === void 0 || raw === null) return void 0
-    if (typeof raw === 'string') return raw;
-    if (Array.isArray(raw)) return raw.join('\n')
-    return '' + raw;
+    if (typeof raw === 'string') return raw as T;
+    if (Array.isArray(raw)) return raw.join('\n') as T
+    return ('' + raw) as T;
   }
-  private set_str(name: keyof this, v: string | undefined) {
+  private set_str<T extends string = string>(name: keyof this, v: T | undefined) {
     this.raw.i18n[this.lang][name] = v;
   }
   with_lang(lang: string): Info {

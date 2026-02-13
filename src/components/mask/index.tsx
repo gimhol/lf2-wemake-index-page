@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import csses from "./styles.module.scss";
 import { ctrl_a_bounding } from "./ctrl_a_bounding";
+import { useRefNow } from "../../hooks/useRefNow";
 
 export interface IMaskProps extends React.HTMLAttributes<HTMLDivElement> {
   open?: boolean;
@@ -13,6 +14,7 @@ export interface IMaskProps extends React.HTMLAttributes<HTMLDivElement> {
   container_blur?: boolean
 }
 let _mask_count = 0;
+
 export function Mask(props: IMaskProps) {
   const {
     container_blur = true,
@@ -27,6 +29,7 @@ export function Mask(props: IMaskProps) {
     pointerEvents: open ? 'all' : void 0,
   }), [style, open])
 
+  const ref_afterClose = useRefNow(afterClose)
   const [gone, set_gone] = useState(!open);
   useEffect(() => {
     if (open) {
@@ -38,11 +41,11 @@ export function Mask(props: IMaskProps) {
       document.getElementById('root')!.style.filter = _mask_count ? `blur(${_mask_count * 5}px)` : ''
     if (open) return () => { _mask_count-- };
     const tid = setTimeout(() => {
-      afterClose?.();
+      ref_afterClose.current?.();
       set_gone(true)
     }, 1000);
     return () => clearTimeout(tid)
-  }, [open, afterClose, container_blur])
+  }, [open, container_blur, ref_afterClose])
 
   const inner = (
     <div {..._p}

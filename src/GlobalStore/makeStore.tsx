@@ -59,7 +59,6 @@ export function makeStore<V, A extends Action<V>>(opts: {
     const { immediate = false, fallback, children } = props;
     const [ready, set_ready] = useState(!loader)
     const [value, dispatch] = useReducer(inner_reducer, init_value);
-
     useEffect(() => {
       if (!loader) return;
       let cancelled = false
