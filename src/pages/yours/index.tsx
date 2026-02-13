@@ -398,7 +398,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                       disabled={pending}
                       onClick={() => publish(me)} />
                   }
-                  {(me.type !== 'mod' || me.status !== 'published') ? null :
+                  {(me.type !== 'mod' || !me.status) ? null :
                     <IconButton
                       img={img_unpublish}
                       title={t('unpublish_mod')}
@@ -407,6 +407,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                   }
                   {(me.type !== 'mod' || me.status !== 'reviewing') ? null :
                     <IconButton
+                      disabled
                       img={img_reviewing}
                       title={t('mod_reviewing')} />
                   }

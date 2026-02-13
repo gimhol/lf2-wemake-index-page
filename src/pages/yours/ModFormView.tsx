@@ -19,6 +19,21 @@ import { MD5 } from "crypto-js";
 export interface IModFormViewProps {
   mod_id?: number;
 }
+
+
+export interface IGetModFormOpts {
+  mod_id?: number
+}
+// eslint-disable-next-line react-refresh/only-export-components
+export async function getModForm(opts: IGetModFormOpts) {
+  const { mod_id } = opts;
+  if (!mod_id) throw new Error('!')
+  const mods = await listModFiles({ id: mod_id })
+  const mod_info = mods[0];
+  if (!mod_info.owner_id) throw new Error('mod not found!')
+  const user_info = await getUserInfo({ id: mod_info.owner_id })
+  return [mod_info, user_info] as const
+}
 export function ModFormView(props: IModFormViewProps) {
   const { mod_id } = props;
   const { t } = useTranslation();
@@ -116,9 +131,19 @@ export function ModFormView(props: IModFormViewProps) {
       .set_url(available ? names.data_obj_name : void 0)
       .set_unavailable(available ? void 0 : 'unpublish')
 
-    console.log(next.raw)
-    // oss.put(names.info_obj_name)
-    set_loading(false)
+    const json_blob = new Blob([JSON.stringify(next.raw)], { type: 'application/json; charset=utf-8' })
+    oss.put(names.info_obj_path, json_blob).then(() => {
+      console.log(sts.base + names.info_obj_path)
+      return oss.head(names.info_obj_path + '1')
+    }).then(r => {
+      return r
+    }).then(r => {
+      alert(r)
+    }).catch(e => {
+      toast.error(e)
+    }).finally(() => {
+      set_loading(false)
+    })
   }
 
   return (
