@@ -25,6 +25,7 @@ export interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
   download?: string;
   actions?: ReactNode;
   onDetail?(): void;
+  icon_title?: string;
 }
 export function FileRow(props: IFileRowProps) {
   const { t } = useTranslation()
@@ -34,7 +35,7 @@ export function FileRow(props: IFileRowProps) {
     onNameChanged,
     renameing,
     className, draggable, desc, owner, download, actions,
-    disabled, onOpen, onDel, onDetail, icon, modify_time, create_time, ..._p } = props;
+    disabled, onOpen, onDel, onDetail, icon, icon_title, modify_time, create_time, ..._p } = props;
   const [renaming, set_renaming] = useState(renameing);
   const [name, set_name] = useState(__name);
 
@@ -73,6 +74,7 @@ export function FileRow(props: IFileRowProps) {
           disabled={disabled}
           className={classnames(csses.icon_btn)}
           onClick={(e) => { interrupt_event(e); onOpen?.() }}
+          title={icon_title}
           icon={icon}
           onDoubleClick={interrupt_event} />
         <div className={csses.mid_zone}>
@@ -126,7 +128,6 @@ export function FileRow(props: IFileRowProps) {
           }
           <div
             className={csses.action_zone}
-            onDragStart={interrupt_event}
             onClick={interrupt_event}
             onDoubleClick={interrupt_event}>
             {actions}
@@ -142,12 +143,12 @@ export function FileRow(props: IFileRowProps) {
         </div>
         <div className={csses.right_zone}>
           <div className={csses.desc_view}>
-            {owner ? <div>{owner}</div> : ''}
-            {desc ? <div>{desc}</div> : ''}
+            {owner ? <div className={csses.desc_txt}>{owner}</div> : ''}
+            {desc ? <div className={csses.desc_txt}>{desc}</div> : ''}
           </div>
           <div className={csses.desc_view}>
-            <div>Create: {create_time}</div>
-            <div>Update: {modify_time}</div>
+            <div className={csses.desc_txt}>Create: {create_time}</div>
+            <div className={csses.desc_txt}>Update: {modify_time}</div>
           </div>
         </div>
       </div>

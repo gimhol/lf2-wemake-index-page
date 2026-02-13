@@ -86,7 +86,7 @@
       align-items   : flex-end;
       font-size     : 11px;
 
-      &>* {
+      .desc_txt {
         white-space: nowrap;
       }
     }

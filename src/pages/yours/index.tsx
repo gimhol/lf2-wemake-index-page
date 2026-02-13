@@ -24,18 +24,17 @@ import { interrupt_event } from "@/utils/interrupt_event"
 import { LocationParams } from "@/utils/LocationParams"
 import { default as classnames, default as classNames } from "classnames"
 import dayjs from "dayjs"
-import { Fragment, useContext, useEffect, useRef, useState } from "react"
+import { Fragment, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router"
 import Viewer from 'viewerjs'
 import 'viewerjs/dist/viewer.min.css'
 import { FileRow } from "./FileRow"
-import { get_icon } from "./get_icon"
+import { get_icon, get_icon_title } from "./get_icon"
 import { ModFormModal } from "./ModFormModal"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
 import { VideoModal } from "./VideoModal"
-import { Tooltip } from "@/gimd/Tooltip"
 
 export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const { t } = useTranslation()
@@ -44,7 +43,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [viewing_video_open, set_viewing_video_open] = useState<boolean>()
   const [toast, toast_ctx] = Toast.useToast()
   const [path, set_path] = useState<IFileInfo[]>([]);
-  const dir: IFileInfo | undefined = path.at(path.length - 1)
+  const dir: IFileInfo = useMemo(() => path.at(path.length - 1) ?? { id: 0 }, [path])
   const [pending, set_pending] = useState(false);
   const [files, set_files] = useState<IFileInfo[]>([]);
   const [new_dir, set_new_dir] = useState(0);
@@ -220,7 +219,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         return false
       }).then(ok => {
         if (!ok) return;
-        return refresh_files(dir?.id)
+        return refresh_files(dir.id)
       }).catch(e => {
         toast.error(e)
       }).finally(() => {
@@ -236,7 +235,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         sts,
         progress: (progress, info) => set_progress((progress >= 1 || !info) ? void 0 : [info.file.name, progress, info.fileSize])
       }).then(() => {
-        return (dir?.id !== me.id) || (!dir != !me.id)
+        return (dir.id !== me.id) || (!dir != !me.id)
       }).catch(e => {
         toast.error(e)
         return false
@@ -326,7 +325,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
           title={t("create_dir")}
           onClick={e => {
             interrupt_event(e)
-            add_dir(dir?.id)
+            add_dir(dir.id)
           }} />
         <IconButton
           img={img_create_file}
@@ -334,10 +333,14 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
           title={t("create_mod_info")}
           onClick={e => {
             interrupt_event(e)
-            add_dir(dir?.id, 'mod')
+            add_dir(dir.id, 'mod')
           }} />
       </div>
-      <div className={classnames(csses.file_list, csses.scrollview)} draggable={false}>
+      <div
+        className={classnames(csses.file_list, csses.scrollview, dragover == dir.id ? csses.dragover : void 0)}
+        onDragOver={e => onDragOver(e, dir)}
+        onDragLeave={() => set_dragover(void 0)}
+        onDrop={e => onDrop(e, dir)}>
         {!pending && !files.length ? <div style={{ margin: 'auto' }}>empty</div> : null}
         {
           files.map(me => {
@@ -346,6 +349,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 disabled={pending}
                 key={'' + me.id + me.name + me.create_time + me.modify_time}
                 icon={get_icon(me)}
+                icon_title={get_icon_title(me)}
                 name={me.name}
                 className={classnames(dragover == me.id ? csses.dragover : void 0)}
                 modify_time={me.modify_time ? dayjs(me.modify_time).format('YYYY-MM-DD HH:mm:ss.SSS') : void 0}
@@ -353,6 +357,14 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 renameing={new_dir == me.id}
                 draggable
                 desc={me.size ? `Size: ${file_size_txt(me.size)}` : `Type: ${me.type ?? 'dir'}`}
+                onMouseDown={e => {
+                  const el = (e.target as HTMLElement);
+                  if (el.tagName !== 'DIV') {
+                    console.log(el.tagName)
+                    e.stopPropagation()
+                    e.preventDefault()
+                  }
+                }}
                 onDragStart={(e) => {
                   if (pending) interrupt_event(e)
                   ref_dragging.current = me;
@@ -409,24 +421,22 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                     set_new_dir(0)
                     return true;
                   }
-                  const { oss_name } = me;
+                  let { oss_name } = me;
                   if (oss_name && !oss)
                     return false;
                   set_pending(true)
                   if (oss_name && oss) {
+                    if (oss_name.startsWith('/')) oss_name = oss_name.substring(1)
                     const content_disposition = get_content_disposition(name);
-                    console.log('oss_name:', oss_name)
-                    console.log('content_disposition:', content_disposition)
-                    console.log('oss.debugging_options.endpoint:', oss.debugging_options.endpoint)
-                    const meta: any = { ['content-disposition']: content_disposition }
-                    const ok = await oss.putMeta(oss_name, meta, {})
-                      .then(() => {
-                        return true
-                      }).catch(e => {
-                        set_pending(false)
-                        toast.error(e)
-                        return false
-                      })
+                    const ok = await oss.copy(oss_name, oss_name, {
+                      headers: { 'content-disposition': content_disposition }
+                    }).then(() => {
+                      return true
+                    }).catch(e => {
+                      set_pending(false)
+                      toast.error(e)
+                      return false
+                    })
                     if (!ok) return ok
                   }
                   const ok = await ApiHttp.post(`${API_BASE}lf2wmods/save`, null, {
@@ -469,7 +479,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
             <div>size: {file_size_txt(progress[2])}</div>
           </div> : null
       }
-
     </div>
   )
 }

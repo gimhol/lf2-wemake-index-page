@@ -55,12 +55,13 @@
     }
 
     .breadcrumb_item.dragover {
-      background-color: whitesmoke;
+      background-color: rgba(245, 245, 245, 0.219);
     }
   }
 }
 
 .file_list {
+  @extend ._transparent_border;
   display       : flex;
   flex-direction: column;
   overflow      : auto;
@@ -70,6 +71,10 @@
   &:not(:last-child) {
     @extend ._bottom_dash_line;
   }
+}
+
+.file_list.dragover {
+  background-color: rgba(245, 245, 245, 0.219);
 }
 
 .file_list_foot {
