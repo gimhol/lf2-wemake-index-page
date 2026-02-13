@@ -14,7 +14,6 @@ export function CollapseButton(props: ICollapseButtonProps) {
         onClick?.(e);
         __set_open(!__open);
       }}
-      title="fold or unfold"
       style={{ transform: `rotateZ(${__open ? 90 : 0}deg)` }}
       img={img_arr}
       {..._p} />

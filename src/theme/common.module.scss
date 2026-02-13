@@ -38,3 +38,15 @@
     display: none;
   }
 }
+
+
+
+._transparent_border {
+  border: 1px transparent solid;
+}
+
+._bottom_dash_line {
+  border-bottom-style: dashed;
+  border-bottom-width: 1px;
+  border-bottom-color: var(--divider-color, black);
+}

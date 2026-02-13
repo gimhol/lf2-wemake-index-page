@@ -1,26 +1,26 @@
 import gfm from '@bytemd/plugin-gfm';
-// import breaks from '@bytemd/plugin-breaks';
-// import frontmatter from '@bytemd/plugin-frontmatter';
-// import gemoji from '@bytemd/plugin-gemoji';
-// import highlight from '@bytemd/plugin-highlight';
-// import math from '@bytemd/plugin-math';
-// import medium_zoom from '@bytemd/plugin-medium-zoom';
-// import mermaid from '@bytemd/plugin-mermaid';
+import breaks from '@bytemd/plugin-breaks';
+import frontmatter from '@bytemd/plugin-frontmatter';
+import gemoji from '@bytemd/plugin-gemoji';
+import highlight from '@bytemd/plugin-highlight';
+import math from '@bytemd/plugin-math';
+import medium_zoom from '@bytemd/plugin-medium-zoom';
+import mermaid from '@bytemd/plugin-mermaid';
 import { Editor, type EditorProps } from '@bytemd/react';
 import 'bytemd/dist/index.css';
 import { useState } from 'react';
-import "./bytemd.scss"
+import "./bytemd.module.scss";
 
 
 const default_plugins = [
   gfm(),
-  // breaks(),
-  // frontmatter(),
-  // gemoji(),
-  // highlight(),
-  // math(),
-  // medium_zoom(),
-  // mermaid(),
+  breaks(),
+  frontmatter(),
+  gemoji(),
+  highlight(),
+  math(),
+  medium_zoom(),
+  mermaid(),
 ]
 export interface IEditorViewProps extends Omit<EditorProps, 'value'> {
   value?: string;

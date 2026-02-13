@@ -1,0 +1,15 @@
+:global {
+  .bytemd {
+    .bytemd-status-right {
+      >label {
+        display: flex !important;
+      }
+
+      display: flex !important;
+    }
+  }
+
+  .bytemd-fullscreen {
+    z-index: 100;
+  }
+}

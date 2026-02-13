@@ -137,6 +137,13 @@ export class Info implements IInfo {
 
     let text = `# ${this.title}`
     text += '\n\n'
+    if (this.author && this.author_url) {
+      text += `visit [**${this.author}**](${this.author_url})\n\n`
+    } else if (this.author) {
+      text += `by **${this.author}**\n\n`
+    } else if (this.author_url) {
+      text += `visit [author](${this.author_url})\n\n`
+    }
     text += `[中文](CHANGELOG.MD) | [English](CHANGELOG.EN.MD)`
     text += '\n\n'
     text += await this.fetch_desc().then(r => r ? `${r}\n\n` : '')
