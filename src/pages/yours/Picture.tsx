@@ -1,4 +1,4 @@
-import { Loading } from "@/components/loading/LoadingImg";
+import { Loading } from "@/components/loading";
 import cns from "classnames";
 import { useState } from "react";
 import csses from "./Picture.module.scss";

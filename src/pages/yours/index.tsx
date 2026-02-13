@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { addModFile } from "@/api/addModFile"
 import { listModFiles, type IFileInfo } from "@/api/listModFiles"
+import { listModPath } from "@/api/listModPath"
 import img_create_dir from "@/assets/svg/create_dir.svg"
 import img_create_file from "@/assets/svg/create_file.svg"
 import img_edit from "@/assets/svg/edit.svg"
@@ -9,9 +10,9 @@ import img_preview from "@/assets/svg/preview.svg"
 import img_publish from "@/assets/svg/publish.svg"
 import img_unpublish from "@/assets/svg/unpublish.svg"
 import { IconButton } from "@/components/button/IconButton"
-import { Loading } from "@/components/loading/LoadingImg"
+import { Loading } from "@/components/loading"
 import Toast from "@/gimd/Toast"
-import { useGlobalValue } from "@/GlobalStore/useGlobalValue"
+import GlobalStore from "@/GlobalStore"
 import { get_content_disposition } from "@/hooks/ossUploadFiles"
 import { ossUploadModFiles } from "@/hooks/ossUploadModFiles"
 import { useOSS } from "@/hooks/useOSS"
@@ -19,9 +20,10 @@ import { ApiHttp } from "@/network/ApiHttp"
 import { Paths } from "@/Paths"
 import { file_size_txt } from "@/utils/file_size_txt"
 import { interrupt_event } from "@/utils/interrupt_event"
+import { LocationParams } from "@/utils/LocationParams"
 import { default as classnames, default as classNames } from "classnames"
 import dayjs from "dayjs"
-import { Fragment, useEffect, useRef, useState } from "react"
+import { Fragment, useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router"
 import Viewer from 'viewerjs'
@@ -36,43 +38,60 @@ import { VideoModal } from "./VideoModal"
 export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const { t } = useTranslation()
   const [toast, toast_ctx] = Toast.useToast()
-  const [dirs, set_dirs] = useState<IFileInfo[]>([]);
+
+  const [path, set_path] = useState<IFileInfo[]>([]);
+  const dir: IFileInfo | undefined = path.at(path.length - 1)
+
   const [pending, set_pending] = useState(false);
   const [files, set_files] = useState<IFileInfo[]>([]);
   const [new_dir, set_new_dir] = useState(0);
-  const dir: IFileInfo | undefined = dirs.at(dirs.length - 1)
   const ref_dragging = useRef<IFileInfo | undefined>(void 0);
   const [dragover, set_dragover] = useState<number | undefined>(void 0);
   const [editing_mod, set_editing_mod] = useState<{ open?: boolean, data?: IFileInfo }>({})
   const ref_root = useRef<HTMLDivElement>(null);
   const [progress, set_progress] = useState<[string, number, number]>()
-  const { global_value: { session_id } } = useGlobalValue();
-  const nav = useNavigate()
-  useEffect(() => {
-    if (!session_id) nav(Paths.All.main)
-  }, [session_id, nav])
+  const { value: { session_id } } = useContext(GlobalStore.context);
+  const nav = useNavigate();
+  const { search } = LocationParams.useAll()
 
   useEffect(() => {
-    const el = ref_root.current
-    if (!el) return;
-  }, [])
-
-  useEffect(() => {
-    set_pending(true)
+    const path = search.get_numbers('path') ?? []
     const ab = new AbortController();
-    listModFiles({}, { signal: ab.signal })
-      .then(r => {
+    set_pending(true)
+    if (!path.length) {
+      listModFiles({ parent: 0 }, { signal: ab.signal }).then(r => {
         if (ab.signal.aborted) return;
+        set_path([])
         set_files(r ?? [])
-      }).catch(e => {
-        if (ab.signal.aborted) return;
-        toast(e)
       }).finally(() => {
         if (ab.signal.aborted) return;
         set_pending(false)
       })
-    return () => { ab.abort() }
-  }, [toast])
+      return () => ab.abort()
+    }
+    listModPath({ path }, { signal: ab.signal }).then(r => {
+      if (ab.signal.aborted) return;
+      set_path(r)
+      return listModFiles({ parent: r[r.length - 1].id }, { signal: ab.signal })
+    }).catch(e => {
+      if (ab.signal.aborted) return;
+      toast.error(e);
+      nav({ search: search.clone().delele('path').to_query() })
+    }).then(r => {
+      if (ab.signal.aborted) return;
+      set_files(r ?? [])
+    }).finally(() => {
+      if (ab.signal.aborted) return;
+      set_pending(false)
+    })
+
+
+    return () => ab.abort()
+  }, [nav, search, toast])
+
+  useEffect(() => {
+    if (!session_id) nav(Paths.All.main)
+  }, [session_id, nav])
 
   const add_dir = (parent: number = 0, type?: 'mod') => {
     set_pending(true)
@@ -110,7 +129,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     }
   }
   const open_image = (target: IFileInfo) => {
-
     const imgs = files.map(file => {
       if (!file.content_type?.startsWith('image/')) return;
       if (!file.url) return;
@@ -136,36 +154,15 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     }
   }
   const open_dir = (target?: IFileInfo) => {
-    set_pending(true)
-    listModFiles({ parent: target?.id })
-      .then(r => {
-        set_files(r ?? [])
-        if (!target) {
-          set_dirs([]);
-          return
-        }
-        const mine_idx = dirs.findIndex(v => v.id === target.id)
-        if (mine_idx >= 0) {
-          set_dirs(dirs.slice(0, mine_idx + 1));
-          return;
-        }
-        if (target.parent === 0) {
-          set_dirs([target]);
-          return;
-        }
-        const praent_idx = dirs.findIndex(v => v.id === target.parent)
-        if (praent_idx >= 0) {
-          const next = dirs.slice(0, praent_idx + 1)
-          next.push(target)
-          set_dirs(next);
-          return;
-        }
-      }).catch(e => {
-        toast(e)
-      }).finally(() => {
-        set_pending(false)
-      })
+    if (!target) {
+      const s = search.clone().delele('path').to_query()
+      return nav({ search: s });
+    }
+    const path = [target.path, target.id].filter(Boolean).join()
+    const s = search.clone().set('path', path).to_query();
+    nav({ search: s })
   }
+
   const onDragOver = (e: React.DragEvent, me: IFileInfo) => {
     const not_allow = () => { e.stopPropagation() }
     if (pending || typeof me.id !== 'number') return not_allow();
@@ -262,10 +259,10 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       <div className={csses.file_list_head}>
         <IconButton
           letter="←"
-          disabled={pending || !dirs.length}
+          disabled={pending || !path.length}
           onClick={e => {
             interrupt_event(e)
-            open_dir(dirs[dirs.length - 2])
+            open_dir(path[path.length - 2])
           }} />
         <div className={classnames(csses.breadcrumb, csses.noscrollbar)}>
           <Fragment >
@@ -283,7 +280,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
             <div>/</div>
           </Fragment>
           {
-            dirs.map((me, idx, arr) => {
+            path.map((me, idx, arr) => {
               return (
                 <Fragment key={me.id}>
                   <button

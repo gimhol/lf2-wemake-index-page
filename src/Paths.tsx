@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import React from "react"
 import type { RouteObject } from "react-router"
-import { Loading } from "./components/loading/LoadingImg"
+import { Loading } from "./components/loading"
 export namespace Paths {
   export enum All {
     _ = '',

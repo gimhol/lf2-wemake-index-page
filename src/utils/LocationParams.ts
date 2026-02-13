@@ -58,9 +58,15 @@ export class LocationParams {
     }
     return nums;
   }
-  delele(key: string): void {
+  set(key: string, value: string): this {
     this.map.clear();
-    delete this.raw[key];
+    this.raw[key] = value;
+    return this
+  }
+  delele(...keys: string[]): this {
+    this.map.clear();
+    for (const k of keys) delete this.raw[k];
+    return this
   }
   get_string(key: string): string | undefined;
   get_string(key: string, fallback: string): string;

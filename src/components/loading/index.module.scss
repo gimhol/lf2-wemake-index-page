@@ -20,3 +20,21 @@
   height        : 21px;
   pointer-events: none;
 }
+
+.fixed {
+  position : fixed;
+  top      : 50%;
+  left     : 50%;
+  transform: translate(-50%, -50%);
+}
+
+.absolute {
+  position : absolute;
+  top      : 50%;
+  left     : 50%;
+  transform: translate(-50%, -50%);
+}
+
+.center {
+  align-self: center;
+}

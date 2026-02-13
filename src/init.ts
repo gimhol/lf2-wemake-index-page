@@ -1,6 +1,5 @@
 import 'current-device';
-import { GlobalValue } from "./GlobalStore";
-import { create_global_value } from './GlobalStore/IGlobalValue';
+import { GlobalStore } from "./GlobalStore";
 import './i18n';
 import { ApiHttp } from "./network/ApiHttp";
 import * as Compat from "./network/Compat";
@@ -26,7 +25,7 @@ ApiHttp.addRequestInterceptor((url, opts) => {
   if (url.startsWith(API_BASE)) {
     const headers = opts.headers || {}
     if (!Compat.Header.has(headers, "Authorization"))
-      Compat.Header.set(headers, "Authorization", GlobalValue.current.global_value.session_id)
+      Compat.Header.set(headers, "Authorization", GlobalStore.store.value.session_id)
     if (!Compat.Header.has(headers, "Content-Type"))
       Compat.Header.set(headers, "Content-Type", "application/json;charset=UTF-8")
     opts.headers = headers;
@@ -36,7 +35,7 @@ ApiHttp.addRequestInterceptor((url, opts) => {
 
 ApiHttp.addErrorInterceptor((e: Error) => {
   if (KnownError.is(e) && e.http_status === 401) {
-    GlobalValue.current.set_global_value(create_global_value())
+    GlobalStore.reset()
   }
   return e
 })

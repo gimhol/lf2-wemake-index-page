@@ -2,7 +2,7 @@
 import img_markdown from "@/assets/svg/markdown.svg";
 import type { Info } from "@/base/Info";
 import { IconButton } from "@/components/button/IconButton";
-import { Loading } from "@/components/loading/LoadingImg";
+import { Loading } from "@/components/loading";
 import { type IMaskProps, Mask } from "@/components/mask";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";

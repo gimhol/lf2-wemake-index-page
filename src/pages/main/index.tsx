@@ -7,12 +7,12 @@ import img_menu from "@/assets/svg/menu.svg";
 import { Info } from "@/base/Info";
 import { IconButton } from "@/components/button/IconButton";
 import { LangButton } from "@/components/LangButton";
-import { Loading } from "@/components/loading/LoadingImg";
+import { Loading } from "@/components/loading";
 import { Mask } from "@/components/mask";
 import { Dropdown } from "@/gimd/Dropdown";
 import Show from "@/gimd/Show";
 import Toast from "@/gimd/Toast";
-import { useGlobalValue } from "@/GlobalStore/useGlobalValue";
+import GlobalStore from "@/GlobalStore";
 import { useMovingBg } from "@/hooks/useMovingBg";
 import { ApiHttp } from "@/network/ApiHttp";
 import * as KnownError from "@/network/KnownError";
@@ -20,7 +20,7 @@ import { Paths } from "@/Paths";
 import { submit_visit_event } from "@/utils/events";
 import { LocationParams } from "@/utils/LocationParams";
 import classnames from "classnames";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { fetch_info_list } from "./fetch_info_list";
@@ -37,7 +37,7 @@ export default function MainPage() {
   const [games, set_games] = useState<Info[]>()
   const [loading, set_loading] = useState(false);
   const nav = useNavigate();
-  const { global_value, set_global_value } = useGlobalValue();
+  const { value: global_value, dispatch } = useContext(GlobalStore.context);
   const { session_id } = global_value
   const {
     search, hash,
@@ -70,9 +70,9 @@ export default function MainPage() {
   useEffect(() => {
     const session = search.get_string('session')
     if (!session) return;
-    set_global_value(prev => ({ ...prev, session_id: session }))
+    dispatch({ type: 'merge', value: { session_id: session } })
     set_location({})
-  }, [set_location, search, set_global_value, toast])
+  }, [set_location, search, dispatch, toast])
 
   useEffect(() => {
     const c = new AbortController()
@@ -81,14 +81,15 @@ export default function MainPage() {
       signal: c.signal
     }).then(r => {
       if (c.signal.aborted) return;
-      set_global_value(prev => ({
-        ...prev,
-        session_id: session_id,
-        admin: r.data.admin,
-        user_id: r.data.id,
-        username: r.data.username,
-        nickname: r.data.nickname,
-      }))
+      dispatch({
+        type: 'merge', value: {
+          session_id: session_id,
+          admin: r.data.admin,
+          user_id: r.data.id,
+          username: r.data.username,
+          nickname: r.data.nickname,
+        }
+      })
       set_location({})
     })
       .catch(ApiHttp.ignoreAbort)
@@ -98,7 +99,7 @@ export default function MainPage() {
         toast(e)
       })
     return () => c.abort()
-  }, [session_id, set_global_value, set_location, toast])
+  }, [session_id, dispatch, set_location, toast])
 
   const actived = useMemo(() => games?.find(v => v.id === game_id), [game_id, games])
   useEffect(() => {
@@ -112,8 +113,7 @@ export default function MainPage() {
         set_games(list)
       }).catch(e => {
         if (ab.signal.aborted) return;
-        console.warn(e)
-        toast({ id: '' + e, msg: '' + e })
+        toast.error(e)
       }).finally(() => {
         if (ab.signal.aborted) return;
         set_loading(false)
@@ -125,31 +125,30 @@ export default function MainPage() {
 
   const game_list = useMemo(() => {
     return (
-      <Show yes={!!games?.length || session_id}>
-        <div className={classnames(csses.game_list, csses.scrollview)}>
-          {games?.map((v, idx) => {
-            const cls_name = (game_id ? game_id === v.id : idx == 0) ? csses.game_item_actived : csses.game_item
-            return (
-              <button className={cls_name} key={v.id} onClick={() => {
-                set_location({ game: v.id });
-                set_game_list_open(false)
-              }}>
-                {v.short_title}
-              </button>
-            )
-          })}
-          <Show yes={!!session_id}>
-            <button className={csses.game_item} onClick={() => {
-              set_location({ game: 'yours' });
+      <div className={classnames(csses.game_list, csses.scrollview)}>
+        <Show yes={!!session_id}>
+          <button className={pathname === Paths.All.yours ? csses.game_item_actived : csses.game_item} onClick={() => {
+            set_location({ game: 'yours' });
+            set_game_list_open(false)
+          }}>
+            {t('your_works')}
+          </button>
+        </Show>
+        {games?.map((v) => {
+          const cls_name = game_id === v.id ? csses.game_item_actived : csses.game_item
+          return (
+            <button className={cls_name} key={v.id} onClick={() => {
+              set_location({ game: v.id });
               set_game_list_open(false)
             }}>
-              {t('your_works')}
+              {v.short_title}
             </button>
-          </Show>
-        </div>
-      </Show>
+          )
+        })}
+        <Loading loading={loading} center />
+      </div>
     )
-  }, [games, game_id, session_id, t, set_location])
+  }, [games, game_id, session_id, t, set_location, loading, pathname])
 
   return <>
     <div className={csses.main_page}
@@ -193,7 +192,7 @@ export default function MainPage() {
             <IconButton
               title={t('logout')}
               img={img_logout}
-              onClick={() => set_global_value(prev => ({ ...prev, session_id: '' }))} />
+              onClick={() => dispatch({ type: 'reset' })} />
           </Show>
           <IconButton
             href="https://github.com/gimhol/little-fighter-2-WEMAKE"
