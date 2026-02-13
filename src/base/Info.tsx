@@ -33,42 +33,42 @@ export class Info implements IInfo {
   readonly parent: Info | null = null;
   src: string | null;
   raw: any;
-  set id(v: string | undefined) { this.set_str('id', v) }
-  get id(): string | undefined { return this.get_str('id') }
-  set_id(v: string) { this.id = v; return this; }
+  set id(v: string | undefined) { this.raw.id = v }
+  get id(): string | undefined { return this.raw.id }
+  set_id(v: string | undefined) { this.id = v; return this; }
   set title(v: string | undefined) { this.set_str('title', v) }
   get title(): string | undefined { return this.get_str('title') }
-  set_title(v: string) { this.title = v; return this; }
+  set_title(v: string | undefined) { this.title = v; return this; }
   set short_title(v: string | undefined) { this.set_str('short_title', v) }
   get short_title(): string | undefined { return this.get_str('short_title') }
-  set_short_title(v: string) { this.short_title = v; return this; }
+  set_short_title(v: string | undefined) { this.short_title = v; return this; }
   set author(v: string | undefined) { this.set_str('author', v) }
   get author(): string | undefined { return this.get_str('author') }
-  set_author(v: string) { this.author = v; return this; }
+  set_author(v: string | undefined) { this.author = v; return this; }
   set author_url(v: string | undefined) { this.set_str('author_url', v) }
   get author_url(): string | undefined { return this.get_str('author_url') }
-  set_author_url(v: string) { this.author_url = v; return this; }
+  set_author_url(v: string | undefined) { this.author_url = v; return this; }
   set desc(v: string | undefined) { this.set_str('desc', v) }
   get desc(): string | undefined { return this.get_str('desc') }
-  set_desc(v: string) { this.desc = v; return this; }
+  set_desc(v: string | undefined) { this.desc = v; return this; }
   set desc_url(v: string | undefined) { this.set_str('desc_url', v) }
   get desc_url(): string | undefined { return this.get_str('desc_url') }
-  set_desc_url(v: string) { this.desc_url = v; return this; }
+  set_desc_url(v: string | undefined) { this.desc_url = v; return this; }
   set changelog(v: string | undefined) { this.set_str('changelog', v) }
   get changelog(): string | undefined { return this.get_str('changelog') }
-  set_changelog(v: string) { this.changelog = v; return this; }
+  set_changelog(v: string | undefined) { this.changelog = v; return this; }
   set changelog_url(v: string | undefined) { this.set_str('changelog_url', v) }
   get changelog_url(): string | undefined { return this.get_str('changelog_url') }
-  set_changelog_url(v: string) { this.changelog_url = v; return this; }
+  set_changelog_url(v: string | undefined) { this.changelog_url = v; return this; }
   set children_title(v: string | undefined) { this.set_str('children_title', v) }
   get children_title(): string | undefined { return this.get_str('children_title') }
-  set_children_title(v: string) { this.children_title = v; return this; }
+  set_children_title(v: string | undefined) { this.children_title = v; return this; }
   set children_url(v: string | undefined) { this.set_str('children_url', v) }
   get children_url(): string | undefined { return this.get_str('children_url') }
-  set_children_url(v: string) { this.children_url = v; return this; }
+  set_children_url(v: string | undefined) { this.children_url = v; return this; }
   set url(v: string | undefined) { this.set_str('url', v) }
   get url(): string | undefined { return this.get_str('url') }
-  set_url(v: string) { this.url = v; return this; }
+  set_url(v: string | undefined) { this.url = v; return this; }
   set date(v: string | undefined) { this.set_str('date', v) }
   get date(): string | undefined { return this.get_str('date') }
   set_date(v: string) { this.date = v; return this; }
@@ -77,13 +77,13 @@ export class Info implements IInfo {
   set_url_type(v: string) { this.url_type = v; return this; }
   set cover_url(v: string | undefined) { this.set_str('cover_url', v) }
   get cover_url(): string | undefined { return this.get_str('cover_url') }
-  set_cover_url(v: string) { this.cover_url = v; return this; }
+  set_cover_url(v: string | undefined) { this.cover_url = v; return this; }
   set type(v: TInfoType | undefined) { this.set_str<TInfoType>('type', v) }
   get type(): TInfoType | undefined { return this.get_str<TInfoType>('type') }
   set_type(v: TInfoType) { this.type = v; return this; }
   set unavailable(v: string | undefined) { this.set_str('unavailable', v) }
   get unavailable(): string | undefined { return this.get_str('unavailable') }
-  set_unavailable(v: string) { this.unavailable = v; return this; }
+  set_unavailable(v: string | undefined) { this.unavailable = v; return this; }
 
   lang: string;
   private _children?: Info[];

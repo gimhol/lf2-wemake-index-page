@@ -1,8 +1,8 @@
 import { addModFile } from "@/api/addModFile";
 import { read_blob_as_md5 } from "@/utils/read_blob_as_md5";
-import { ossUploadFiles, type IOssUploadImagesOpts } from "./ossUploadFiles";
+import { ossUploadFiles, type IOssUploadFilesOpts } from "./ossUploadFiles";
 
-export interface IOssUploadModFilesOpts extends Omit<IOssUploadImagesOpts, 'getObjectName'> {
+export interface IOssUploadModFilesOpts extends IOssUploadFilesOpts {
   mod_id?: number;
 }
 export interface IUploadFileResult {
@@ -10,15 +10,17 @@ export interface IUploadFileResult {
   alt: string;
   title: string;
 }
+
 export async function ossUploadModFiles(opts: IOssUploadModFilesOpts): Promise<IUploadFileResult[]> {
-  const { mod_id, ..._p } = opts;
+  const {
+    mod_id,
+    getObjectName = async (f: File, sts: IOSSStsInfo) => {
+      if (typeof mod_id !== 'number') throw new Error('mod_id not set')
+      const md5 = await read_blob_as_md5(f);
+      if (sts.dir) return `${sts.dir}/${mod_id}/${md5}`
+      return `${mod_id}/${md5}`
+    }, ..._p } = opts;
   if (typeof mod_id !== 'number') throw new Error('mod_id not set');
-  const getObjectName = async (f: File, sts: IOSSStsInfo) => {
-    if (typeof mod_id !== 'number') throw new Error('mod_id not set')
-    const md5 = await read_blob_as_md5(f);
-    if (sts.dir) return `${sts.dir}/${mod_id}/${md5}`
-    return `${mod_id}/${md5}`
-  }
   const r = await ossUploadFiles({ ..._p, getObjectName });
   const base = r.sts.base.endsWith('/') ? r.sts.base.substring(0, r.sts.base.length - 1) : r.sts.base
   for (const { file, result } of r.list) {

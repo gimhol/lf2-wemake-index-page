@@ -10,6 +10,11 @@
   flex-direction: column;
   user-select   : none;
 
+  &.loading>div {
+    opacity       : 0.3;
+    pointer-events: none;
+  }
+
   .title {
     margin: 0px;
   }
@@ -111,5 +116,9 @@
       display         : flex;
       align-items     : center;
     }
+  }
+
+  .foot {
+    display: flex;
   }
 }

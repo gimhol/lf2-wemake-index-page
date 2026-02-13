@@ -7,7 +7,7 @@ export interface IOSSUploadImagesResult {
   }[]
 }
 
-export interface IOssUploadImagesOpts {
+export interface IOssUploadFilesOpts {
   sts?: IOSSStsInfo;
   oss?: OSS | null;
   files?: File[];
@@ -38,7 +38,7 @@ function test_limit(files: File[], limits: { [x in string]?: { max_size: number 
   });
   if (too_large) throw new Error(`file size must be <= 5MB, name: ${too_large.name}`);
 }
-export async function ossUploadFiles(opts: IOssUploadImagesOpts) {
+export async function ossUploadFiles(opts: IOssUploadFilesOpts) {
   const { sts, oss, files, getObjectName, progress } = opts;
   if (!sts) throw new Error(`sts got ${sts}`);
   if (!oss) throw new Error(`oss got ${sts}`);

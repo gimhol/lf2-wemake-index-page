@@ -72,13 +72,10 @@ const common_attrs: [keyof IClickEventData, (keyof HTMLElement)?, string?][] = [
   ["id"],
   ["class"],
   ["style"],
-  ["title"],
+  ["title", void 0, 'data-title'],
   ["what", void 0, 'data-what'],
   ["inner", 'innerText'],
 ]
-
-
-
 export interface IClickEventData {
   el?: string;
   id?: string;

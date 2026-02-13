@@ -34,7 +34,7 @@ export function Tooltip(props: ITooltipProps) {
           const ih = window.innerHeight
           const iw = window.innerWidth
           const s: CSSProperties = {}
-          if (rect.right <= iw / 2) s.left = rect.right
+          if (rect.right <= iw / 2) s.left = rect.left
           else s.right = `calc(100vW - ${rect.right}px)`
           if (rect.bottom <= ih / 2) s.top = rect.bottom
           else s.bottom = `calc(100vh - ${rect.top}px)`
@@ -53,7 +53,7 @@ export function Tooltip(props: ITooltipProps) {
     }
   }, [children, set_open, title])
 
-  const [gone, status] = useToggleStatus(open || viewing)
+  const [gone, status] = useToggleStatus(open || viewing, [100, 300])
   const cls = classnames(csses.tooltip, status === 'opening' ? csses.open : void 0)
   return <>
     {_children}
