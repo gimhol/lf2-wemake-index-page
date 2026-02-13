@@ -66,6 +66,12 @@
       text-overflow: ellipsis;
       overflow     : hidden;
     }
+
+    .action_zone {
+      display    : flex;
+      gap        : 5px;
+      flex-shrink: 0;
+    }
   }
 
   .right_zone {

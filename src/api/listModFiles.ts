@@ -13,6 +13,7 @@ export interface IFileInfo {
   url?: string;
   size?: number;
   oss_name?: string;
+  status?: 'published' | 'reviewing'
 }
 
 export interface IListModFilesBody {

@@ -2,6 +2,7 @@ import { open_link } from "@/utils/open_link";
 import classnames from "classnames";
 import csses from "./IconButton.module.scss";
 import type { ReactNode } from "react";
+import { Tooltip } from "@/gimd/Tooltip";
 
 export interface IIconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   __keep?: unknown;
@@ -30,13 +31,15 @@ export function IconButton(props: IIconButtonProps) {
 
   const cls_root = classnames(csses.icon_button, className)
   return (
-    <button className={cls_root} onClick={_on_click} title={title}{..._p} >
-      {img ? <img src={img} width={size} draggable={false} alt={alt} /> : null}
-      {icon}
-      {letter ? <span className={csses.letter}>{letter}</span> : null}
-      {children}
-      {href ? <a href={href} className={csses.icon_button_href} /> : null}
-    </button>
+    <Tooltip title={title}>
+      <button className={cls_root} onClick={_on_click} title={title}{..._p} >
+        {img ? <img src={img} width={size} draggable={false} alt={alt} /> : null}
+        {icon}
+        {letter ? <span className={csses.letter}>{letter}</span> : null}
+        {children}
+        {href ? <a href={href} className={csses.icon_button_href} /> : null}
+      </button>
+    </Tooltip>
   )
 }
 

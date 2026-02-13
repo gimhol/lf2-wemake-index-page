@@ -8,21 +8,11 @@ export function useOSS() {
   const { value: { session_id, sts }, set_value, dispatch } = useContext(GlobalStore.context);
 
   useEffect(() => {
-    if (!session_id) {
-      console.log('getSTSToken session_id:', session_id)
-      return;
-    }
+    if (!session_id) return;
     const c = new AbortController();
-    console.log('getSTSToken')
     getSTSToken()
-      .then(sts => {
-        console.log('getSTSToken ok, sts:', sts)
-        dispatch({ type: 'merge', value: { sts } })
-      })
-      .catch(e => {
-        console.log('getSTSToken failed:', e)
-        ApiHttp.ignore401(e)
-      });
+      .then(sts => dispatch({ type: 'merge', value: { sts } }))
+      .catch(e => ApiHttp.ignore401(e));
     return () => {
       c.abort(new Error('useEffect leave'))
     };

@@ -8,6 +8,7 @@ import img_create_file from "@/assets/svg/create_file.svg"
 import img_edit from "@/assets/svg/edit.svg"
 import img_preview from "@/assets/svg/preview.svg"
 import img_publish from "@/assets/svg/publish.svg"
+import img_reviewing from "@/assets/svg/reviewing.svg"
 import img_unpublish from "@/assets/svg/unpublish.svg"
 import { IconButton } from "@/components/button/IconButton"
 import { Loading } from "@/components/loading"
@@ -34,6 +35,7 @@ import { ModFormModal } from "./ModFormModal"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
 import { VideoModal } from "./VideoModal"
+import { Tooltip } from "@/gimd/Tooltip"
 
 export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const { t } = useTranslation()
@@ -56,6 +58,17 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const nav = useNavigate();
   const { search } = LocationParams.useAll()
 
+  const refresh_files = (parent = dir?.parent) => {
+    set_pending(true)
+    listModFiles({ parent })
+      .then(r => {
+        set_files(r ?? [])
+      }).catch(e => {
+        toast.error(e)
+      }).finally(() => {
+        set_pending(false)
+      })
+  }
   useEffect(() => {
     const path = search.get_numbers('path') ?? []
     const ab = new AbortController();
@@ -86,8 +99,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       if (ab.signal.aborted) return;
       set_pending(false)
     })
-
-
     return () => ab.abort()
   }, [nav, search, toast])
 
@@ -99,24 +110,22 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     set_pending(true)
     addModFile({ name: '' + Date.now(), parent, type }).then((r) => {
       set_new_dir(r);
-      return listModFiles({ parent })
-    }).then(r => {
-      set_files(r ?? [])
+      return refresh_files(parent)
     }).catch(e => {
-      toast(e)
+      toast.error(e)
     }).finally(() => {
       set_pending(false)
     })
   }
+
+
   const del_file = (target: IFileInfo) => {
     set_pending(true)
     ApiHttp.delete(`${API_BASE}lf2wmods/delete`, { id: target.id }).then((r) => {
       toast.success(`deleted count: ${r.data}`)
-      return listModFiles({ parent: target.parent })
-    }).then(r => {
-      set_files(r ?? [])
+      return refresh_files()
     }).catch(e => {
-      toast(e)
+      toast.error(e)
     }).finally(() => {
       set_pending(false)
     })
@@ -144,7 +153,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     new Viewer(div)
     imgs[idx].click()
   }
-  const edit_mod_info = (target: IFileInfo) => {
+  const edit_mod = (target: IFileInfo) => {
     set_editing_mod({ open: true, data: target });
   }
   const open_file = (target: IFileInfo) => {
@@ -164,7 +173,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     const s = search.clone().set('path', path).to_query();
     nav({ search: s })
   }
-
   const onDragOver = (e: React.DragEvent, me: IFileInfo) => {
     const not_allow = () => { e.stopPropagation() }
     if (pending || typeof me.id !== 'number') return not_allow();
@@ -208,15 +216,13 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       }).then(() => {
         return true
       }).catch(e => {
-        toast(e)
+        toast.error(e)
         return false
       }).then(ok => {
         if (!ok) return;
-        return listModFiles({ parent: dir?.id })
-      }).then(r => {
-        if (r) set_files(r ?? [])
+        return refresh_files(dir?.id)
       }).catch(e => {
-        toast(e)
+        toast.error(e)
       }).finally(() => {
         set_pending(false)
       })
@@ -236,15 +242,29 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         return false
       }).then(ok => {
         if (!ok) return
-        return listModFiles({ parent: me.parent })
-      }).then((r) => {
-        if (r) set_files(r)
+        return refresh_files(me.parent)
       }).catch(e => {
         toast.error(e)
       }).finally(() => {
         set_pending(false)
       })
     }
+  }
+  const unpublish = (me: IFileInfo) => {
+    set_pending(true)
+    ApiHttp.post(`${API_BASE}lf2wmods/unpublish`, {}, { id: me.id }).then(r => {
+      return r.data && refresh_files()
+    }).finally(() => {
+      set_pending(false)
+    })
+  }
+  const publish = (me: IFileInfo) => {
+    set_pending(true)
+    ApiHttp.post(`${API_BASE}lf2wmods/publish`, {}, { id: me.id }).then(r => {
+      return r.data && refresh_files()
+    }).finally(() => {
+      set_pending(false)
+    })
   }
   return (
     <div {...props} className={classNames(csses.mine_page, props.className)} style={props.style} ref={ref_root} >
@@ -254,7 +274,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         src={viewing_video}
         onClose={() => set_viewing_video_open(void 0)}
         afterClose={() => set_viewing_video(void 0)} />
-
       <div className={csses.file_list_head}>
         <IconButton
           letter="←"
@@ -351,32 +370,33 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                       img={img_edit}
                       title={t('edit_mod_info')}
                       disabled={pending}
-                      onClick={(e) => { interrupt_event(e); edit_mod_info(me) }}
-                      onDoubleClick={(e) => { interrupt_event(e) }} />
+                      onClick={() => edit_mod(me)} />
                   }
                   {me.type !== 'mod' ? null :
                     <IconButton
                       img={img_preview}
                       title={t('preview_mod_info')}
                       disabled={pending}
-                      onClick={(e) => { interrupt_event(e); edit_mod_info(me) }}
-                      onDoubleClick={(e) => { interrupt_event(e) }} />
+                      onClick={() => edit_mod(me)} />
                   }
-                  {me.type !== 'mod' ? null :
+                  {(me.type !== 'mod' || me.status) ? null :
                     <IconButton
                       img={img_publish}
-                      title={t('publish')}
+                      title={t('publish_mod')}
                       disabled={pending}
-                      onClick={(e) => { interrupt_event(e); edit_mod_info(me) }}
-                      onDoubleClick={(e) => { interrupt_event(e) }} />
+                      onClick={() => publish(me)} />
                   }
-                  {me.type !== 'mod' ? null :
+                  {(me.type !== 'mod' || me.status !== 'published') ? null :
                     <IconButton
                       img={img_unpublish}
-                      title={t('unpublish')}
+                      title={t('unpublish_mod')}
                       disabled={pending}
-                      onClick={(e) => { interrupt_event(e); edit_mod_info(me) }}
-                      onDoubleClick={(e) => { interrupt_event(e) }} />
+                      onClick={() => unpublish(me)} />
+                  }
+                  {(me.type !== 'mod' || me.status !== 'reviewing') ? null :
+                    <IconButton
+                      img={img_reviewing}
+                      title={t('mod_reviewing')} />
                   }
                 </>}
                 onDragOver={e => onDragOver(e, me)}
@@ -384,7 +404,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 onNameChanged={async (name) => {
                   if (name === me.name) {
                     if (new_dir == me.id && me.type == 'mod') {
-                      edit_mod_info(me)
+                      edit_mod(me)
                     }
                     set_new_dir(0)
                     return true;
@@ -392,7 +412,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                   const { oss_name } = me;
                   if (oss_name && !oss)
                     return false;
-
                   set_pending(true)
                   if (oss_name && oss) {
                     const content_disposition = get_content_disposition(name);
@@ -410,7 +429,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                       })
                     if (!ok) return ok
                   }
-
                   const ok = await ApiHttp.post(`${API_BASE}lf2wmods/save`, null, {
                     id: me.id,
                     name: name
@@ -418,14 +436,14 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                     toast.success('done')
                     me.name = name;
                     if (new_dir == me.id && me.type == 'mod') {
-                      edit_mod_info(me)
+                      edit_mod(me)
                     }
                     set_new_dir(0)
                     return true
                   }).catch(e => {
                     set_new_dir(0)
                     console.log(e)
-                    toast(e)
+                    toast.error(e)
                     return false
                   }).finally(() => {
                     set_pending(false)
@@ -433,7 +451,8 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                   return ok;
                 }}
                 onOpen={() => open_any(me)}
-                onDel={() => del_file(me)} />
+                onDel={() => del_file(me)}
+                onDetail={() => alert(JSON.stringify(me, null, 2))} />
             )
           })}
         <ModFormModal

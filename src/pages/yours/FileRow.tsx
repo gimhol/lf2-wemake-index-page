@@ -1,13 +1,13 @@
+import img_download from "@/assets/svg/download.svg"
 import { IconButton } from "@/components/button/IconButton"
 import { Dropdown } from "@/gimd/Dropdown"
 import { filename_ok } from "@/utils/filename_ok"
 import { interrupt_event } from "@/utils/interrupt_event"
+import { open_link } from "@/utils/open_link"
 import classnames from "classnames"
 import { useState, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import csses from "./FileRow.module.scss"
-import img_download from "@/assets/svg/download.svg"
-import { open_link } from "@/utils/open_link"
 export interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
   name?: string;
   modify_time?: ReactNode;
@@ -24,6 +24,7 @@ export interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
   owner?: ReactNode;
   download?: string;
   actions?: ReactNode;
+  onDetail?(): void;
 }
 export function FileRow(props: IFileRowProps) {
   const { t } = useTranslation()
@@ -33,7 +34,7 @@ export function FileRow(props: IFileRowProps) {
     onNameChanged,
     renameing,
     className, draggable, desc, owner, download, actions,
-    disabled, onOpen, onDel, icon, modify_time, create_time, ..._p } = props;
+    disabled, onOpen, onDel, onDetail, icon, modify_time, create_time, ..._p } = props;
   const [renaming, set_renaming] = useState(renameing);
   const [name, set_name] = useState(__name);
 
@@ -52,6 +53,10 @@ export function FileRow(props: IFileRowProps) {
           children: t('delete'),
           title: t('delete'),
           onClick: onDel,
+        }, {
+          children: t('detail'),
+          title: t('detail'),
+          onClick: onDetail,
         }]
       }}>
       <div
@@ -119,16 +124,21 @@ export function FileRow(props: IFileRowProps) {
                 {name}
               </div>
           }
-          {actions}
-          {download ?
-            <IconButton
-              draggable={false}
-              disabled={disabled}
-              img={img_download}
-              title={download}
-              onDragStart={e => interrupt_event(e)}
-              onClick={(e) => { interrupt_event(e); open_link(download) }}
-              onDoubleClick={(e) => { interrupt_event(e); }} /> : null}
+          <div
+            className={csses.action_zone}
+            onDragStart={interrupt_event}
+            onClick={interrupt_event}
+            onDoubleClick={interrupt_event}>
+            {actions}
+            {download ?
+              <IconButton
+                draggable={false}
+                disabled={disabled}
+                img={img_download}
+                title={download}
+                onClick={() => open_link(download)} /> : null}
+          </div>
+
         </div>
         <div className={csses.right_zone}>
           <div className={csses.desc_view}>
