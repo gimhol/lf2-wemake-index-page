@@ -14,6 +14,7 @@ export interface IFileInfo {
   size?: number;
   oss_name?: string;
   status?: 'published' | 'reviewing'
+  brief?: string;
 }
 
 export interface IListModFilesBody {

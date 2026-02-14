@@ -36,10 +36,13 @@
   white-space  : nowrap;
   display      : flex;
   align-items  : center;
+  color        : white;
 
   .title {
-    padding  : 0px 5px;
-    font-size: 1.2rem;
+    padding      : 0px 5px;
+    font-size    : 1.2rem;
+    text-overflow: ellipsis;
+    overflow     : hidden;
   }
 
   img {
@@ -47,16 +50,11 @@
     pointer-events: none;
   }
 
-  .left {
-    color: white;
-  }
-
   .mid {
     flex: 1;
   }
 
   .right {
-    color      : white;
     display    : flex;
     align-items: center;
     gap        : 5px;

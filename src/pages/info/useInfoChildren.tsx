@@ -28,7 +28,7 @@ export function useInfoChildren(info: Info | undefined | null) {
     fetch_info_list(children_url, info, info.lang, { signal: ab.signal })
       .then(list => {
         if (ab.signal.aborted) return;
-        info.children = list;
+        if (list) info.children = list;
         set_children(list ?? []);
       }).catch(e => {
         if (ab.signal.aborted) return;

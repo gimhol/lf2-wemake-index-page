@@ -7,7 +7,6 @@ export async function fetch_info_list(url: string, parent: Info | null, lang: st
   const raw_list = await resp.json();
   if (!Array.isArray(raw_list)) throw new Error(`[fetch_info_list] failed, got ${raw_list}`);
   if (signal?.aborted) return;
-
   const cooked_list: Info[] = [];
   for (const raw_item of raw_list) {
     if (!raw_item) continue;

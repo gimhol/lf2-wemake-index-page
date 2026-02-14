@@ -1,0 +1,42 @@
+@use "../../theme/common.module.scss"as *;
+
+.info_view_modal {
+  display       : flex;
+  flex-direction: column;
+  overflow      : hidden;
+  flex-wrap     : wrap;
+
+  .head {
+    padding: 10px 20px;
+
+    .title {
+      color : white;
+      margin: 0px;
+    }
+  }
+
+  .main {
+    padding    : 0px 20px;
+    gap        : 20px;
+    flex       : 1;
+    display    : flex;
+    align-items: flex-start;
+    overflow   : hidden;
+  }
+
+  .info_viewscrollview {
+    display       : flex;
+    flex-direction: column;
+    flex          : 1;
+    flex-shrink   : 0;
+    align-self    : stretch;
+    height        : 100%;
+    overflow      : auto;
+
+    .info_view {
+      border-radius: 10px;
+      align-self   : stretch;
+      box-shadow   : -10px -10px 20px -20px rgba(0, 0, 0);
+    }
+  }
+}

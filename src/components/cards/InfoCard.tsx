@@ -14,13 +14,14 @@ import { DetailCard } from "./DetailCard";
 import csses from "./InfoCard.module.scss";
 
 export interface IInfoCardProps extends ICardBaseProps {
-  info: Info
+  info?: Info
 }
 const classNames = { card: csses.info_card }
+const empty_info = Info.empty()
 export function InfoCard(props: IInfoCardProps) {
   const { t } = useTranslation()
   const dl_win_x64 = t('dl_win_x64')
-  const { info } = props;
+  const { info = empty_info } = props;
   const { url, url_type, cover_url, unavailable } = info;
   const win_x64_url = info.get_download_url('win_x64');
   const ref_el = useRef<HTMLDivElement>(null)
@@ -53,20 +54,16 @@ export function InfoCard(props: IInfoCardProps) {
       __ref={ref_el}>
       <div className={csses.info_card_inner}>
         <div className={csses.info_card_head}>
-          <div className={csses.left}>
-            <Link className={csses.title} href={url}>
-              {info.title}
-              {url_type === Info.OPEN_IN_BROWSER && url ? ' ▸' : null}
-            </Link>
-            <span className={csses.suffix}>
-              {title_suffix}
-            </span>
-          </div>
+          <Link className={csses.title} href={url}>
+            {info.title}
+            {url_type === Info.OPEN_IN_BROWSER && url ? ' ▸' : null}
+          </Link>
+          <span className={csses.suffix}>
+            {title_suffix}
+          </span>
           <div className={csses.mid}></div>
-          <div className={csses.right}>
-            <MarkdownButton info={info} />
-            <IconButton title={dl_win_x64} href={win_x64_url} gone={!win_x64_url} img={windows_x64} />
-          </div>
+          <MarkdownButton info={info} />
+          <IconButton title={dl_win_x64} href={win_x64_url} gone={!win_x64_url} img={windows_x64} />
         </div>
         <div className={csses.info_card_main}>
           {

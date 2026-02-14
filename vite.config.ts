@@ -1,9 +1,9 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
-import { visualizer } from "rollup-plugin-visualizer";
-import svgr from "vite-plugin-svgr";
+import react from '@vitejs/plugin-react';
 import dayjs from "dayjs";
+import { resolve } from 'path';
+import { visualizer } from "rollup-plugin-visualizer";
+import { defineConfig } from 'vite';
+import svgr from "vite-plugin-svgr";
 
 const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
 const development = {
@@ -43,7 +43,10 @@ export default defineConfig({
     svgr({ include: "**/*.svg?react" }),
     react({
       babel: {
-        plugins: [['babel-plugin-react-compiler']],
+        plugins: [
+          ['babel-plugin-react-compiler'],
+          ['@babel/plugin-proposal-decorators', { version: "2023-05" }]
+        ],
       },
     }),
     visualizer({

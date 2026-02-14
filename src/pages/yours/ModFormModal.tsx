@@ -10,7 +10,7 @@ export interface IModFormModalProps extends IMaskProps {
 export function ModFormModal(props: IModFormModalProps) {
   const { container = document.body, onClose, mod_id, ..._p } = props;
   return (
-    <Mask container={container} onClose={onClose}{..._p}>
+    <Mask container={container} onClose={onClose} {..._p}>
       <ModFormView mod_id={mod_id} />
       <IconButton
         style={{ position: 'absolute', right: 10, top: 10 }}

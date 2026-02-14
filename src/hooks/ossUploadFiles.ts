@@ -12,7 +12,7 @@ export interface IOssUploadFilesOpts {
   oss?: OSS | null;
   files?: File[];
   getObjectName?: (file: File, sts: IOSSStsInfo) => Promise<string>;
-  progress?(percentage: number, info: { file: File, fileSize: number } | null): void;
+  progress?(percentage: number, info: { file: File, fileSize: number }): void;
   limits?: { [x in string]?: { max_size: number } };
 }
 
@@ -56,7 +56,7 @@ export async function ossUploadFiles(opts: IOssUploadFilesOpts) {
         "Content-Type": file.type,
         'Content-Disposition': get_content_disposition(file.name)
       },
-      progress
+      progress: (a, b) => progress?.(a, b || { file, fileSize: file.size })
     });
     ret.list.push({ file, result });
   }

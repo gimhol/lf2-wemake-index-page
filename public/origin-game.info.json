@@ -1,20 +1,18 @@
 {
   "id": "origin",
+  "type": "cards",
+  "date": "2026-01-15",
+  "short_title": "Origin",
+  "title": "Little Fighter 2 Wemake",
+  "desc": [
+    "'Little Fighter 2 Wemake' is **unofficial** Open-Source Web-based Remaked LF2 created by Gim in 2024.",
+    "> **Gameplays, arts, and sounds are all from 'Litter Fighter 2' basically,<br>",
+    "created by Marti Wong and Starsky Wong in 1999.<br>",
+    "The original author, Marti Wong, has now launched ['Little Fighter 2 Remastered'](https://lf2.net/). <br>",
+    "Please purchase it on [Steam](https://store.steampowered.com/app/3249650) to support the original author.**"
+  ],
+  "children_url": "origin-game.info-list.json",
   "i18n": {
-    "": {
-      "type": "cards",
-      "date": "2026-01-15",
-      "short_title": "Origin",
-      "title": "Little Fighter 2 Wemake",
-      "desc": [
-        "'Little Fighter 2 Wemake' is **unofficial** Open-Source Web-based Remaked LF2 created by Gim in 2024.",
-        "> **Gameplays, arts, and sounds are all from 'Litter Fighter 2' basically,<br>",
-        "created by Marti Wong and Starsky Wong in 1999.<br>",
-        "The original author, Marti Wong, has now launched ['Little Fighter 2 Remastered'](https://lf2.net/). <br>",
-        "Please purchase it on [Steam](https://store.steampowered.com/app/3249650) to support the original author.**"
-      ],
-      "children_url": "origin-game.info-list.json"
-    },
     "zh": {
       "short_title": "原版",
       "desc": [

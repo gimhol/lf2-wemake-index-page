@@ -16,7 +16,7 @@ export interface DropdownProps extends PropsWithChildren {
   size?: IButtonProps['size'];
   open?: boolean;
   forceRender?: boolean;
-  onChange?: React.Dispatch<React.SetStateAction<boolean>>;
+  onChange?: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   alignX?: number,
   alignY?: number,
   anchorX?: number,

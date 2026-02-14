@@ -3,7 +3,7 @@ import { usePropState } from "../../utils/usePropState";
 import img_arr from "@/assets/svg/angle-right.svg"
 export interface ICollapseButtonProps extends IIconButtonProps {
   open?: boolean;
-  whenChange?(v: boolean): void;
+  whenChange?(v?: boolean): void;
 }
 export function CollapseButton(props: ICollapseButtonProps) {
   const { open, whenChange, onClick, ..._p } = props;

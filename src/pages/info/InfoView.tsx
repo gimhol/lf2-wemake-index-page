@@ -29,9 +29,9 @@ function next_list_like(v: string | undefined | null): ListLike {
 export interface IInfoViewProps extends React.HTMLAttributes<HTMLDivElement> {
   info?: Info | null;
   open?: boolean;
-  whenOpen?(open: boolean): void;
+  whenOpen?(open?: boolean): void;
   listLike?: ListLike;
-  whenListLike?(v: ListLike): void;
+  whenListLike?(v?: ListLike): void;
 }
 
 export function InfoView(props: IInfoViewProps) {
@@ -54,9 +54,9 @@ export function InfoView(props: IInfoViewProps) {
     __set_listLike(listlike)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [info])
-
+  
   const { t } = useTranslation()
-  const { children_title, date, unavailable, desc, desc_url, title, changelog, changelog_url } = info ?? {};
+  const { children_title, date, unavailable, desc, brief, desc_url, title, changelog, changelog_url } = info ?? {};
   const win_x64_url = info?.get_download_url('win_x64')
   const open_in_browser = t('open_in_browser')
   const dl_win_x64 = t('dl_win_x64')
@@ -69,7 +69,6 @@ export function InfoView(props: IInfoViewProps) {
   const url = info?.url ?? children?.find(v => v.url)?.url;
   const url_type = info?.url ? info.url_type : children?.find(v => v.url)?.url_type;
   const tags = [t(unavailable || url_type || '')].filter(Boolean);
-
   if (!info) return <>{toast_ctx}</>;
   return (
     <div className={cls_root} {..._p}>
@@ -99,6 +98,9 @@ export function InfoView(props: IInfoViewProps) {
           </div>
         </div>
       </div>
+      <Viewer
+        emptyAsGone
+        content={brief} />
       <Collapse open={__open && has_content} className={csses.content_zone} >
         <Viewer
           emptyAsGone

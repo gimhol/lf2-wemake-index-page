@@ -10,7 +10,9 @@ import img_preview from "@/assets/svg/preview.svg"
 import img_publish from "@/assets/svg/publish.svg"
 import img_reviewing from "@/assets/svg/reviewing.svg"
 import img_unpublish from "@/assets/svg/unpublish.svg"
+import { Info } from "@/base/Info"
 import { IconButton } from "@/components/button/IconButton"
+import { ImagesViewer } from "@/components/images/Viewer"
 import { Loading } from "@/components/loading"
 import Toast from "@/gimd/Toast"
 import GlobalStore from "@/GlobalStore"
@@ -27,10 +29,12 @@ import dayjs from "dayjs"
 import { Fragment, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router"
-import Viewer from 'viewerjs'
-import 'viewerjs/dist/viewer.min.css'
+import { useImmer } from "use-immer"
+import { fetch_info } from "../main/fetch_info"
 import { FileRow } from "./FileRow"
 import { get_icon, get_icon_title } from "./get_icon"
+import { get_mod_paths_names } from "./get_mod"
+import { InfoViewModal } from "./InfoViewModal"
 import { ModFormModal } from "./ModFormModal"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
@@ -55,9 +59,10 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const ctx = useContext(GlobalStore.context);
   const { value: { session_id } } = ctx;
   const nav = useNavigate();
-  const { search } = LocationParams.useAll()
+  const { search } = LocationParams.useAll();
+  const [previewing, set_previewing] = useImmer({ open: false, data: Info.empty(null) })
 
-  const refresh_files = (parent = dir?.parent) => {
+  const refresh_files = (parent = dir?.id) => {
     set_pending(true)
     listModFiles({ parent })
       .then(r => {
@@ -139,21 +144,23 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     }
   }
   const open_image = (target: IFileInfo) => {
-    const imgs = files.map(file => {
-      if (!file.content_type?.startsWith('image/')) return;
-      if (!file.url) return;
-      const img = document.createElement('img')
-      img.src = file.url; img.width = 1; img.height = 1;
-      return img
-    }).filter(Boolean) as HTMLImageElement[]
-    const idx = imgs.findIndex(v => v?.src === target.url)
-    const div = document.createElement('div')
-    div.append(...imgs)
-    new Viewer(div)
-    imgs[idx].click()
+    const imgs = files.filter(v => v.url && v.content_type?.startsWith('image/')).map(v => ({
+      url: v.url!,
+      alt: v.name
+    }))
+    const idx = imgs.findIndex(v => v?.url === target.url)
+    ImagesViewer.open(imgs, idx)
   }
   const edit_mod = (target: IFileInfo) => {
     set_editing_mod({ open: true, data: target });
+  }
+  const preview_mod = async ({ owner_id, id, type }: IFileInfo) => {
+    if (type != 'mod') return new Error('TODO');
+    if (!id || !owner_id) return new Error('TODO')
+    if (!sts?.base) return new Error('TODO')
+    const { info_obj_path } = get_mod_paths_names(owner_id, id);
+    const info = await fetch_info(sts.base + info_obj_path, null, '', {})
+    set_previewing({ open: true, data: info })
   }
   const open_file = (target: IFileInfo) => {
     if (target.content_type?.startsWith('image/') && target.url) {
@@ -389,7 +396,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                       img={img_preview}
                       title={t('preview_mod_info')}
                       disabled={pending}
-                      onClick={() => edit_mod(me)} />
+                      onClick={() => preview_mod(me)} />
                   }
                   {(me.type !== 'mod' || me.status) ? null :
                     <IconButton
@@ -480,6 +487,12 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
             <div>size: {file_size_txt(progress[2])}</div>
           </div> : null
       }
+      <InfoViewModal
+        open={previewing.open}
+        onClose={() => set_previewing(d => { d.open = false; })}
+        afterClose={() => set_previewing(d => { d.data = Info.empty() })}
+        data={previewing.data}
+      />
     </div>
   )
 }

@@ -1,27 +1,25 @@
 {
   "id": "mods",
   "type": "cards",
+  "date": "2026-02-02",
+  "short_title": "Mods",
+  "title": "Mods",
+  "desc": [
+    "You can download the 'Mod' you want.",
+    "Then open LF2Wemake and drag the 'Mod' ",
+    "onto the Entry Page or the Main Page.",
+    "After loading, you'll be able to play the content in 'Mod' 😀\n",
+    "> 'Mod' is basically a Zip file. Don't need to unzip it after downloading from here.",
+    "For how to use the 'Mod', please look at the video below. ",
+    "<video width='320' src='https://lf.gim.ink/docs/video/download_and_use_extra_data.mp4' controls></video>\n",
+    "If you want to use your own characters, weapons, backgrounds, or even stages in LF2Wemake,",
+    "you can check out this ['Conversion Tool'](/tools).\n",
+    "But I'm unable to support AI scripts at present 🤦. ",
+    "Support for AI script functionality may be added in future updates, ",
+    "and such AI scripts will likely need to be written in TypeScript/JavaScript instead of ActionScript."
+  ],
+  "children_url": "mods.info-list.json",
   "i18n": {
-    "": {
-      "date": "2026-02-02",
-      "short_title": "Mods",
-      "title": "Mods",
-      "desc": [
-        "You can download the 'Mod' you want.",
-        "Then open LF2Wemake and drag the 'Mod' ",
-        "onto the Entry Page or the Main Page.",
-        "After loading, you'll be able to play the content in 'Mod' 😀\n",
-        "> 'Mod' is basically a Zip file. Don't need to unzip it after downloading from here.",
-        "For how to use the 'Mod', please look at the video below. ",
-        "<video width='320' src='https://lf.gim.ink/docs/video/download_and_use_extra_data.mp4' controls></video>\n",
-        "If you want to use your own characters, weapons, backgrounds, or even stages in LF2Wemake,",
-        "you can check out this ['Conversion Tool'](/tools).\n",
-        "But I'm unable to support AI scripts at present 🤦. ",
-        "Support for AI script functionality may be added in future updates, ",
-        "and such AI scripts will likely need to be written in TypeScript/JavaScript instead of ActionScript."
-      ],
-      "children_url": "mods.info-list.json"
-    },
     "zh": {
       "short_title": "模组",
       "title": "模组",

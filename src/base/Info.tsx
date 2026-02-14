@@ -1,5 +1,9 @@
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  makeI18N,
+  type TSetStr
+} from "./MakeUstr";
 export interface InfoProp {
   key?: keyof Info;
   type: 'string';
@@ -11,8 +15,11 @@ export interface IInfo {
   id?: string;
   title?: string;
   short_title?: string;
+  brief?: string;
   author?: string;
   author_url?: string;
+  url?: string;
+  url_type?: string;
   desc?: string;
   desc_url?: string;
   changelog?: string;
@@ -20,111 +27,114 @@ export interface IInfo {
   children_title?: string;
   children_url?: string;
   children?: IInfo[];
-  type?: TInfoType;
+  type?: string;
+  date?: string;
+  cover_url?: string;
+  unavailable?: string;
+  downloads?: { [x in string]: string };
   i18n?: { [x in string]: IInfo };
 }
-export class Info implements IInfo {
+
+const { Cls, Str } = makeI18N();
+@Cls export class Info implements IInfo {
   static readonly OPEN_IN_BROWSER = 'open_in_browser';
   static readonly PLAY_IN_BROWSER = 'play_in_browser';
   static readonly DOWNLOAD = 'download';
+
   static empty(parent: Info | null = null) {
     return new Info({}, '', parent, null)
   }
   readonly parent: Info | null = null;
   src: string | null;
-  raw: any;
+  raw!: IInfo;
   set id(v: string | undefined) { this.raw.id = v }
   get id(): string | undefined { return this.raw.id }
   set_id(v: string | undefined) { this.id = v; return this; }
-  set title(v: string | undefined) { this.set_str('title', v) }
-  get title(): string | undefined { return this.get_str('title') }
-  set_title(v: string | undefined) { this.title = v; return this; }
-  set short_title(v: string | undefined) { this.set_str('short_title', v) }
-  get short_title(): string | undefined { return this.get_str('short_title') }
-  set_short_title(v: string | undefined) { this.short_title = v; return this; }
-  set author(v: string | undefined) { this.set_str('author', v) }
-  get author(): string | undefined { return this.get_str('author') }
-  set_author(v: string | undefined) { this.author = v; return this; }
-  set author_url(v: string | undefined) { this.set_str('author_url', v) }
-  get author_url(): string | undefined { return this.get_str('author_url') }
-  set_author_url(v: string | undefined) { this.author_url = v; return this; }
-  set desc(v: string | undefined) { this.set_str('desc', v) }
-  get desc(): string | undefined { return this.get_str('desc') }
-  set_desc(v: string | undefined) { this.desc = v; return this; }
-  set desc_url(v: string | undefined) { this.set_str('desc_url', v) }
-  get desc_url(): string | undefined { return this.get_str('desc_url') }
-  set_desc_url(v: string | undefined) { this.desc_url = v; return this; }
-  set changelog(v: string | undefined) { this.set_str('changelog', v) }
-  get changelog(): string | undefined { return this.get_str('changelog') }
-  set_changelog(v: string | undefined) { this.changelog = v; return this; }
-  set changelog_url(v: string | undefined) { this.set_str('changelog_url', v) }
-  get changelog_url(): string | undefined { return this.get_str('changelog_url') }
-  set_changelog_url(v: string | undefined) { this.changelog_url = v; return this; }
-  set children_title(v: string | undefined) { this.set_str('children_title', v) }
-  get children_title(): string | undefined { return this.get_str('children_title') }
-  set_children_title(v: string | undefined) { this.children_title = v; return this; }
-  set children_url(v: string | undefined) { this.set_str('children_url', v) }
-  get children_url(): string | undefined { return this.get_str('children_url') }
-  set_children_url(v: string | undefined) { this.children_url = v; return this; }
-  set url(v: string | undefined) { this.set_str('url', v) }
-  get url(): string | undefined { return this.get_str('url') }
-  set_url(v: string | undefined) { this.url = v; return this; }
-  set date(v: string | undefined) { this.set_str('date', v) }
-  get date(): string | undefined { return this.get_str('date') }
-  set_date(v: string) { this.date = v; return this; }
-  set url_type(v: string | undefined) { this.set_str('url_type', v) }
-  get url_type(): string | undefined { return this.get_str('url_type') }
-  set_url_type(v: string) { this.url_type = v; return this; }
-  set cover_url(v: string | undefined) { this.set_str('cover_url', v) }
-  get cover_url(): string | undefined { return this.get_str('cover_url') }
-  set_cover_url(v: string | undefined) { this.cover_url = v; return this; }
-  set type(v: TInfoType | undefined) { this.set_str<TInfoType>('type', v) }
-  get type(): TInfoType | undefined { return this.get_str<TInfoType>('type') }
-  set_type(v: TInfoType) { this.type = v; return this; }
-  set unavailable(v: string | undefined) { this.set_str('unavailable', v) }
-  get unavailable(): string | undefined { return this.get_str('unavailable') }
-  set_unavailable(v: string | undefined) { this.unavailable = v; return this; }
+
+  @Str title            !: string | undefined; set_title          !: TSetStr<this>
+  @Str short_title      !: string | undefined; set_short_title    !: TSetStr<this>
+  @Str author           !: string | undefined; set_author         !: TSetStr<this>
+  @Str author_url       !: string | undefined; set_author_url     !: TSetStr<this>
+  @Str brief            !: string | undefined; set_brief          !: TSetStr<this>
+  @Str desc             !: string | undefined; set_desc           !: TSetStr<this>
+  @Str desc_url         !: string | undefined; set_desc_url       !: TSetStr<this>
+  @Str changelog        !: string | undefined; set_changelog      !: TSetStr<this>
+  @Str changelog_url    !: string | undefined; set_changelog_url  !: TSetStr<this>
+  @Str children_title   !: string | undefined; set_children_title !: TSetStr<this>
+  @Str children_url     !: string | undefined; set_children_url   !: TSetStr<this>
+  @Str url              !: string | undefined; set_url            !: TSetStr<this>
+  @Str url_type         !: string | undefined; set_url_type       !: TSetStr<this>
+  @Str date             !: string | undefined; set_date           !: TSetStr<this>
+  @Str cover_url        !: string | undefined; set_cover_url      !: TSetStr<this>
+  @Str unavailable      !: string | undefined; set_unavailable    !: TSetStr<this>
+  @Str type             !: string | undefined; set_type           !: TSetStr<this>
 
   lang: string;
-  private _children?: Info[];
+  private _md?: string;
+  private _bros: { [x in string]?: Info } = {}
+  private _subs: Info[] = [];
+  get children() { return this._subs; }
+  set children(v: Info[]) { this._subs = v; }
 
   constructor(raw: IInfo, lang: string, parent: Info | null, src: string | null) {
     this.src = src;
     this.parent = parent;
     this.lang = lang;
+    this.load(raw)
+  }
+
+  load(raw: IInfo): this {
     this.raw = JSON.parse(JSON.stringify(raw));
-    if (!this.raw.i18n) this.raw.i18n = {}
-    if (!this.raw.i18n[lang]) this.raw.i18n[lang] = {}
-    if (!this.raw.i18n['']) this.raw.i18n[''] = {}
-
-    const children = this.raw.i18n[lang].children || this.raw.children;
-    if (typeof children === 'string') {
-      this.children_url = children
-    } else if (Array.isArray(children)) {
-      this._children = children
+    const alias_paths = new Set<string>()
+    const bros = this.raw.i18n;
+    const bro_keys = this.raw.i18n && Object.keys(this.raw.i18n)
+    if (bros && bro_keys?.length) {
+      for (const bro_key of bro_keys) {
+        let bro: any = bros[bro_key]
+        if (typeof bro === 'string') {
+          if (alias_paths.has(bro))
+            throw new Error('i18n bad loop!')
+          bro = bros[bro]
+          alias_paths.add(bro)
+        }
+        if (!bro || !Object.keys(bro).length) {
+          delete bros[bro_key]
+          continue;
+        }
+        this._bros[bro_key] = new Info(bro, bro_key, this.parent, this.src)
+      }
+    } else {
+      delete this.raw.i18n
     }
-  }
-  get children() { return this._children; }
-  set children(v: Info[] | undefined) { this._children = v; }
+    const { children } = this.raw
+    if (Array.isArray(children))
+      this._subs = children.map(c => new Info(c, this.lang, this, this.src))
 
-  private get_str<T extends string = string>(name: keyof this): T | undefined {
-    const raw = this.raw.i18n[this.lang][name] || this.raw.i18n[''][name] || this.raw[name];
-    if (raw === void 0 || raw === null) return void 0
-    if (typeof raw === 'string') return raw as T;
-    if (Array.isArray(raw)) return raw.join('\n') as T
-    return ('' + raw) as T;
+    if (this._bros['']) {
+      Object.assign(this.raw, this._bros[''].raw);
+      delete this.raw.i18n?.[''];
+      delete this._bros[''];
+    }
+    return this;
   }
-  private set_str<T extends string = string>(name: keyof this, v: T | undefined) {
-    this.raw.i18n[this.lang][name] = v;
+  get_str<K extends keyof IInfo>(key: K): string | undefined {
+    const value =
+      this._bros[this.lang]?.get_str(key) ??
+      this.raw[key];
+    if (value === void 0 || value === null) return void 0
+    if (Array.isArray(value)) return value.join('\n')
+    return '' + value;
+  }
+  set_str<K extends keyof IInfo, V extends IInfo[K]>(key: K, v: V) {
+    return this.raw[key] = v;
   }
   with_lang(lang: string): Info {
     const ret = new Info(this.raw, lang, this.parent, this.src);
-    ret.children = this.children?.map(v => v.with_lang(lang));
     return ret;
   }
   clone(): Info {
     const ret = new Info(this.raw, this.lang, this.parent, this.src);
-    ret.children = this.children?.map(v => v.clone());
+    ret.children = this.children.map(v => v.clone());
     return ret;
   }
   get_download_url(type: string) {
@@ -132,7 +142,7 @@ export class Info implements IInfo {
     return this.raw.downloads[type] || '';
   }
   async markdown() {
-    const md = this.get_str('markdown')
+    const md = this._md
     if (md) return md;
 
     let text = `# ${this.title}`
@@ -160,7 +170,6 @@ export class Info implements IInfo {
     }
     return text;
   }
-
   async fetch_desc() {
     if (this.desc) return this.desc
     if (!this.desc_url) return '';
@@ -177,54 +186,4 @@ export class Info implements IInfo {
       .then(v => this.changelog = v)
       .catch(e => '' + e)
   }
-}
-
-export const mod_info_props: Record<keyof Info, InfoProp | undefined> = {
-  parent: undefined,
-  raw: undefined,
-  id: undefined,
-  src: void 0,
-
-  title: { type: 'string', },
-  author: { type: 'string', },
-  author_url: { type: 'string', },
-  cover_url: { type: 'string', },
-  url: { type: 'string', },
-  unavailable: { type: 'string', },
-
-  url_type: undefined,
-  short_title: undefined,
-  desc: undefined,
-  desc_url: undefined,
-  changelog: undefined,
-  changelog_url: undefined,
-  date: undefined,
-  children_title: undefined,
-  children_url: undefined,
-  type: undefined,
-  lang: undefined,
-  children: undefined,
-  with_lang: undefined,
-  get_download_url: undefined,
-  markdown: undefined,
-  fetch_desc: undefined,
-  fetch_changelog: undefined,
-  set_desc: undefined,
-  set_changelog: undefined,
-  set_title: undefined,
-  clone: undefined,
-  set_author: undefined,
-  set_author_url: undefined,
-  set_id: undefined,
-  set_desc_url: undefined,
-  set_changelog_url: undefined,
-  set_children_title: undefined,
-  set_children_url: undefined,
-  set_url: undefined,
-  set_short_title: undefined,
-  set_date: undefined,
-  set_url_type: undefined,
-  set_cover_url: undefined,
-  set_type: undefined,
-  set_unavailable: undefined
 }

@@ -15,7 +15,7 @@
     pointer-events: none;
   }
 
-  &>* {
+  &>div {
     padding: 10px;
     @extend ._bottom_dash_line;
   }

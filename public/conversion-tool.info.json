@@ -1,23 +1,21 @@
   {
     "id": "tools",
     "type": "cards",
+    "date": "2026-02-04",
+    "short_title": "Conversion Tool",
+    "title": "Conversion Tool",
+    "desc": [
+      "You can use this tool to convert LF2 data into 'Mod Zip' that can be used by LF2W.",
+      "> For how to use the conversion tool, please look at the video below: ",
+      "<video width='320' src='https://lf.gim.ink/docs/video/how_to_use_the_conversion_tool_basic.mp4' controls></video>",
+      "In the video, \"Memento's LF2 pack 2026\" by Memento was used for demonstration,",
+      "and you can find it in the ['Mods'](/mods).\n",
+      "But I'm unable to support AI scripts at present 🤦. ",
+      "Support for AI script functionality may be added in future updates, ",
+      "and such AI scripts will likely need to be written in TypeScript/JavaScript instead of ActionScript."
+    ],
+    "children_url": "conversion-tool.info-list.json",
     "i18n": {
-      "": {
-        "date": "2026-02-04",
-        "short_title": "Conversion Tool",
-        "title": "Conversion Tool",
-        "desc": [
-          "You can use this tool to convert LF2 data into 'Mod Zip' that can be used by LF2W.",
-          "> For how to use the conversion tool, please look at the video below: ",
-          "<video width='320' src='https://lf.gim.ink/docs/video/how_to_use_the_conversion_tool_basic.mp4' controls></video>",
-          "In the video, \"Memento's LF2 pack 2026\" by Memento was used for demonstration,",
-          "and you can find it in the ['Mods'](/mods).\n",
-          "But I'm unable to support AI scripts at present 🤦. ",
-          "Support for AI script functionality may be added in future updates, ",
-          "and such AI scripts will likely need to be written in TypeScript/JavaScript instead of ActionScript."
-        ],
-        "children_url": "conversion-tool.info-list.json"
-      },
       "zh": {
         "short_title": "转换工具",
         "title": "转换工具",

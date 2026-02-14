@@ -35,6 +35,11 @@ const zh = {
   "gitee_login": "Gitee授权登录",
   "logout": "登出",
   "your_works": "你的作品",
+  "mod_base_info": "基础信息",
+  "mod_brief": "简介",
+  "mod_description": "描述",
+  "mod_changelog": "更新日志",
+  "edit_brief_here": "再此编辑简介(500字内)"
 }
 const en = {
   "author": "author",
@@ -70,6 +75,11 @@ const en = {
   "gitee_login": "Login with Gitee",
   "logout": "Logout",
   "your_works": "Your Works",
+  "mod_base_info": "Base Infomation",
+  "mod_brief": "Brief",
+  "mod_description": "Description",
+  "mod_changelog": "Changelog",
+  "edit_brief_here": "Edit Brief Here (Within 500 Characters)"
 }
 const resources = {
   "zh": { translation: zh },

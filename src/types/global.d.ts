@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare const NODE_ENV: string;
 declare const BUILD_TIME: string;
 declare const API_BASE: string;
@@ -71,4 +73,13 @@ declare module '*.module.scss' {
   const classes: { readonly [key: string]: string };
   export default classes;
 }
-
+declare type Classnames<T> = Partial<Record<T, string>>
+declare type Styles<T> = Partial<Record<T, React.CSSProperties>>
+declare module "classnames" {
+  declare type Value = string | number | boolean | undefined | null;
+  declare type Mapping = Record<string, any>;
+  declare interface ArgumentArray extends Array<Argument> { }
+  declare interface ReadonlyArgumentArray extends ReadonlyArray<Argument> { }
+  declare type Argument = Value | Mapping | ArgumentArray | ReadonlyArgumentArray;
+  export default function cns(...args: ArgumentArray): string
+}

@@ -1,15 +1,13 @@
 {
   "id": "rn_lf2",
+  "date": "2026-01-15",
+  "short_title": "RN-LF2",
+  "title": "RN-LF2Wemake",
+  "desc": [
+    "RN-LF2"
+  ],
+  "children_url": "rn-lf2.info-list.json",
   "i18n": {
-    "": {
-      "date": "2026-01-15",
-      "short_title": "RN-LF2",
-      "title": "RN-LF2Wemake",
-      "desc": [
-        "RN-LF2"
-      ],
-      "children_url": "rn-lf2.info-list.json"
-    },
     "zh": "",
     "zh-hans": "zh",
     "zh-hant": "zh",
