@@ -291,7 +291,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         afterClose={() => set_viewing_video(void 0)} />
       <div className={csses.file_list_head}>
         <IconButton
-          letter="←"
+          icon="←"
           disabled={pending || !path.length}
           onClick={e => {
             interrupt_event(e)
@@ -336,7 +336,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         </div>
         <Loading loading={pending} style={{ alignSelf: 'center' }} />
         <IconButton
-          img={img_create_dir}
+          icon={img_create_dir}
           disabled={pending}
           title={t("create_dir")}
           onClick={e => {
@@ -344,7 +344,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
             add_dir(dir.id)
           }} />
         <IconButton
-          img={img_create_file}
+          icon={img_create_file}
           disabled={pending}
           title={t("create_mod_info")}
           onClick={e => {
@@ -395,28 +395,28 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 actions={<>
                   {me.type !== 'mod' ? null :
                     <IconButton
-                      img={img_edit}
+                      icon={img_edit}
                       title={t('edit_mod_info')}
                       disabled={pending}
                       onClick={() => edit_mod(me)} />
                   }
                   {me.type !== 'mod' ? null :
                     <IconButton
-                      img={img_preview}
+                      icon={img_preview}
                       title={t('preview_mod_info')}
                       disabled={pending}
                       onClick={() => preview_mod(me)} />
                   }
                   {(me.type !== 'mod' || me.status) ? null :
                     <IconButton
-                      img={img_publish}
+                      icon={img_publish}
                       title={t('publish_mod')}
                       disabled={pending}
                       onClick={() => publish(me)} />
                   }
                   {(me.type !== 'mod' || !me.status) ? null :
                     <IconButton
-                      img={img_unpublish}
+                      icon={img_unpublish}
                       title={t('unpublish_mod')}
                       disabled={pending}
                       onClick={() => unpublish(me)} />
@@ -424,7 +424,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                   {(me.type !== 'mod' || me.status !== 'reviewing') ? null :
                     <IconButton
                       disabled
-                      img={img_reviewing}
+                      icon={img_reviewing}
                       title={t('mod_reviewing')} />
                   }
                 </>}

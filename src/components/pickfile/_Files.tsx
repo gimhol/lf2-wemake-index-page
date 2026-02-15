@@ -59,7 +59,7 @@ export function Files(props: IFilePickerFilesProps) {
                 onFileClose?.(e, record, ctx);
                 remove(record);
               }}
-              letter="✖︎" />
+              icon="✖︎" />
             <div
               className={cns(csses.bottom, onFileClick && csses.bottom_clickable, classNames?.bottom)}
               onClick={e => {

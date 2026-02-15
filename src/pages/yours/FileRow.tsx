@@ -135,7 +135,7 @@ export function FileRow(props: IFileRowProps) {
               <IconButton
                 draggable={false}
                 disabled={disabled}
-                img={img_download}
+                icon={img_download}
                 title={download}
                 onClick={() => open_link(download)} /> : null}
           </div>

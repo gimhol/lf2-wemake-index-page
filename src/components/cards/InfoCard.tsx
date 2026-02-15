@@ -61,7 +61,7 @@ export function InfoCard(props: IInfoCardProps) {
             {title_suffix}
           </span>
           <div className={csses.mid}></div>
-          <IconButton title={dl_win_x64} href={win_x64_url} gone={!win_x64_url} img={windows_x64} />
+          <IconButton title={dl_win_x64} href={win_x64_url} gone={!win_x64_url} icon={windows_x64} />
         </div>
         <div className={csses.info_card_main}>
           {

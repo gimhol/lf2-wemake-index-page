@@ -85,13 +85,13 @@ export function InfoView(props: IInfoViewProps) {
           {tags?.map(v => <span className={csses.tag} key={v}> {v} </span>)}
         </h3>
         <div className={csses.head_right_zone}>
-          <IconButton title={open_in_browser} href={url} gone={!url} img={img_browser_mark_white} />
-          <IconButton title={dl_win_x64} href={win_x64_url} gone={!win_x64_url} img={windows_x64} />
+          <IconButton title={open_in_browser} href={url} gone={!url} icon={img_browser_mark_white} />
+          <IconButton title={dl_win_x64} href={win_x64_url} gone={!win_x64_url} icon={windows_x64} />
           <IconButton
             gone={!(children?.length)}
             onClick={() => __set_listLike(__next_list_like)}
             title="Cards or List"
-            img={__next_list_like === 'cards' ? img_cards_view : img_list_view} />
+            icon={__next_list_like === 'cards' ? img_cards_view : img_list_view} />
           {info ? <MarkdownButton info={info} /> : null}
           <div className={csses.el_date}>
             {date}
@@ -117,10 +117,10 @@ export function InfoView(props: IInfoViewProps) {
         children.length ?
           <div className={csses.children_title_div} style={{ height: 0 }}>
             <span className={csses.children_title}>
-              <IconButton img={img_to_top} size={8} title={`scroll ${children_title} to top`}
+              <IconButton icon={img_to_top} size={8} title={`scroll ${children_title} to top`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: 0, behavior: 'smooth' })} />
               <span>{children_title}</span>
-              <IconButton img={img_to_bottom} size={8} title={`scroll ${children_title} to bottom`}
+              <IconButton icon={img_to_bottom} size={8} title={`scroll ${children_title} to bottom`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: ref_el_children.current.scrollHeight, behavior: 'smooth' })} />
             </span>
           </div> : null

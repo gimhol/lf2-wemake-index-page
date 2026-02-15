@@ -17,7 +17,7 @@ export function ModFormModal(props: IModFormModalProps) {
       <div className={csses.right_top}>
         <LangButton />
         <IconButton
-          letter='✖︎'
+          icon='✖︎'
           onClick={e => { interrupt_event(e); onClose?.() }} />
       </div>
 

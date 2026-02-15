@@ -42,13 +42,13 @@ export function MarkdownModal(props: { info?: Info } & IMaskProps) {
         <div className={classnames(csses.right_top_zone)}>
           <IconButton
             gone={loading}
-            letter="📋"
+            icon="📋"
             onClick={() => navigator.clipboard.writeText(markdown)}
             title="Copy Markdown"
             stopPropagation>
           </IconButton>
           <IconButton
-            letter="✖︎"
+            icon="✖︎"
             onClick={onClose}
             title="Close"
             stopPropagation />
@@ -69,7 +69,7 @@ export function MarkdownButton(props: { info?: Info }) {
   const [md_open, set_md_open] = useState(false);
   return (
     <>
-      <IconButton onClick={() => set_md_open(true)} title="View Markdown" img={img_markdown} />
+      <IconButton onClick={() => set_md_open(true)} title="View Markdown" icon={img_markdown} />
       <MarkdownModal
         info={info}
         open={md_open && !!info}

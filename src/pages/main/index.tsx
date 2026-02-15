@@ -159,7 +159,7 @@ export default function MainPage() {
         <IconButton
           className={csses.btn_toggle_game_list}
           onClick={() => set_game_list_open(!game_list_open)}
-          img={img_menu}
+          icon={img_menu}
           title={t('menu')} />
         <h1 className={csses.main_title}>
           {t("main_title")}
@@ -185,23 +185,23 @@ export default function MainPage() {
               }}>
               <IconButton
                 title={t('login')}
-                img={img_login} />
+                icon={img_login} />
             </Dropdown>
           </Show>
           <Show yes={!!session_id}>
             <IconButton
               title={t('logout')}
-              img={img_logout}
+              icon={img_logout}
               onClick={() => dispatch({ type: 'reset' })} />
           </Show>
           <IconButton
             href="https://github.com/gimhol/little-fighter-2-WEMAKE"
             title={t('goto_github')}
-            img={img_github} />
+            icon={img_github} />
           <IconButton
             href="https://gim.ink"
             title={t('goto_gimink')}
-            img={img_gimink} />
+            icon={img_gimink} />
         </div>
       </div>
       <div className={csses.main}>

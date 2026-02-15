@@ -53,7 +53,7 @@ export function Tooltip(props: ITooltipProps) {
     }
   }, [children, set_open, title])
 
-  const [gone, status] = useToggleStatus(open || viewing, [100, 300])
+  const [gone, status] = useToggleStatus(open || viewing, [300, 300])
   const cls = classnames(csses.tooltip, status === 'opening' ? csses.open : void 0)
   return <>
     {_children}

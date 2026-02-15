@@ -1,13 +1,16 @@
 import type { IFileInfo } from "@/api/listModRecords";
 import type { ReactNode } from "react";
 import { Picture } from "./Picture";
+import img_lf2_mod from "@/assets/svg/lf2_mod.svg"
+import img_lfw_mod from "@/assets/svg/lfw_mod.svg"
 
 export function get_icon(me: IFileInfo): ReactNode {
   const { type, content_type } = me;
   if (!type) return '📂'
   switch (type) {
     case "dir": return '📂';
-    case "mod": return '🧰';
+    case "mod": return img_lfw_mod;
+    case "omod": return img_lf2_mod;
     case "file":
       if (content_type && icon_map[content_type]) {
         const w = icon_map[content_type];

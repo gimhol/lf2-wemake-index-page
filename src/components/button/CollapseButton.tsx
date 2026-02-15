@@ -15,7 +15,7 @@ export function CollapseButton(props: ICollapseButtonProps) {
         __set_open(!__open);
       }}
       style={{ transform: `rotateZ(${__open ? 90 : 0}deg)` }}
-      img={img_arr}
+      icon={img_arr}
       {..._p} />
   );
 }

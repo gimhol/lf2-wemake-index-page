@@ -47,8 +47,8 @@ export function DetailCard(props: IDetailCardProps) {
           <div className={csses.mid}></div>
           <div className={csses.right}>
             <MarkdownButton info={info} />
-            <IconButton title={dl_win_x64} img={windows_x64} href={win_x64_url} gone={!win_x64_url} />
-            <IconButton letter='✖︎' onClick={onClose} stopPropagation />
+            <IconButton title={dl_win_x64} icon={windows_x64} href={win_x64_url} gone={!win_x64_url} />
+            <IconButton icon='✖︎' onClick={onClose} stopPropagation />
           </div>
         </div>
         <div className={csses.detail_card_main}>

@@ -26,7 +26,7 @@ export function InfoViewModal(props: IInfoViewModalProps) {
       </div>
       <IconButton
         style={{ position: 'absolute', right: 10, top: 10 }}
-        letter='✖︎'
+        icon='✖︎'
         onClick={e => { interrupt_event(e); onClose?.() }} />
     </Mask>
   );
