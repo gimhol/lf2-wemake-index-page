@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import { addModRecord } from "@/api/addModRecord"
+import { editModRecord } from "@/api/editModRecord"
 import { listModPath } from "@/api/listModPath"
 import { listModRecords, type IFileInfo } from "@/api/listModRecords"
 import img_create_dir from "@/assets/svg/create_dir.svg"
@@ -10,7 +11,6 @@ import img_preview from "@/assets/svg/preview.svg"
 import img_publish from "@/assets/svg/publish.svg"
 import img_reviewing from "@/assets/svg/reviewing.svg"
 import img_unpublish from "@/assets/svg/unpublish.svg"
-import { Info } from "@/base/Info"
 import { IconButton } from "@/components/button/IconButton"
 import { ImagesViewer } from "@/components/images/Viewer"
 import { Loading } from "@/components/loading"
@@ -32,12 +32,11 @@ import { useNavigate } from "react-router"
 import { useImmer } from "use-immer"
 import { FileRow } from "./FileRow"
 import { get_icon, get_icon_title } from "./get_icon"
-import { InfoViewModal } from "./InfoViewModal"
+import { ModPreviewModal } from "./ModPreviewModal"
 import { ModFormModal } from "./ModFormModal"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
 import { VideoModal } from "./VideoModal"
-import { editModRecord } from "@/api/editModRecord"
 
 export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const { t } = useTranslation()
@@ -58,7 +57,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const { value: { session_id, nickname, username } } = useContext(GlobalStore.context);
   const nav = useNavigate();
   const { search } = LocationParams.useAll();
-  const [previewing, set_previewing] = useImmer({ open: false, data: Info.empty(null) })
+  const [previewing, set_previewing] = useImmer({ open: false, mod_id: 0 })
 
   const refresh_files = (parent = dir?.id) => {
     set_pending(true)
@@ -155,15 +154,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     set_editing_mod({ open: true, data: target });
   }
 
-  const preview_mod = async ({ owner_id, id, type }: IFileInfo) => {
-    // TODO
-    if (type != 'mod') return new Error('TODO');
-    if (!id || !owner_id) return new Error('TODO')
-    if (!sts?.base) return new Error('TODO')
-    // const { info_obj_path } = get_mod_paths_names(owner_id, id);
-    // const info = await fetch_info(sts.base + info_obj_path, null, '', {})
-    // set_previewing({ open: true, data: info })
-  }
 
   const open_file = (target: IFileInfo) => {
     if (target.content_type?.startsWith('image/') && target.url) {
@@ -360,6 +350,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         {!pending && !files.length ? <div style={{ margin: 'auto' }}>empty</div> : null}
         {
           files.map(me => {
+            const mod_id = me.id;
             return (
               <FileRow
                 disabled={pending}
@@ -368,8 +359,8 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 icon_title={get_icon_title(me)}
                 name={me.name}
                 className={classnames(dragover == me.id ? csses.dragover : void 0)}
-                modify_time={me.modify_time ? dayjs(me.modify_time).format('YYYY-MM-DD HH:mm:ss.SSS') : void 0}
-                create_time={me.create_time ? dayjs(me.create_time).format('YYYY-MM-DD HH:mm:ss.SSS') : void 0}
+                modify_time={me.modify_time ? dayjs(me.modify_time).format('YYYY-MM-DD HH:mm:ss') : void 0}
+                create_time={me.create_time ? dayjs(me.create_time).format('YYYY-MM-DD HH:mm:ss') : void 0}
                 renameing={new_dir == me.id}
                 draggable
                 desc={me.size ? `Size: ${file_size_txt(me.size)}` : `Type: ${me.type ?? 'dir'}`}
@@ -400,12 +391,12 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                       disabled={pending}
                       onClick={() => edit_mod(me)} />
                   }
-                  {me.type !== 'mod' ? null :
+                  {me.type !== 'mod' || !mod_id ? null :
                     <IconButton
                       icon={img_preview}
                       title={t('preview_mod_info')}
                       disabled={pending}
-                      onClick={() => preview_mod(me)} />
+                      onClick={() => set_previewing({ open: true, mod_id })} />
                   }
                   {(me.type !== 'mod' || me.status) ? null :
                     <IconButton
@@ -496,12 +487,11 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
             <div>size: {file_size_txt(progress[2])}</div>
           </div> : null
       }
-      <InfoViewModal
+      <ModPreviewModal
         open={previewing.open}
         onClose={() => set_previewing(d => { d.open = false; })}
-        afterClose={() => set_previewing(d => { d.data = Info.empty() })}
-        data={previewing.data}
-      />
+        afterClose={() => set_previewing(d => { d.mod_id = 0 })}
+        mod_id={previewing.mod_id} />
     </div>
   )
 }

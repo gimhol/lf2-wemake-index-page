@@ -8,6 +8,7 @@
   white-space     : nowrap;
   opacity         : 0;
   transition      : opacity 255ms;
+  z-index         : 1000;
 }
 
 .tooltip.open {

@@ -49,8 +49,10 @@
 
   &>.foot {
     border-top     : 1px var(--color-divider) dashed;
+    color          : var(--color-secondary);
     display        : flex;
-    justify-content: center;
+    justify-content: flex-end;
+    align-items    : center;
     padding        : 5px;
   }
 }

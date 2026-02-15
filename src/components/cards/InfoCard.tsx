@@ -21,7 +21,7 @@ export function InfoCard(props: IInfoCardProps) {
   const { t } = useTranslation()
   const dl_win_x64 = t('dl_win_x64')
   const { info = empty_info } = props;
-  const { url, url_type, cover_url, unavailable } = info;
+  const { url, url_type, full_cover_url, unavailable } = info;
   const win_x64_url = info.get_download_url('win_x64');
   const ref_el = useRef<HTMLDivElement>(null)
   const [detail_style, set_detail_style] = useState<React.CSSProperties>({})
@@ -65,17 +65,17 @@ export function InfoCard(props: IInfoCardProps) {
         </div>
         <div className={csses.info_card_main}>
           {
-            !cover_url ? null : <img className={classnames(csses.pic_zone)} draggable={false} src={cover_url} />
+            !full_cover_url ? null : <img className={classnames(csses.pic_zone)} draggable={false} src={full_cover_url} />
           }
           {
             !(info.desc || info.desc_url || info.changelog || info.changelog_url) ? null :
-              <div className={classnames(cover_url ? csses.info_zone_half : csses.info_zone, csses.scrollview)}>
+              <div className={classnames(full_cover_url ? csses.info_zone_half : csses.info_zone, csses.scrollview)}>
                 <Viewer plain content={info.desc} url={info.desc_url} whenLoaded={v => info.set_desc(v)} />
                 <Viewer plain content={info.changelog} url={info.changelog_url} whenLoaded={v => info.set_changelog(v)} />
               </div>
           }
           {
-            (cover_url || info.desc || info.desc_url || info.changelog || info.changelog_url) ? null :
+            (full_cover_url || info.desc || info.desc_url || info.changelog || info.changelog_url) ? null :
               <div className={classnames(csses.no_content)}>{t('no_content')}</div>
           }
         </div>

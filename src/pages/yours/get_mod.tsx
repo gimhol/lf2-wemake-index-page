@@ -1,8 +1,7 @@
-import { findModRecord as findModRecord } from "@/api/findModRecord";
+import { findModRecord } from "@/api/findModRecord";
 import { getUserInfo, type IUserInfo } from "@/api/getUserInfo";
 import { type IFileInfo } from "@/api/listModRecords";
 import { Info, type IInfo } from "@/base/Info";
-import type OSS from "ali-oss";
 import { MD5 } from "crypto-js";
 import { join_url } from "./join_url";
 
@@ -29,8 +28,6 @@ export function get_mod_paths_names(owner_id: number, mod_id: number) {
 }
 export interface IGetModFormOpts {
   mod_id?: number;
-  oss?: OSS;
-  sts?: IOSSStsInfo;
 }
 export interface IMod {
   info: Info;
@@ -41,17 +38,12 @@ export interface IMod {
 const TAG = '[get_mod]'
 export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
   console.debug(`${TAG} opts:`, opts)
-  const { mod_id, oss, sts } = opts;
+  const { mod_id } = opts;
   if (!mod_id) throw new Error(`${TAG} mod_id got ${mod_id}`);
-  if (!sts) throw new Error(`${TAG} oss got ${oss}`);
-  if (!oss) throw new Error(`${TAG} sts got ${oss}`);
   const record = await findModRecord({ id: mod_id });
   const { owner_id, oss_name } = record;
   if (!owner_id) throw new Error('mod not found!');
   const owner = await getUserInfo({ id: record.owner_id });
-
-
-  
   const raw_info: IInfo = {
     author_url: owner?.home_url || owner?.gitee_url || owner?.github_url,
     author: owner.username || owner.username,

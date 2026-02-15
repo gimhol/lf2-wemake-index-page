@@ -8,6 +8,7 @@
   --color-link                : rgb(255, 255, 255);
   --color-link-hover          : rgb(255, 255, 255);
   --color-txt                 : rgb(255, 255, 255);
+  --color-secondary           : rgba(255, 255, 255, 0.425);
   --color-input               : rgb(255, 255, 255);
   --color-primary             : #10206C;
   --color-primary-hover       : #213492;
@@ -27,7 +28,7 @@
   --padding-l                 : 5px;
   --padding-l-align-w-icon-btn: var(--size-w-icon-btn);
 
-
+  color: var(--color-txt)
 }
 
 html.small-screen {

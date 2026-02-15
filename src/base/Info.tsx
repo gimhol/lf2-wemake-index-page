@@ -81,10 +81,9 @@ const { Cls, Str } = makeI18N();
     const { cover_url: url, src } = this
     if (!url) return void 0;
     if (url.match(/^https?:\/\//)) return url;
+    if (url.includes('/')) return join_url(STORAGE_URL_BASE, url)
     if (!src) return url
-    const parts = src.split('/')
-    parts.pop()
-    return join_url(...parts, url)
+    return join_url(STORAGE_URL_BASE, ...src.split('/').slice(0, -1), url)
   }
   constructor(raw: IInfo, lang: string, parent: Info | null, src: string | null) {
     this.src = src;
@@ -164,8 +163,8 @@ const { Cls, Str } = makeI18N();
     } else if (this.author_url) {
       text += `visit [author](${this.author_url})\n\n`
     }
-    text += `[中文](CHANGELOG.MD) | [English](CHANGELOG.EN.MD)`
-    text += '\n\n'
+    text += `[中文](CHANGELOG.MD) | [English](CHANGELOG.EN.MD)\n\n`
+
     text += await this.fetch_desc().then(r => r ? `${r}\n\n` : '')
     text += await this.fetch_changelog().then(r => r ? `${r}\n\n` : '')
 

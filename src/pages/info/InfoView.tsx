@@ -54,7 +54,7 @@ export function InfoView(props: IInfoViewProps) {
     __set_listLike(listlike)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [info])
-  
+
   const { t } = useTranslation()
   const { children_title, date, unavailable, desc, brief, desc_url, title, changelog, changelog_url } = info ?? {};
   const win_x64_url = info?.get_download_url('win_x64')
@@ -93,22 +93,22 @@ export function InfoView(props: IInfoViewProps) {
             title="Cards or List"
             icon={__next_list_like === 'cards' ? img_cards_view : img_list_view} />
           {info ? <MarkdownButton info={info} /> : null}
-          <div className={csses.el_date}>
-            {date}
-          </div>
+          {date ? <div className={csses.el_date}> {date} </div> : null}
         </div>
       </div>
-      <Viewer
-        emptyAsGone
-        content={brief} />
-      <Collapse open={__open && has_content} className={csses.content_zone} >
+
+      <Viewer className={csses.content_zone} emptyAsGone content={brief} />
+
+      <Collapse open={__open && has_content} >
         <Viewer
           emptyAsGone
+          className={csses.content_zone}
           content={desc}
           url={desc_url}
           whenLoaded={t => info?.set_desc(t)} />
         <Viewer
           emptyAsGone
+          className={csses.content_zone}
           content={changelog}
           url={changelog_url}
           whenLoaded={t => info?.set_changelog(t)} />

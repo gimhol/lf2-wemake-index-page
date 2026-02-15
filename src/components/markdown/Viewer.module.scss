@@ -1,5 +1,5 @@
 .viewer {
-  padding: 10px;
+  padding: var(--padding-t) var(--padding-r) var(--padding-b) var(--padding-l);
 
   video {
     display      : block;

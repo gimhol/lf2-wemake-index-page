@@ -213,6 +213,11 @@ export default function MainPage() {
           <Outlet />
         </main_context.Provider>
       </div>
+      <div className={csses.foot}>
+        <span className={csses.foot}>
+          {t('latest_build_time')}: {BUILD_TIME}
+        </span>
+      </div>
     </div >
     <Loading big loading={loading} style={{ position: 'absolute', margin: 'auto auto' }} />
     <Mask

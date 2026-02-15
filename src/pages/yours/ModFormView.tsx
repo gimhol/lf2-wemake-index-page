@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import type { IInfo } from "@/base/Info";
+import { Info, type IInfo } from "@/base/Info";
 import { CollapseButton } from "@/components/button/CollapseButton";
 import { IconButton } from "@/components/button/IconButton";
+import { InfoCard } from "@/components/cards/InfoCard";
 import { Collapse } from "@/components/collapse/Collapse";
 import { ImagesViewer } from "@/components/images/Viewer";
 import { Loading } from "@/components/loading";
@@ -14,9 +15,11 @@ import { useOSS } from "@/hooks/useOSS";
 import { useOSSUploadModImages } from "@/hooks/useOSSUploadModImages";
 import { interrupt_event } from "@/utils/interrupt_event";
 import classnames from "classnames";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useImmer } from "use-immer";
+import { InfoView } from "../info/InfoView";
 import csses from "./ModFormView.module.scss";
 import { get_mod, type IMod } from "./get_mod";
 import { replace_one } from "./join_url";
@@ -39,12 +42,8 @@ export function ModFormView(props: IModFormViewProps) {
   const [covers, set_covers] = useState<IPickedFile[]>()
   const [attachments, set_attachments] = useState<IPickedFile[]>()
   const [attachment_uploading, set_attachment_uploading] = useState(false);
-  const [opens, set_opens] = useImmer({
-    base: true,
-    brief: true,
-    desc: !document.firstElementChild?.classList.contains('small-screen'),
-    changelog: !document.firstElementChild?.classList.contains('small-screen'),
-  })
+  const small = !document.firstElementChild?.classList.contains('small-screen')
+  const [opens, set_opens] = useImmer({ base: true, brief: small, desc: small, changelog: small, preview: false })
   useEffect(() => {
     if (!mod_id || !sts) {
       set_loading(false)
@@ -52,7 +51,7 @@ export function ModFormView(props: IModFormViewProps) {
     }
     set_loading(true);
     const ab = new AbortController();
-    get_mod({ mod_id, oss, sts })
+    get_mod({ mod_id })
       .then(r => {
         if (ab.signal.aborted) return;
         set_draft(r.info.raw)
@@ -71,13 +70,26 @@ export function ModFormView(props: IModFormViewProps) {
 
   const tool_tips_container = () => document.getElementsByClassName(csses.mod_form_view).item(0)!
 
+  const [previewing, set_previewing] = useImmer({ info: void 0 as undefined | Info })
+
+  const preview = () => {
+    if (!mod) return;
+    const open = opens.preview;
+    if (open) {
+      set_previewing({ info: void 0 })
+    } else {
+      set_previewing({ info: mod.info.load(draft).clone().set_id('' + mod_id).set_date(dayjs().format(`YYYY-MM-DD HH:mm:ss`)) })
+    }
+    set_opens({ base: open, brief: open, desc: open, changelog: open, preview: !open })
+  }
+
   const save = () => {
     if (!mod) return;
     set_loading(true)
-    const next = mod.info.load(draft).clone().set_id('' + mod_id);
+    const next = mod.info.load(draft).clone().set_id('' + mod_id).set_date(dayjs().format(`YYYY-MM-DD HH:mm:ss`));
     save_mod({ mod_id, oss, sts, info: next })
       .then(() => {
-        return get_mod({ mod_id, oss, sts })
+        return get_mod({ mod_id })
       }).then(r => {
         set_draft(r.info.raw)
         set_mod(r)
@@ -92,7 +104,7 @@ export function ModFormView(props: IModFormViewProps) {
       })
   }
 
-  return (
+  return <>
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
       {toast_ctx}
       <div className={csses.head}>
@@ -182,7 +194,7 @@ export function ModFormView(props: IModFormViewProps) {
             </PickFile>
           </div>
           <div className={csses.form_row}>
-            <span>{t('data_zip')}:</span>
+            <span>{t('attachment')}:</span>
             <PickFile
               max={1}
               accept=".zip"
@@ -260,9 +272,28 @@ export function ModFormView(props: IModFormViewProps) {
               placeholder={t("edit_changelog_here")} />
           </div>
         </Collapse>
+        <h2 className={csses.title}>
+          <CollapseButton open={opens.preview} onClick={preview} />
+          {t("mod_preview")}
+        </h2>
+        <Collapse open={opens.preview} classNames={{ inner: csses.collapse_inner }}>
+          <div style={{ display: 'flex', gap: 10, padding: 10, alignItems: 'flex-start' }}>
+            <InfoCard info={previewing.info} />
+            <InfoView info={previewing.info} className='bg' style={{ flex: 1 }} />
+          </div>
+        </Collapse>
       </div>
+
       <div className={csses.foot}>
         <div style={{ flex: 1 }} />
+        <IconButton
+          style={{ fontSize: '2rem' }}
+          title={t('save_mod_info')}
+          container={tool_tips_container}
+          disabled={loading || cover_uploading || attachment_uploading}
+          onClick={preview}>
+          {t('preview')}
+        </IconButton>
         <IconButton
           style={{ fontSize: '2rem' }}
           title={t('save_mod_info')}
@@ -274,5 +305,5 @@ export function ModFormView(props: IModFormViewProps) {
       </div>
       <Loading big absolute center loading={loading} />
     </div>
-  );
+  </>
 }

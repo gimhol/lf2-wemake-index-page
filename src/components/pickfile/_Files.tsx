@@ -70,7 +70,7 @@ export function Files(props: IFilePickerFilesProps) {
               }}>
               {typeof record.progress === 'number' ? <div className={csses.progress} title={record.name}
                 style={{ width: `${(100 * record.progress).toFixed(1)}%` }} /> : null}
-              {record.file?.size ? `(${file_size_txt(record.file.size)})` : null}{record.name} 
+              {record.file?.size ? `(${file_size_txt(record.file.size)})` : null}{record.name}
             </div>
           </div>
         )
@@ -80,7 +80,7 @@ export function Files(props: IFilePickerFilesProps) {
           interrupt_event(e);
           open()
         }}>
-          {" Click & Pick or Drop File in here "}
+          Click & Pick or Drop {accept ? `"${accept}"` : 'Files'} in here
         </div>
       }
     </div>

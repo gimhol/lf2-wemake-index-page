@@ -18,8 +18,7 @@ export async function ossUploadModRecords(opts: IOssUploadModRecordsOpts): Promi
     getObjectName = async (f: File, sts: IOSSStsInfo) => {
       if (typeof mod_id !== 'number') throw new Error('mod_id not set')
       const md5 = await read_blob_as_md5(f);
-      if (sts.dir) join_url(sts.dir, mod_id, md5)
-      return `${mod_id}/${md5}`
+      return join_url(sts.dir, mod_id, md5)
     }, ..._p } = opts;
   if (typeof mod_id !== 'number') throw new Error('mod_id not set');
   const r = await ossUploadFiles({ ..._p, getObjectName });

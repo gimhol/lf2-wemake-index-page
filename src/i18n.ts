@@ -40,7 +40,9 @@ const zh = {
   "mod_description": "描述",
   "mod_changelog": "更新日志",
   "edit_brief_here": "再此编辑简介(500字内)",
-  "workspace": "Workspace",
+  "workspace": "工作间",
+  "attachment": "附件",
+  "latest_build_time": "最近构建"
 }
 const en = {
   "author": "author",
@@ -82,6 +84,8 @@ const en = {
   "mod_changelog": "Changelog",
   "edit_brief_here": "Edit Brief Here (Within 500 Characters)",
   "workspace": "Workspace",
+  "attachment": "Attachment",
+  "latest_build_time": "Latest Build"
 }
 const resources = {
   "zh": { translation: zh },
