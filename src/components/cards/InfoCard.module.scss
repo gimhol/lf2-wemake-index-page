@@ -8,14 +8,15 @@
 
   .suffix {
     opacity    : 0.5;
-    font-size  : 0.6rem;
+    font-size  : var(--font-size-tiny);
+    font-weight : 100;
     display    : inline-block;
     margin-left: 2px;
   }
 
   .prefix {
     opacity     : 0.5;
-    font-size   : 0.6rem;
+    font-size   : var(--font-size-tiny);
     display     : inline-block;
     margin-right: 2px;
   }

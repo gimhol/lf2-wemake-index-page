@@ -1,14 +1,15 @@
 .tooltip {
   position        : fixed;
-  background-color: var(--tooltip-bg-color, white);
-  color           : var(--tooltip-txt-color, black);
-  font-size       : var(--tooltip-font-size, 12px);
+  color           : var(--color-tooltip);
+  background-color: var(--color-tooltip-bg);
+  font-size       : var(--font-size-tooltip);
   border-radius   : 5px;
   padding         : 5px;
   white-space     : nowrap;
   opacity         : 0;
   transition      : opacity 255ms;
 }
+
 .tooltip.open {
   opacity: 1;
 }

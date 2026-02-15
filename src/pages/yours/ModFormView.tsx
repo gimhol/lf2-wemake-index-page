@@ -9,23 +9,22 @@ import { EditorView } from "@/components/markdown/editor/EditorView";
 import { PickFile } from "@/components/pickfile";
 import type { IPickedFile } from "@/components/pickfile/_Common";
 import Toast from "@/gimd/Toast";
-import { ossUploadModFiles, type IUploadFileResult } from "@/hooks/ossUploadModFiles";
+import { ossUploadModRecords, type IUploadFileResult } from "@/hooks/ossUploadModRecords";
 import { useOSS } from "@/hooks/useOSS";
 import { useOSSUploadModImages } from "@/hooks/useOSSUploadModImages";
 import { file_size_txt } from "@/utils/file_size_txt";
 import { interrupt_event } from "@/utils/interrupt_event";
+import { read_blob_as_md5 } from "@/utils/read_blob_as_md5";
 import classnames from "classnames";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useImmer } from "use-immer";
 import csses from "./ModFormView.module.scss";
 import { get_mod, type IMod } from "./get_mod";
-import { replace_one } from "./join_url";
+import { join_url, replace_one } from "./join_url";
 export interface IModFormViewProps {
   mod_id?: number;
 }
-
-
 export function ModFormView(props: IModFormViewProps) {
   const { mod_id } = props;
   const { t } = useTranslation();
@@ -57,7 +56,8 @@ export function ModFormView(props: IModFormViewProps) {
         if (ab.signal.aborted) return;
         set_draft(r.info.raw)
         set_mod(r)
-        if (r.full_cover_url) set_covers([{ url: r.full_cover_url }])
+        if (r.info.full_cover_url) 
+          set_covers([{ url: r.info.full_cover_url }])
       }).catch(e => {
         if (ab.signal.aborted) return;
         toast(e)
@@ -79,9 +79,11 @@ export function ModFormView(props: IModFormViewProps) {
       .set_url(available ? mod.strings.data_obj_name : void 0)
       .set_unavailable(available ? void 0 : 'unpublish')
     const json_blob = new Blob([JSON.stringify(next.raw)], { type: 'application/json; charset=utf-8' })
-    oss.put(mod.strings.info_obj_path, json_blob).then(() => {
-      console.log(sts.base + mod.strings.info_obj_path)
-      return oss.head(mod.strings.info_obj_path)
+
+    const oss_obj_name = join_url(sts.dir, mod_id, read_blob_as_md5(json_blob))
+    console.log(oss_obj_name)
+    oss.put(oss_obj_name, json_blob).then(() => {
+      return oss.head(oss_obj_name)
     }).then(r => {
       return r
     }).then(r => {
@@ -155,7 +157,7 @@ export function ModFormView(props: IModFormViewProps) {
                 set_covers(records)
                 if (!records?.length) return;
                 set_cover_uploading(true);
-                ossUploadModFiles({
+                ossUploadModRecords({
                   mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
                     'image/png': { max_size: 5 * 1024 * 1024 },
                     'image/jpeg': { max_size: 5 * 1024 * 1024 },
@@ -194,7 +196,7 @@ export function ModFormView(props: IModFormViewProps) {
               onChange={e => {
                 if (!e.target.files?.length) return;
                 const files = Array.from(e.target.files)
-                ossUploadModFiles({
+                ossUploadModRecords({
                   mod_id, files, oss, sts, limits: {
                     'application/x-zip-compressed': { max_size: 100 * 1024 * 1024 },
                     'application/zip': { max_size: 100 * 1024 * 1024 },

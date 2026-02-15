@@ -14,7 +14,7 @@
       width           : 100px;
       height          : 100px;
       border-width    : 1px;
-      border-color    : var(--border-color, var(--txt-color, red));
+      border-color    : var(--border-color, var(--color-txt, red));
       border-style    : dashed;
       position        : relative;
       background-color: var(--filepicker-img-bg-color, #00000055);
@@ -25,7 +25,7 @@
       align-items    : center;
       justify-content: center;
       text-align     : center;
-      font-size      : var(--font-size-small, 12px);
+      font-size      : var(--font-size-small);
       white-space    : pre-wrap;
     }
 
@@ -101,7 +101,7 @@
       white-space            : nowrap;
       text-overflow          : ellipsis;
       padding                : 2px 5px;
-      font-size              : var(--font-size-small, 12px);
+      font-size              : var(--font-size-small);
       color                  : var(--txt-in-dark-color, white);
       border-radius          : var(--border-radius, 10px);
       border-top-right-radius: 0px;

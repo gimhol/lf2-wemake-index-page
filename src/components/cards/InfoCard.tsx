@@ -1,6 +1,5 @@
 import windows_x64 from "@/assets/svg/windows_x64.svg";
 import { Info } from "@/base/Info";
-import { MarkdownButton } from "@/pages/main/MarkdownModal";
 import { submit_click_event } from "@/utils/events";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
@@ -56,13 +55,12 @@ export function InfoCard(props: IInfoCardProps) {
         <div className={csses.info_card_head}>
           <Link className={csses.title} href={url}>
             {info.title}
-            {url_type === Info.OPEN_IN_BROWSER && url ? ' ▸' : null}
+            {info.url_type === Info.OPEN_IN_BROWSER && url ? ' ▸' : null}
           </Link>
           <span className={csses.suffix}>
             {title_suffix}
           </span>
           <div className={csses.mid}></div>
-          <MarkdownButton info={info} />
           <IconButton title={dl_win_x64} href={win_x64_url} gone={!win_x64_url} img={windows_x64} />
         </div>
         <div className={csses.info_card_main}>

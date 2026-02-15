@@ -1,4 +1,4 @@
-import type { IFileInfo } from "@/api/listModFiles";
+import type { IFileInfo } from "@/api/listModRecords";
 import type { ReactNode } from "react";
 import { Picture } from "./Picture";
 

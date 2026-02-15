@@ -1,4 +1,4 @@
-@import url(@/theme/common.module.scss);
+@use "@/theme/common.module.scss"as any;
 
 .main_page {
   display       : flex;
@@ -13,7 +13,7 @@
 
   &>.head {
     padding      : var(--padding-t) var(--padding-r) var(--padding-b) var(--padding-l);
-    border-bottom: 1px var(--divider-color) dashed;
+    border-bottom: 1px var(--color-divider) dashed;
     display      : flex;
     align-items  : center;
     position     : relative;
@@ -37,14 +37,11 @@
       flex       : 1;
       position   : relative;
       margin     : 0px 0px;
-      font-size  : 1.2em;
       white-space: nowrap;
     }
 
     .right_zone {
-      margin-left: auto;
-      display    : flex;
-      gap        : 8px;
+      @extend .actions_row;
     }
 
   }
@@ -66,7 +63,7 @@
   }
 
   &>.foot {
-    border-top     : 1px var(--divider-color) dashed;
+    border-top     : 1px var(--color-divider) dashed;
     display        : flex;
     justify-content: center;
     padding        : 5px;
@@ -89,7 +86,7 @@
   overflow      : auto;
   display       : flex;
   flex-direction: column;
-  border-right  : 1px var(--divider-color) dashed;
+  border-right  : 1px var(--color-divider) dashed;
   padding       : 5px;
   box-sizing    : border-box;
   flex-shrink   : 1;
@@ -108,12 +105,12 @@
 }
 
 .game_item:hover {
-  background-color: var(--primary-color-hover);
+  background-color: var(--color-primary-hover);
 }
 
 .game_item_actived {
   @extend .game_item;
-  background-color: var(--primary-color-actived);
+  background-color: var(--color-primary-actived);
 }
 
 .changelog_md_modal {
@@ -121,7 +118,7 @@
   display         : inline-block;
   box-shadow      : 0px 5px 15px -3px rgba(0, 0, 0, 0.5);
   border-radius   : 10px;
-  background-color: var(--primary-color);
+  background-color: var(--color-primary);
   box-sizing      : border-box;
   overflow        : hidden;
   transition      : all 220ms;

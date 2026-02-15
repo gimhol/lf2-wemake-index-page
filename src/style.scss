@@ -1,27 +1,39 @@
 :root {
   // font-family             : Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata", "Courier New", monospace;
-  font-family             : Consolas, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  font-synthesis          : none;
-  text-rendering          : optimizeLegibility;
-  -webkit-font-smoothing  : antialiased;
-  -moz-osx-font-smoothing : grayscale;
-  --divider-color         : #FFFFFF22;
-  --link-color            : rgb(176, 185, 231);
-  --link-color-hover      : #FFFFFFFF;
-  --txt-color             : #8393e4FF;
-  --input-color           : rgb(176, 185, 231);
-  --primary-color         : #10206C;
-  --primary-color-hover   : #213492;
-  --primary-color-actived : #1b2a75;
+  font-family            : Consolas, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-synthesis         : none;
+  text-rendering         : optimizeLegibility;
+  -webkit-font-smoothing : antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --color-divider        : #ffffff1a;
+  --color-link           : rgb(255, 255, 255);
+  --color-link-hover     : rgb(255, 255, 255);
+  --color-txt            : rgb(255, 255, 255);
+  --color-input          : rgb(255, 255, 255);
+  --color-primary        : #10206C;
+  --color-primary-hover  : #213492;
+  --color-primary-actived: #1b2a75;
+  --color-tooltip-bg     : white;
+  --color-tooltip        : black;
+
   --small-screen-width-min: 0px;
   --icon-button-width     : 1.8rem;
   --icon-button-height    : 1.8rem;
+
+  --font-size-txt    : 14px;
+  --font-size-small  : 10px;
+  --font-size-tiny   : 8px;
+  --font-size-tooltip: 12px;
+
 }
 
 #root {
   height    : 100%;
   width     : 100%;
   transition: all 255ms;
+  font-size : var(--font-size-txt);
+  color     : var(--color-txt);
 }
 
 .scrollview {
@@ -29,10 +41,9 @@
 }
 
 .bg {
-  background-color : var(--primary-color);
+  background-color : var(--color-primary);
   background-image : url(./assets/img_bg.png);
   background-repeat: repeat;
-  color            : var(--txt-color);
 }
 
 .modal {
@@ -63,18 +74,17 @@ button {
   border         : none;
   background     : none;
   outline        : none;
-  color          : white;
+  color          : var(--color-txt);
   border-radius  : 5px;
   padding        : 3px 5px;
   transition     : all 200ms;
   display        : flex;
   align-items    : center;
   justify-content: center;
-  font-size      : 1rem;
 }
 
 a {
-  color      : var(--link-color);
+  color      : var(--color-link);
   transition : all 200ms;
   padding    : 0px;
   display    : inline-flex;
@@ -91,7 +101,7 @@ a {
 a:hover:not(:disabled),
 button:hover:not(:disabled) {
   border-radius   : 5px;
-  background-color: var(--divider-color);
+  background-color: var(--color-divider);
 }
 
 a:disabled,

@@ -1,4 +1,4 @@
-@use "../../theme/common.module.scss"as *;
+@use "@/theme/common.module.scss"as *;
 
 .mod_form_view {
   width         : 100%;
@@ -17,7 +17,7 @@
 
   &>div {
     padding: 10px;
-    @extend ._bottom_dash_line;
+    @extend .bottom_divider;
   }
 }
 
@@ -38,9 +38,8 @@
   color           : white;
   border-radius   : 5px;
   padding         : 5px 5px;
-  font-size       : 1rem;
   font-family     : inherit;
-  background-color: var(--divider-color);
+  background-color: var(--color-divider);
   box-sizing      : border-box;
   display         : flex;
   align-items     : center;

@@ -1,52 +1,44 @@
-.scrollview {
-  &::-webkit-scrollbar {
-    width           : 8px;
-    height          : 8px;
-    background-color: transparent;
-  }
-
-  &::-webkit-scrollbar-track {
-    background   : transparent;
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background   : var(--divider-color);
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: #FFFFFF88;
-  }
+.scrollview::-webkit-scrollbar {
+  width           : 8px;
+  height          : 8px;
+  background-color: transparent;
 }
 
-
-.noscrollbar {
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  &::-webkit-scrollbar-track {
-    display: none;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    display: none;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    display: none;
-  }
+.scrollview::-webkit-scrollbar-track {
+  background   : transparent;
+  border-radius: 4px;
 }
 
+.scrollview::-webkit-scrollbar-thumb {
+  background   : var(--color-divider);
+  border-radius: 4px;
+}
 
+.scrollview::-webkit-scrollbar-thumb:hover {
+  background: #FFFFFF88;
+}
 
-._transparent_border {
+.noscrollbar::-webkit-scrollbar,
+.noscrollbar::-webkit-scrollbar-track,
+.noscrollbar::-webkit-scrollbar-thumb,
+.noscrollbar::-webkit-scrollbar-thumb:hover {
+  display: none;
+}
+
+.transparent_border {
   border: 1px transparent solid;
 }
 
-._bottom_dash_line {
+.bottom_divider {
   border-bottom-style: dashed;
   border-bottom-width: 1px;
-  border-bottom-color: var(--divider-color, black);
+  border-bottom-color: var(--color-divider, black);
+}
+
+.actions_row {
+  margin-left    : auto;
+  display        : flex;
+  gap            : 8px;
+  align-items    : center;
+  justify-content: center;
 }

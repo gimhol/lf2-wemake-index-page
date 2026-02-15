@@ -1,11 +1,11 @@
-._transparent_border {
+.transparent_border {
   border: 1px transparent solid;
 }
 
-._bottom_dash_line {
+.bottom_divider {
   border-bottom-style: dashed;
   border-bottom-width: 1px;
-  border-bottom-color: var(--divider-color, black);
+  border-bottom-color: var(--color-divider, black);
 }
 
 .file_list_item.dragover {
@@ -13,7 +13,7 @@
 }
 
 .file_list_item {
-  @extend ._transparent_border;
+  @extend .transparent_border;
   display    : flex;
   align-items: stretch;
   cursor     : default;
@@ -22,7 +22,7 @@
   flex-wrap  : wrap;
 
   &:not(:last-child) {
-    @extend ._bottom_dash_line;
+    @extend .bottom_divider;
   }
 
   .icon_btn {
@@ -32,7 +32,7 @@
   .mid_zone {
     flex       : 2;
     align-items: center;
-    color      : var(--input-color, black);
+    color      : var(--color-input, black);
     gap        : 5px;
     flex-shrink: 0;
 
@@ -41,8 +41,8 @@
       outline            : none;
       border             : none;
       background         : none;
-      color              : var(--input-color, black);
-      border-bottom-color: var(--txt-color, black);
+      color              : var(--color-input, black);
+      border-bottom-color: var(--color-txt, black);
       border-bottom-style: solid;
       border-bottom-width: 1px;
 
@@ -53,7 +53,6 @@
 
       padding    : 0px;
       align-self : stretch;
-      font-size  : 1rem;
       font-family: inherit;
       box-sizing : border-box;
     }
@@ -84,7 +83,7 @@
     .desc_view {
       flex-direction: column;
       align-items   : flex-end;
-      font-size     : 11px;
+      font-size     : var(--font-size-small);
 
       .desc_txt {
         white-space: nowrap;

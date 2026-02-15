@@ -1,6 +1,6 @@
-import { findModFile } from "@/api/findModFile";
+import { findModRecord as findModRecord } from "@/api/findModRecord";
 import { getUserInfo, type IUserInfo } from "@/api/getUserInfo";
-import { type IFileInfo } from "@/api/listModFiles";
+import { type IFileInfo } from "@/api/listModRecords";
 import { Info, type IInfo } from "@/base/Info";
 import type OSS from "ali-oss";
 import { MD5 } from "crypto-js";
@@ -8,20 +8,20 @@ import { join_url } from "./join_url";
 
 export function get_mod_paths_names(owner_id: number, mod_id: number) {
   const dir = `user/${owner_id}/${mod_id}`;
-  const info_obj_name = MD5(`${mod_id}/info`).toString()
+  // const info_obj_name = MD5(`${mod_id}/info`).toString()
   const data_obj_name = MD5(`${mod_id}/data`).toString()
   const desc_obj_name = MD5(`${mod_id}/desc`).toString()
   const children_obj_name = MD5(`${mod_id}/children`).toString()
-  const info_obj_path = dir + '/' + info_obj_name
+  // const info_obj_path = dir + '/' + info_obj_name
   const data_obj_path = dir + '/' + data_obj_name
   const desc_obj_path = dir + '/' + desc_obj_name
   const children_obj_path = dir + '/' + children_obj_name
   return {
-    info_obj_name,
+    // info_obj_name,
     data_obj_name,
     desc_obj_name,
     children_obj_name,
-    info_obj_path,
+    // info_obj_path,
     data_obj_path,
     desc_obj_path,
     children_obj_path
@@ -34,32 +34,38 @@ export interface IGetModFormOpts {
 }
 export interface IMod {
   info: Info;
-  file: IFileInfo;
+  record: IFileInfo;
   owner: IUserInfo;
   strings: ReturnType<typeof get_mod_paths_names>
-  full_cover_url?: string;
 }
 
 export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
+
+
   const { mod_id, oss, sts } = opts;
   if (!mod_id || !oss || !sts) throw new Error('!');
-  const mod_info = await findModFile({ id: mod_id });
-  const { owner_id } = mod_info;
+
+  const record = await findModRecord({ id: mod_id });
+  const { owner_id, oss_name } = record;
   if (!owner_id) throw new Error('mod not found!');
-
-  join_url(STORAGE_URL_BASE, 'user', owner_id, mod_id)
-
-  const owner_info = await getUserInfo({ id: mod_info.owner_id });
-  const paths_names = get_mod_paths_names(owner_info.id, mod_id);
-  const raw_info = await oss.get(paths_names.info_obj_path).then<IInfo>(r => {
-    return JSON.parse(new TextDecoder().decode(r.content));
-  }).catch(e => {
-    if (e.name !== 'NoSuchKeyError') throw e;
-    return {} as IInfo;
-  });
-  const info = new Info(raw_info, '', null, null);
-  info.author_url = info.author_url || owner_info?.home_url || owner_info?.gitee_url || owner_info?.github_url;
-  info.author = info.author || owner_info.username || owner_info.username;
-  info.title = info.title || mod_info.name;
-  return { strings: paths_names, info, file: mod_info, owner: owner_info };
+  const owner = await getUserInfo({ id: record.owner_id });
+  const raw_info: IInfo = {
+    author_url: owner?.home_url || owner?.gitee_url || owner?.github_url,
+    author: owner.username || owner.username,
+    title: record.name,
+  }
+  if (oss_name) {
+    Object.assign(
+      raw_info,
+      await fetch(join_url(STORAGE_URL_BASE, oss_name)).then<IInfo>(r => {
+        if (!r.ok) throw new Error(`[${r.status}]${r.statusText}`)
+        return r.json()
+      })
+    )
+  }
+  const strings = get_mod_paths_names(owner.id, mod_id);
+  const info = new Info(raw_info, '', null, oss_name || null);
+  info.id = '' + mod_id;
+  console.log({ info })
+  return { strings, info, record, owner };
 }

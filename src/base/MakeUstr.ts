@@ -19,8 +19,8 @@ export function makeI18N() {
     if (desc.kind !== 'field' || desc.static || typeof name !== 'string') return
     fields.add(name)
   }
-  function Cls(cls: any) {
-    class A extends cls {
+  function Cls(cls: any): any {
+    return class extends cls {
       constructor(...args: any[]) {
         super(...args);
         for (const field of fields) {
@@ -35,7 +35,6 @@ export function makeI18N() {
         }
       }
     }
-    return A as any
   }
   return { Cls, Str }
 }

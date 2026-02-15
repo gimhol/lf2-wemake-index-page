@@ -9,7 +9,7 @@
 
 .badge.badge_size_s {
   padding      : 3px;
-  font-size    : 10px;
+  font-size    : var(--font-size-small);
   border-radius: 8px;
   min-width    : 16px;
   height       : 16px;
@@ -17,7 +17,7 @@
 
 .badge.badge_size_m {
   padding      : 3px;
-  font-size    : 10px;
+  font-size    : var(--font-size-small);
   border-radius: 8px;
   min-width    : 16px;
   height       : 16px;
@@ -25,7 +25,7 @@
 
 .badge.badge_size_l {
   padding      : 3px;
-  font-size    : 10px;
+  font-size    : var(--font-size-small);
   border-radius: 8px;
   min-width    : 16px;
   height       : 16px;

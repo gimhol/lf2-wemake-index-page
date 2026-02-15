@@ -12,19 +12,19 @@
   }
 }
 
-._transparent_border {
+.transparent_border {
   border: 1px transparent solid;
 }
 
-._bottom_dash_line {
+.bottom_divider {
   border-bottom-style: dashed;
   border-bottom-width: 1px;
-  border-bottom-color: var(--divider-color, black);
+  border-bottom-color: var(--color-divider, black);
 }
 
 .file_list_head {
-  @extend ._transparent_border;
-  @extend ._bottom_dash_line;
+  @extend .transparent_border;
+  @extend .bottom_divider;
   display    : flex;
   align-items: stretch;
   overflow   : hidden;
@@ -40,15 +40,13 @@
     div {
       display    : flex;
       align-items: center;
-      font-size  : 12px;
     }
 
     .breadcrumb_item {
       display    : flex;
       align-items: center;
-      font-size  : 12px;
       padding    : 0px;
-      color      : var(--txt-color);
+      color      : var(--color-txt);
       line-height: 12px;
       flex-shrink: 0;
       min-width  : 28px;
@@ -61,15 +59,14 @@
 }
 
 .file_list {
-  @extend ._transparent_border;
+  @extend .transparent_border;
   display       : flex;
   flex-direction: column;
   overflow      : auto;
   flex          : 1;
-  padding       : 10px;
 
   &:not(:last-child) {
-    @extend ._bottom_dash_line;
+    @extend .bottom_divider;
   }
 }
 

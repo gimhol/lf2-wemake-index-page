@@ -1,4 +1,4 @@
-@import url(@/theme/common.module.scss);
+@use "@/theme/common.module.scss"as *;
 
 .info_view_root {
   overflow      : hidden;
@@ -12,29 +12,29 @@
 
   .suffix {
     opacity    : 0.75;
-    font-size  : 0.6rem;
+    font-size  : var(--font-size-tiny);
     display    : inline-block;
     margin-left: 2px;
   }
-
+  .prefix {
+    opacity     : 0.5;
+    font-size   : var(--font-size-tiny);
+    display     : inline-block;
+    margin-right: 2px;
+  }
   .tag {
     @extend .suffix;
     border-radius: 2px;
     border-width : 1px;
     border-style : solid;
-    border-color : var(--txt-color);
+    border-color : var(--color-txt);
     padding      : 1px;
   }
 
-  .prefix {
-    opacity     : 0.5;
-    font-size   : 0.6rem;
-    display     : inline-block;
-    margin-right: 2px;
-  }
+
 
   &:not(:last-child) {
-    border-bottom: 1px var(--divider-color) dashed;
+    border-bottom: 1px var(--color-divider) dashed;
   }
 
   .collapse_btn_hide {
@@ -71,17 +71,13 @@
   }
 
   .head_right_zone {
-    min-width      : 48px;
-    display        : flex;
-    align-items    : center;
-    justify-content: center;
-    gap            : 8px;
-    margin-left    : auto;
+    @extend .actions_row;
+    min-width: 48px;
   }
 
   .el_date {
     opacity        : 0.75;
-    font-size      : 12px;
+    font-size      : var(--font-size-small);
     font-weight    : normal;
     overflow       : visible;
     display        : flex;
@@ -114,7 +110,7 @@
 
     button {
       pointer-events         : all;
-      --icon-letter-color    : var(--txt-color);
+      --icon-letter-color    : var(--color-txt);
       --icon-letter-font-size: 12px;
       height                 : 16px;
       width                  : 16px;
@@ -125,12 +121,12 @@
     }
 
     &:not(:last-child) {
-      border-bottom: 1px var(--divider-color) dashed;
+      border-bottom: 1px var(--color-divider) dashed;
     }
 
     .children_title {
       &>span {
-        background-color: var(--primary-color);
+        background-color: var(--color-primary);
       }
 
       font-size   : 12px;

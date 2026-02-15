@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
-import { addModFile } from "@/api/addModFile"
-import { listModFiles, type IFileInfo } from "@/api/listModFiles"
+import { addModRecord } from "@/api/addModRecord"
 import { listModPath } from "@/api/listModPath"
+import { listModRecords, type IFileInfo } from "@/api/listModRecords"
 import img_create_dir from "@/assets/svg/create_dir.svg"
 import img_create_file from "@/assets/svg/create_file.svg"
 import img_edit from "@/assets/svg/edit.svg"
@@ -17,7 +17,7 @@ import { Loading } from "@/components/loading"
 import Toast from "@/gimd/Toast"
 import GlobalStore from "@/GlobalStore"
 import { get_content_disposition } from "@/hooks/ossUploadFiles"
-import { ossUploadModFiles } from "@/hooks/ossUploadModFiles"
+import { ossUploadModRecords } from "@/hooks/ossUploadModRecords"
 import { useOSS } from "@/hooks/useOSS"
 import { ApiHttp } from "@/network/ApiHttp"
 import { Paths } from "@/Paths"
@@ -30,10 +30,8 @@ import { Fragment, useContext, useEffect, useMemo, useRef, useState } from "reac
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router"
 import { useImmer } from "use-immer"
-import { fetch_info } from "../main/fetch_info"
 import { FileRow } from "./FileRow"
 import { get_icon, get_icon_title } from "./get_icon"
-import { get_mod_paths_names } from "./get_mod"
 import { InfoViewModal } from "./InfoViewModal"
 import { ModFormModal } from "./ModFormModal"
 import { OwnerName } from "./OwnerName"
@@ -56,15 +54,14 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [editing_mod, set_editing_mod] = useState<{ open?: boolean, data?: IFileInfo }>({})
   const ref_root = useRef<HTMLDivElement>(null);
   const [progress, set_progress] = useState<[string, number, number]>()
-  const ctx = useContext(GlobalStore.context);
-  const { value: { session_id } } = ctx;
+  const { value: { session_id, nickname, username } } = useContext(GlobalStore.context);
   const nav = useNavigate();
   const { search } = LocationParams.useAll();
   const [previewing, set_previewing] = useImmer({ open: false, data: Info.empty(null) })
 
   const refresh_files = (parent = dir?.id) => {
     set_pending(true)
-    listModFiles({ parent })
+    listModRecords({ parent })
       .then(r => {
         set_files(r ?? [])
       }).catch(e => {
@@ -78,7 +75,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     const ab = new AbortController();
     set_pending(true)
     if (!path.length) {
-      listModFiles({ parent: 0 }, { signal: ab.signal }).then(r => {
+      listModRecords({ parent: 0 }, { signal: ab.signal }).then(r => {
         if (ab.signal.aborted) return;
         set_path([])
         set_files(r ?? [])
@@ -91,7 +88,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     listModPath({ path }, { signal: ab.signal }).then(r => {
       if (ab.signal.aborted) return;
       set_path(r)
-      return listModFiles({ parent: r[r.length - 1].id }, { signal: ab.signal })
+      return listModRecords({ parent: r[r.length - 1].id }, { signal: ab.signal })
     }).catch(e => {
       if (ab.signal.aborted) return;
       toast.error(e);
@@ -110,9 +107,9 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     if (!session_id) nav(Paths.All.main)
   }, [session_id, nav])
 
-  const add_dir = (parent: number = 0, type?: 'mod') => {
+  const add_dir = (parent: number = 0, type?: 'mod' | 'omod') => {
     set_pending(true)
-    addModFile({ name: '' + Date.now(), parent, type }).then((r) => {
+    addModRecord({ name: '' + Date.now(), parent, type }).then((r) => {
       set_new_dir(r);
       return refresh_files(parent)
     }).catch(e => {
@@ -121,7 +118,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       set_pending(false)
     })
   }
-
 
   const del_file = (target: IFileInfo) => {
     set_pending(true)
@@ -134,6 +130,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       set_pending(false)
     })
   }
+
   const open_any = (target: IFileInfo) => {
     if (target.type == 'mod' || !target.type) {
       open_dir(target)
@@ -143,6 +140,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       alert('failed! type=' + target.type)
     }
   }
+
   const open_image = (target: IFileInfo) => {
     const imgs = files.filter(v => v.url && v.content_type?.startsWith('image/')).map(v => ({
       url: v.url!,
@@ -151,17 +149,21 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     const idx = imgs.findIndex(v => v?.url === target.url)
     ImagesViewer.open(imgs, idx)
   }
+
   const edit_mod = (target: IFileInfo) => {
     set_editing_mod({ open: true, data: target });
   }
+
   const preview_mod = async ({ owner_id, id, type }: IFileInfo) => {
+    // TODO
     if (type != 'mod') return new Error('TODO');
     if (!id || !owner_id) return new Error('TODO')
     if (!sts?.base) return new Error('TODO')
-    const { info_obj_path } = get_mod_paths_names(owner_id, id);
-    const info = await fetch_info(sts.base + info_obj_path, null, '', {})
-    set_previewing({ open: true, data: info })
+    // const { info_obj_path } = get_mod_paths_names(owner_id, id);
+    // const info = await fetch_info(sts.base + info_obj_path, null, '', {})
+    // set_previewing({ open: true, data: info })
   }
+
   const open_file = (target: IFileInfo) => {
     if (target.content_type?.startsWith('image/') && target.url) {
       open_image(target)
@@ -170,6 +172,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       set_viewing_video_open(true)
     }
   }
+
   const open_dir = (target?: IFileInfo) => {
     if (!target) {
       const s = search.clone().delele('path').to_query()
@@ -179,6 +182,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     const s = search.clone().set('path', path).to_query();
     nav({ search: s })
   }
+
   const onDragOver = (e: React.DragEvent, me: IFileInfo) => {
     const not_allow = () => { e.stopPropagation() }
     if (pending || typeof me.id !== 'number') return not_allow();
@@ -202,6 +206,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     not_allow()
     return;
   }
+
   const onDrop = (e: React.DragEvent, me: IFileInfo) => {
     const not_allow = () => {
       set_dragover(void 0);
@@ -235,7 +240,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     } else if (e.dataTransfer.types.includes('Files')) {
       set_dragover(void 0);
       set_pending(true);
-      ossUploadModFiles({
+      ossUploadModRecords({
         mod_id: me.id,
         files: Array.from(e.dataTransfer.files),
         oss,
@@ -256,6 +261,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       })
     }
   }
+
   const unpublish = (me: IFileInfo) => {
     set_pending(true)
     ApiHttp.post(`${API_BASE}lf2wmods/unpublish`, {}, { id: me.id }).then(r => {
@@ -264,6 +270,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       set_pending(false)
     })
   }
+
   const publish = (me: IFileInfo) => {
     set_pending(true)
     ApiHttp.post(`${API_BASE}lf2wmods/publish`, {}, { id: me.id }).then(r => {
@@ -272,6 +279,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       set_pending(false)
     })
   }
+
   return (
     <div {...props} className={classNames(csses.mine_page, props.className)} style={props.style} ref={ref_root} >
       {toast_ctx}
@@ -289,8 +297,8 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
             open_dir(path[path.length - 2])
           }} />
         <div className={classnames(csses.breadcrumb, csses.noscrollbar)}>
-          <Fragment >
-            <button
+          <Fragment>
+            <IconButton
               title={t('return_to_home_dir')}
               onClick={(e) => {
                 interrupt_event(e)
@@ -299,8 +307,8 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
               className={classnames(csses.breadcrumb_item, dragover == 0 ? csses.dragover : void 0)}
               onDragOver={e => onDragOver(e, { id: 0 })}
               onDrop={e => onDrop(e, { id: 0 })}>
-              home
-            </button>
+              {nickname || username || '~'}
+            </IconButton>
             <div>/</div>
           </Fragment>
           {

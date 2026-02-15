@@ -17,11 +17,11 @@ export interface IFileInfo {
   brief?: string;
 }
 
-export interface IListModFilesBody {
+export interface IListModRecordsBody {
   parent?: number;
   id?: number;
 }
-export async function listModFiles(body?: IListModFilesBody, opts?: RequestInit): Promise<IFileInfo[]> {
+export async function listModRecords(body?: IListModRecordsBody, opts?: RequestInit): Promise<IFileInfo[]> {
   const r = await ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, body ?? {}, opts);
   return r.data;
 }
