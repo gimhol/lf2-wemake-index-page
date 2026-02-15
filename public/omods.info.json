@@ -2,8 +2,8 @@
   "id": "mods",
   "type": "cards",
   "date": "2026-02-02",
-  "short_title": "LFW Mods",
-  "title": "LFW Mods",
+  "short_title": "Mods",
+  "title": "Mods",
   "desc": [
     "You can download the 'Mod' you want.",
     "Then open LF2Wemake and drag the 'Mod' ",
@@ -21,8 +21,8 @@
   "children_url": "mods.info-list.json",
   "i18n": {
     "zh": {
-      "short_title": "LFW Mods",
-      "title": "LFW Mods",
+      "short_title": "模组",
+      "title": "模组",
       "desc": [
         "你可以下载想要的 '模组' ，",
         "然后打开LF2Wemake，将'模组'拖拽至入口页或主页中，",

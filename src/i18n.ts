@@ -4,7 +4,7 @@ import { initReactI18next } from "react-i18next";
 const zh = {
   "author": "作者",
   "date": "日期",
-  "main_title": "LF2W WeMakit🚧",
+  "main_title": "LF2W WeMakit",
   "unavailable": "已停用",
   "dl_win_x64": "下载 Windows x64 应用",
   "open_in_browser": "浏览器中打开",
@@ -44,7 +44,7 @@ const zh = {
 const en = {
   "author": "author",
   "date": "date",
-  "main_title": "LF2W WeMakit🚧",
+  "main_title": "LF2W WeMakit",
   "unavailable": "Unavailable",
   "dl_win_x64": "Download Window x64 Application",
   "open_in_browser": "Open in Browser",
