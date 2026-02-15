@@ -42,8 +42,8 @@ export function ModFormView(props: IModFormViewProps) {
   const [opens, set_opens] = useImmer({
     base: true,
     brief: true,
-    desc: true,
-    changelog: true,
+    desc: !document.firstElementChild?.classList.contains('small-screen'),
+    changelog: !document.firstElementChild?.classList.contains('small-screen'),
   })
   useEffect(() => {
     if (!mod_id || !sts) {
