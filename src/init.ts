@@ -46,6 +46,5 @@ const on_resize = () => {
   else
     document.firstElementChild?.classList.remove('small-screen')
 }
-
 window.addEventListener('resize', on_resize)
 on_resize()

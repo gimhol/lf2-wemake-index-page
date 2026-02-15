@@ -1,20 +1,5 @@
 @use "@/theme/common.module.scss"as any;
 
-:global(.small-screen) {
-  .game_list {
-    display: none;
-  }
-  .card_list {
-    flex-wrap     : nowrap;
-    align-items   : center;
-    flex-direction: column;
-  }
-  .btn_toggle_game_list {
-    display    : flex;
-    flex-shrink: 0;
-  }
-}
-
 
 .main_page {
   display       : flex;
@@ -157,7 +142,26 @@
 }
 
 .version_list {
-  overflow      : auto;
-  display       : flex;
-  flex-direction: column;
+  overflow      : auto !important;
+  display       : flex !important;
+  flex-direction: column !important;
+}
+
+:global(.small-screen) {
+  .main {
+    .game_list {
+      display: none;
+    }
+  }
+
+  .card_list {
+    flex-wrap     : nowrap !important;
+    align-items   : center !important;
+    flex-direction: column !important;
+  }
+
+  .btn_toggle_game_list {
+    display    : flex !important;
+    flex-shrink: 0 !important;
+  }
 }

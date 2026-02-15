@@ -226,7 +226,7 @@ export function ModFormView(props: IModFormViewProps) {
           {t("mod_brief")}
         </h2>
         <Collapse open={opens.brief} classNames={{ inner: csses.collapse_inner }}>
-          <div className={csses.md_editor}>
+          <div className={csses.brief_editor}>
             <EditorView
               uploadImages={upload_images}
               value={draft.brief}

@@ -192,7 +192,10 @@ export default function MainPage() {
             <IconButton
               title={t('logout')}
               icon={img_logout}
-              onClick={() => dispatch({ type: 'reset' })} />
+              onClick={() => {
+                console.debug('click logout')
+                dispatch({ type: 'reset' })
+              }} />
           </Show>
           <IconButton
             href="https://github.com/gimhol/little-fighter-2-WEMAKE"

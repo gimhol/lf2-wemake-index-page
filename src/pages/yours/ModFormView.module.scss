@@ -84,6 +84,7 @@
 .collapse_inner {
   padding-left: var(--padding-l-align-w-icon-btn);
 }
+
 .base_info {
   @extend .collapse_inner;
   display       : flex;
@@ -91,6 +92,10 @@
   gap           : 5px;
 }
 
+.brief_editor {
+  height     : 255px;
+  flex-shrink: 0;
+}
 
 .md_editor {
   height     : 400px;
