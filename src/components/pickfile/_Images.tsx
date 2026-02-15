@@ -4,6 +4,7 @@ import { useContext, useMemo, type HTMLAttributes, type MouseEvent } from "react
 import { IconButton } from "../button/IconButton";
 import csses from "./index.module.scss";
 import { FilePickerCtx, type FilePickerContextValue, type IPickedFile } from "./_Common";
+import { file_size_txt } from "@/utils/file_size_txt";
 
 export interface IFilePickerImagesProps extends HTMLAttributes<HTMLDivElement> {
   _?: never;
@@ -71,10 +72,9 @@ export function Images(props: IFilePickerImagesProps) {
                 if (disabled) return;
                 onNameClick?.(e, record, ctx)
               }}>
-              {typeof record.progress === 'number' ? <div className={csses.progress}
+              {typeof record.progress === 'number' ? <div className={csses.progress} title={record.name}
                 style={{ width: `${(100 * record.progress).toFixed(1)}%` }} /> : null}
-
-              {record.name}
+              {record.file?.size ? `(${file_size_txt(record.file.size)})` : null}{record.name} 
             </div>
           </div>
         )
