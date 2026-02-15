@@ -4,6 +4,7 @@ export interface IPickedFile {
   readonly name?: string;
   readonly url: string;
   readonly progress?: number;
+  readonly error?: string;
 }
 export interface FilePickerContextValue {
   files?: IPickedFile[];
