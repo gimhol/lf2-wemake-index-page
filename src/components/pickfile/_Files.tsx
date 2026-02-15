@@ -1,25 +1,24 @@
 import { interrupt_event } from "@/utils/interrupt_event";
 import cns from "classnames";
-import { useContext, useMemo, type HTMLAttributes, type MouseEvent } from "react";
+import { useContext, type HTMLAttributes, type MouseEvent } from "react";
 import { IconButton } from "../button/IconButton";
-import csses from "./index.module.scss";
 import { FilePickerCtx, type FilePickerContextValue, type IPickedFile } from "./_Common";
+import csses from "./index.module.scss";
 
-export interface IFilePickerImagesProps extends HTMLAttributes<HTMLDivElement> {
+export interface IFilePickerFilesProps extends HTMLAttributes<HTMLDivElement> {
   _?: never;
   classNames?: Classnames<'cell' | 'close' | 'img' | 'bottom'>;
   onNameClick?(e: MouseEvent<HTMLDivElement>, record: IPickedFile, p: FilePickerContextValue): void
   onFileClick?(e: MouseEvent<HTMLDivElement>, record: IPickedFile, p: FilePickerContextValue): void
   onFileClose?(e: MouseEvent<HTMLButtonElement>, record: IPickedFile, p: FilePickerContextValue): void;
 }
-export function Images(props: IFilePickerImagesProps) {
+export function Files(props: IFilePickerFilesProps) {
   const ctx = useContext(FilePickerCtx);
-  const { files, max = Number.MAX_SAFE_INTEGER, remove, add, open, disabled } = ctx
+  const { files, max = Number.MAX_SAFE_INTEGER, remove, add, open, disabled, accept } = ctx
   const { className, classNames, onNameClick, onFileClick, onFileClose, ..._p } = props;
-  const urls = useMemo(() => files?.map(file => file.url), [files])
   return <>
     <div
-      className={cns(csses.pickfile_images, className)}
+      className={cns(csses.pickfile_files, className)}
       {..._p}
       onDragOver={e => {
         e.preventDefault()
@@ -32,7 +31,9 @@ export function Images(props: IFilePickerImagesProps) {
         if (disabled) return;
         if (!e.dataTransfer.files.length) return
         const files = Array.from(e.dataTransfer.files).filter(file => {
-          return file.type.startsWith('image/')
+          const suffixes = accept?.split(';').filter(Boolean)
+          if (!suffixes) return true
+          return suffixes.some(v => file.type.endsWith(v))
         });
         if (!files.length) return
         add(files.map(file => ({ file })))
@@ -48,11 +49,6 @@ export function Images(props: IFilePickerImagesProps) {
               if (disabled) return;
               onFileClick?.(e, record, ctx)
             }}>
-            <img
-              className={cns(csses.img, classNames?.img)}
-              src={urls?.[idx]}
-              alt={record.name}
-              title={record.name} />
             <IconButton
               gone={disabled}
               className={cns(csses.btn_close, classNames?.close)}
@@ -73,7 +69,6 @@ export function Images(props: IFilePickerImagesProps) {
               }}>
               {typeof record.progress === 'number' ? <div className={csses.progress}
                 style={{ width: `${(100 * record.progress).toFixed(1)}%` }} /> : null}
-
               {record.name}
             </div>
           </div>
@@ -84,7 +79,7 @@ export function Images(props: IFilePickerImagesProps) {
           interrupt_event(e);
           open()
         }}>
-          {"Click & Pick\nor\nDrop Pictures\nin here\n"}
+          {" Click & Pick or Drop File in here "}
         </div>
       }
     </div>

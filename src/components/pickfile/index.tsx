@@ -3,6 +3,7 @@ import cns from "classnames";
 import { useEffect, useMemo, type HTMLAttributes, type InputHTMLAttributes } from "react";
 import { FilePickerCtx, type FilePickerContextValue, type IPickedFile } from "./_Common";
 import { Images } from "./_Images";
+import { Files } from "./_Files";
 import csses from "./index.module.scss";
 
 export interface IPickFileProps extends
@@ -94,3 +95,4 @@ export function PickFile(props: IPickFileProps) {
 
 }
 PickFile.Images = Images
+PickFile.Files = Files

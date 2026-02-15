@@ -9,10 +9,9 @@ import { EditorView } from "@/components/markdown/editor/EditorView";
 import { PickFile } from "@/components/pickfile";
 import type { IPickedFile } from "@/components/pickfile/_Common";
 import Toast from "@/gimd/Toast";
-import { ossUploadModRecords, type IUploadFileResult } from "@/hooks/ossUploadModRecords";
+import { ossUploadModRecords } from "@/hooks/ossUploadModRecords";
 import { useOSS } from "@/hooks/useOSS";
 import { useOSSUploadModImages } from "@/hooks/useOSSUploadModImages";
-import { file_size_txt } from "@/utils/file_size_txt";
 import { interrupt_event } from "@/utils/interrupt_event";
 import { read_blob_as_md5 } from "@/utils/read_blob_as_md5";
 import classnames from "classnames";
@@ -25,19 +24,21 @@ import { join_url, replace_one } from "./join_url";
 export interface IModFormViewProps {
   mod_id?: number;
 }
+const uploaded_map = new Map<File, IPickedFile>();
+
 export function ModFormView(props: IModFormViewProps) {
   const { mod_id } = props;
   const { t } = useTranslation();
   const [toast, toast_ctx] = Toast.useToast()
   const upload_images = useOSSUploadModImages({ mod_id, toast })
   const [oss, sts] = useOSS()
-  const [data_progress, set_data_progress] = useState<[number, number]>()
-  const [, set_data_upload_result] = useState<IUploadFileResult[]>([])
   const [draft, set_draft] = useImmer<IInfo>({})
   const [mod, set_mod] = useImmer<IMod | null>(null)
   const [loading, set_loading] = useState(!!mod_id);
   const [cover_uploading, set_cover_uploading] = useState(false);
   const [covers, set_covers] = useState<IPickedFile[]>()
+  const [attachments, set_attachments] = useState<IPickedFile[]>()
+  const [attachment_uploading, set_attachment_uploading] = useState(false);
   const [opens, set_opens] = useImmer({
     base: true,
     brief: true,
@@ -56,7 +57,7 @@ export function ModFormView(props: IModFormViewProps) {
         if (ab.signal.aborted) return;
         set_draft(r.info.raw)
         set_mod(r)
-        if (r.info.full_cover_url) 
+        if (r.info.full_cover_url)
           set_covers([{ url: r.info.full_cover_url }])
       }).catch(e => {
         if (ab.signal.aborted) return;
@@ -73,13 +74,8 @@ export function ModFormView(props: IModFormViewProps) {
     if (!mod) return;
     if (!oss || !sts || !mod.strings || !mod_id) return;
     set_loading(true)
-    const available = data_progress?.[0] == 1;
-    const next = mod.info.load(draft).clone()
-      .set_id('' + mod_id)
-      .set_url(available ? mod.strings.data_obj_name : void 0)
-      .set_unavailable(available ? void 0 : 'unpublish')
+    const next = mod.info.load(draft).clone().set_id('' + mod_id)
     const json_blob = new Blob([JSON.stringify(next.raw)], { type: 'application/json; charset=utf-8' })
-
     const oss_obj_name = join_url(sts.dir, mod_id, read_blob_as_md5(json_blob))
     console.log(oss_obj_name)
     oss.put(oss_obj_name, json_blob).then(() => {
@@ -179,55 +175,48 @@ export function ModFormView(props: IModFormViewProps) {
                 })
               }}>
               <PickFile.Images onFileClick={(_, r, { files }) => {
-                if (!files?.length) return;
-                const imgs = files.map(v => ({ url: v.url, alt: v.name }))
-                ImagesViewer.open(imgs, files.findIndex(v => v.url === r.url))
+                ImagesViewer.open(files, files?.findIndex(v => v.url === r.url))
               }} />
             </PickFile>
           </div>
           <div className={csses.form_row}>
             <span>{t('data_zip')}:</span>
-            <input
-              className={csses.file_input}
-              type="file"
+            <PickFile
+              max={1}
               accept=".zip"
-              onDragOver={e => { e.stopPropagation() }}
-              onDrop={e => { e.stopPropagation() }}
-              onChange={e => {
-                if (!e.target.files?.length) return;
-                const files = Array.from(e.target.files)
+              value={attachments}
+              whenChange={records => {
+                set_attachments(records)
+                if (!records?.length) return;
+                set_attachment_uploading(true);
                 ossUploadModRecords({
-                  mod_id, files, oss, sts, limits: {
+                  mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
                     'application/x-zip-compressed': { max_size: 100 * 1024 * 1024 },
                     'application/zip': { max_size: 100 * 1024 * 1024 },
                   },
-                  getObjectName: async () => {
-                    if (!mod?.strings.data_obj_path) throw new Error('not ready!')
-                    return mod.strings.data_obj_path
-                  },
-                  progress: (progress, info) => {
-                    set_data_progress(prev => {
-                      const file_size = info?.fileSize ?? prev?.[1] ?? 0
-                      return [progress, file_size]
-                    })
+                  progress: (progress, { file }) => {
+                    const record = uploaded_map.get(file);
+                    if (!record) uploaded_map.set(file, { file, url: "", progress, name: file.name });
+                    else uploaded_map.set(file, { ...record, progress })
+                    set_attachments(prev => replace_one(prev, v => {
+                      return v.file == file ? { ...v, progress } : null
+                    }))
                   }
-                }).then((r) => {
-                  set_data_upload_result(r)
+                }).then(r => {
+                  if (!r.length) throw 'upload nothings'
+                  const name = r[0].url.split('/').pop();
+                  set_draft(d => {
+                    d.url = name;
+                    d.url_type = 'download'
+                  })
                 }).catch((err) => {
                   toast.error(err)
-                  e.target.files = null;
+                }).finally(() => {
+                  set_attachment_uploading(false);
                 })
-              }}
-            />
-          </div>
-          <div style={{ display: 'flex' }}>
-            {
-              data_progress ?
-                <div className={csses.upload_result}>
-                  <div>progress: {(100 * data_progress[0]).toFixed(2)}%</div>
-                  <div>size: {file_size_txt(data_progress[1])}</div>
-                </div> : null
-            }
+              }}>
+              <PickFile.Files />
+            </PickFile>
           </div>
         </Collapse>
         <h2 className={csses.title}>
@@ -276,7 +265,7 @@ export function ModFormView(props: IModFormViewProps) {
           style={{ fontSize: '2rem' }}
           title={t('save_mod_info')}
           container={tool_tips_container}
-          disabled={loading || cover_uploading}
+          disabled={loading || cover_uploading || attachment_uploading}
           onClick={save}>
           {t('save')}
         </IconButton>
