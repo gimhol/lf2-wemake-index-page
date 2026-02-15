@@ -4,7 +4,7 @@ import { initReactI18next } from "react-i18next";
 const zh = {
   "author": "作者",
   "date": "日期",
-  "main_title": "LF2W WeMakit",
+  "main_title": "LF-WeMakit",
   "unavailable": "已停用",
   "dl_win_x64": "下载 Windows x64 应用",
   "open_in_browser": "浏览器中打开",
@@ -39,12 +39,13 @@ const zh = {
   "mod_brief": "简介",
   "mod_description": "描述",
   "mod_changelog": "更新日志",
-  "edit_brief_here": "再此编辑简介(500字内)"
+  "edit_brief_here": "再此编辑简介(500字内)",
+  "workspace": "Workspace",
 }
 const en = {
   "author": "author",
   "date": "date",
-  "main_title": "LF2W WeMakit",
+  "main_title": "LF-WeMakit",
   "unavailable": "Unavailable",
   "dl_win_x64": "Download Window x64 Application",
   "open_in_browser": "Open in Browser",
@@ -79,7 +80,8 @@ const en = {
   "mod_brief": "Brief",
   "mod_description": "Description",
   "mod_changelog": "Changelog",
-  "edit_brief_here": "Edit Brief Here (Within 500 Characters)"
+  "edit_brief_here": "Edit Brief Here (Within 500 Characters)",
+  "workspace": "Workspace",
 }
 const resources = {
   "zh": { translation: zh },

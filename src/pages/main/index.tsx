@@ -131,7 +131,7 @@ export default function MainPage() {
             set_location({ game: 'yours' });
             set_game_list_open(false)
           }}>
-            {t('your_works')}
+            {t('workspace')}
           </button>
         </Show>
         {games?.map((v) => {

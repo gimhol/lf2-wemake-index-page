@@ -13,7 +13,7 @@
     "For how to use the 'Mod', please look at the video below. ",
     "<video width='320' src='https://lf.gim.ink/docs/video/download_and_use_extra_data.mp4' controls></video>\n",
     "If you want to use your own characters, weapons, backgrounds, or even stages in LF2Wemake,",
-    "you can check out this ['Conversion Tool'](/tools).\n",
+    "you can check out this ['Mod Tool'](/tools).\n",
     "But I'm unable to support AI scripts at present 🤦. ",
     "Support for AI script functionality may be added in future updates, ",
     "and such AI scripts will likely need to be written in TypeScript/JavaScript instead of ActionScript."
