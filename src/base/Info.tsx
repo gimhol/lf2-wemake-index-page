@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { join_url } from "@/pages/yours/join_url";
 import {
   makeI18N,
   type TSetStr
@@ -76,6 +77,15 @@ const { Cls, Str } = makeI18N();
   get children() { return this._subs; }
   set children(v: Info[]) { this._subs = v; }
 
+  get full_cover_url() {
+    const { cover_url: url, src } = this
+    if (!url) return void 0;
+    if (url.match(/^https?:\/\//)) return url;
+    if (!src) return url
+    const parts = src.split('/')
+    parts.pop()
+    return join_url(...parts, url)
+  }
   constructor(raw: IInfo, lang: string, parent: Info | null, src: string | null) {
     this.src = src;
     this.parent = parent;

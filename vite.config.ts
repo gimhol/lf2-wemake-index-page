@@ -9,11 +9,13 @@ const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
 const development = {
   NODE_ENV: process.env.NODE_ENV,
   API_BASE: 'http://localhost/api/',
+  STORAGE_URL_BASE: 'https://lfwm.gim.ink/',
   BUILD_TIME: now,
 }
 const production = {
   ...development,
   API_BASE: 'https://gim.ink/api/',
+  STORAGE_URL_BASE: 'https://lfwm.gim.ink/',
 }
 const defines = process_string_definition(
   process.argv.some(v => v == '--api=local') ? development : production

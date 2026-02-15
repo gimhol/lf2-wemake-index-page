@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import { useImmer } from "use-immer";
 import csses from "./ModFormView.module.scss";
 import { get_mod, type IMod } from "./get_mod";
+import { replace_one } from "./join_url";
 export interface IModFormViewProps {
   mod_id?: number;
 }
@@ -31,17 +32,12 @@ export function ModFormView(props: IModFormViewProps) {
   const [toast, toast_ctx] = Toast.useToast()
   const upload_images = useOSSUploadModImages({ mod_id, toast })
   const [oss, sts] = useOSS()
-  const [cover_progress, set_cover_progress] = useState<[number, number]>()
   const [data_progress, set_data_progress] = useState<[number, number]>()
-  const cover_upload_status = !cover_progress ? 'none' :
-    cover_progress[0] >= 1 ? 'done' : 'uploading'
-  const data_upload_status = !data_progress ? 'none' :
-    data_progress[0] >= 1 ? 'done' : 'uploading'
   const [, set_data_upload_result] = useState<IUploadFileResult[]>([])
-
   const [draft, set_draft] = useImmer<IInfo>({})
   const [mod, set_mod] = useImmer<IMod | null>(null)
   const [loading, set_loading] = useState(!!mod_id);
+  const [cover_uploading, set_cover_uploading] = useState(false);
   const [covers, set_covers] = useState<IPickedFile[]>()
   const [opens, set_opens] = useImmer({
     base: true,
@@ -61,7 +57,7 @@ export function ModFormView(props: IModFormViewProps) {
         if (ab.signal.aborted) return;
         set_draft(r.info.raw)
         set_mod(r)
-        if (r.cover) set_covers([r.cover])
+        if (r.full_cover_url) set_covers([{ url: r.full_cover_url }])
       }).catch(e => {
         if (ab.signal.aborted) return;
         toast(e)
@@ -80,7 +76,6 @@ export function ModFormView(props: IModFormViewProps) {
     const available = data_progress?.[0] == 1;
     const next = mod.info.load(draft).clone()
       .set_id('' + mod_id)
-      .set_cover_url(cover_progress?.[0] == 1 ? mod.strings.cover_obj_name : void 0)
       .set_url(available ? mod.strings.data_obj_name : void 0)
       .set_unavailable(available ? void 0 : 'unpublish')
     const json_blob = new Blob([JSON.stringify(next.raw)], { type: 'application/json; charset=utf-8' })
@@ -159,32 +154,26 @@ export function ModFormView(props: IModFormViewProps) {
               whenChange={records => {
                 set_covers(records)
                 if (!records?.length) return;
+                set_cover_uploading(true);
                 ossUploadModFiles({
                   mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
                     'image/png': { max_size: 5 * 1024 * 1024 },
                     'image/jpeg': { max_size: 5 * 1024 * 1024 },
                     'image/webp': { max_size: 5 * 1024 * 1024 },
                   },
-                  getObjectName: async () => {
-                    if (!mod?.strings) throw new Error('not ready!')
-                    return mod.strings.cover_obj_path
-                  },
-                  progress: (progress, info) => {
-                    set_cover_progress(prev => {
-                      set_covers(prev => {
-                        if (!prev) return prev;
-                        const idx = prev.findIndex(v => v.file === info?.file)
-                        if (idx < 0) return prev;
-                        const ret = [...prev];
-                        ret[idx] = { ...prev[idx], progress }
-                        return ret;
-                      })
-                      const file_size = info?.fileSize ?? prev?.[1] ?? 0
-                      return [progress, file_size]
-                    })
+                  progress: (progress, { file }) => {
+                    set_covers(prev => replace_one(prev, v => {
+                      return v.file == file ? { ...v, progress } : null
+                    }))
                   }
+                }).then(r => {
+                  if (!r.length) throw 'upload nothings'
+                  const name = r[0].url.split('/').pop();
+                  set_draft(d => { d.cover_url = name })
                 }).catch((err) => {
                   toast.error(err)
+                }).finally(() => {
+                  set_cover_uploading(false);
                 })
               }}>
               <PickFile.Images onFileClick={(_, r, { files }) => {
@@ -285,7 +274,7 @@ export function ModFormView(props: IModFormViewProps) {
           style={{ fontSize: '2rem' }}
           title={t('save_mod_info')}
           container={tool_tips_container}
-          disabled={loading || cover_upload_status === 'uploading' || data_upload_status === 'uploading'}
+          disabled={loading || cover_uploading}
           onClick={save}>
           {t('save')}
         </IconButton>

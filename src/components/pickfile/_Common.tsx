@@ -1,7 +1,7 @@
 import { createContext } from "react";
 export interface IPickedFile {
   readonly file?: File;
-  readonly name: string;
+  readonly name?: string;
   readonly url: string;
   readonly progress?: number;
 }

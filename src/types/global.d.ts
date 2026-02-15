@@ -4,6 +4,7 @@ declare const NODE_ENV: string;
 declare const BUILD_TIME: string;
 declare const API_BASE: string;
 declare const WS_URL: string;
+declare const STORAGE_URL_BASE: string;
 declare interface Window {
   is_sad_day?: boolean;
   is_red_day?: boolean;
