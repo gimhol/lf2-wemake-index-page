@@ -1,5 +1,21 @@
 @use "@/theme/common.module.scss"as any;
 
+:global(.small-screen) {
+  .game_list {
+    display: none;
+  }
+  .card_list {
+    flex-wrap     : nowrap;
+    align-items   : center;
+    flex-direction: column;
+  }
+  .btn_toggle_game_list {
+    display    : flex;
+    flex-shrink: 0;
+  }
+}
+
+
 .main_page {
   display       : flex;
   flex-direction: column;
@@ -20,11 +36,6 @@
 
     .btn_toggle_game_list {
       display: none;
-
-      @media screen and (min-width: 0px) and (max-width: 480px) {
-        display    : flex;
-        flex-shrink: 0;
-      }
     }
 
     .main_title {
@@ -47,12 +58,6 @@
     align-items: stretch;
     height     : 0;
 
-    .game_list {
-      @media screen and (min-width: 0px) and (max-width: 480px) {
-        display: none;
-      }
-    }
-
 
 
   }
@@ -64,9 +69,6 @@
     padding        : 5px;
   }
 }
-
-
-
 
 .game_list_mask {
   .game_list {
@@ -151,11 +153,7 @@
   flex-direction : row;
   flex-wrap      : wrap;
 
-  @media screen and (min-width: 0px) and (max-width: 480px) {
-    flex-wrap     : nowrap;
-    align-items   : center;
-    flex-direction: column;
-  }
+
 }
 
 .version_list {

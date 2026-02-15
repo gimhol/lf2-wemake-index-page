@@ -1,5 +1,6 @@
 @use "@/theme/common.module.scss"as *;
 
+
 .mod_form_view {
   width         : 100%;
   height        : 100%;
@@ -16,7 +17,7 @@
   }
 
   &>div {
-    padding: 10px;
+    padding: var(--padding-t) var(--padding-r) var(--padding-b) var(--padding-l);
     @extend .bottom_divider;
   }
 }
@@ -80,16 +81,16 @@
   gap    : 10px
 }
 
+.collapse_inner {
+  padding-left: var(--padding-l-align-w-icon-btn);
+}
 .base_info {
+  @extend .collapse_inner;
   display       : flex;
   flex-direction: column;
   gap           : 5px;
-  padding-left  : 28px;
 }
 
-.collapse_inner {
-  padding-left: 28px;
-}
 
 .md_editor {
   height     : 400px;

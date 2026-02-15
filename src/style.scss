@@ -1,36 +1,39 @@
 :root {
-  // font-family             : Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata", "Courier New", monospace;
-  font-family            : Consolas, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  font-synthesis         : none;
-  text-rendering         : optimizeLegibility;
-  -webkit-font-smoothing : antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family                 : Consolas, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-synthesis              : none;
+  text-rendering              : optimizeLegibility;
+  -webkit-font-smoothing      : antialiased;
+  -moz-osx-font-smoothing     : grayscale;
+  --color-divider             : #ffffff1a;
+  --color-link                : rgb(255, 255, 255);
+  --color-link-hover          : rgb(255, 255, 255);
+  --color-txt                 : rgb(255, 255, 255);
+  --color-input               : rgb(255, 255, 255);
+  --color-primary             : #10206C;
+  --color-primary-hover       : #213492;
+  --color-primary-actived     : #1b2a75;
+  --color-tooltip-bg          : white;
+  --color-tooltip             : black;
+  --small-screen-width-min    : 0px;
+  --size-w-icon-btn           : 1.8rem;
+  --size-h-icon-btn           : 1.8rem;
+  --font-size-txt             : 14px;
+  --font-size-small           : 10px;
+  --font-size-tiny            : 8px;
+  --font-size-tooltip         : 12px;
+  --padding-t                 : 5px;
+  --padding-r                 : 5px;
+  --padding-b                 : 5px;
+  --padding-l                 : 5px;
+  --padding-l-align-w-icon-btn: var(--size-w-icon-btn);
 
-  --color-divider        : #ffffff1a;
-  --color-link           : rgb(255, 255, 255);
-  --color-link-hover     : rgb(255, 255, 255);
-  --color-txt            : rgb(255, 255, 255);
-  --color-input          : rgb(255, 255, 255);
-  --color-primary        : #10206C;
-  --color-primary-hover  : #213492;
-  --color-primary-actived: #1b2a75;
-  --color-tooltip-bg     : white;
-  --color-tooltip        : black;
 
-  --small-screen-width-min: 0px;
-  --size-w-icon-btn       : 1.8rem;
-  --size-h-icon-btn       : 1.8rem;
-
-  --font-size-txt    : 14px;
-  --font-size-small  : 10px;
-  --font-size-tiny   : 8px;
-  --font-size-tooltip: 12px;
-
-  --padding-t: 5px;
-  --padding-r: 5px;
-  --padding-b: 5px;
-  --padding-l: 5px;
 }
+
+html.small-screen {
+  --padding-l-align-w-icon-btn: var(--padding-l)
+}
+
 
 #root {
   height    : 100%;

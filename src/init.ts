@@ -39,3 +39,13 @@ ApiHttp.addErrorInterceptor((e: Error) => {
   }
   return e
 })
+
+const on_resize = () => {
+  if (window.innerWidth <= 480)
+    document.firstElementChild?.classList.add('small-screen')
+  else
+    document.firstElementChild?.classList.remove('small-screen')
+}
+
+window.addEventListener('resize', on_resize)
+on_resize()
