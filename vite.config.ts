@@ -38,6 +38,10 @@ export default defineConfig({
     },
     extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx', '.json', '.svg']
   },
+  esbuild: {
+    pure: ['console.debug',],
+    drop: ['debugger'],
+  },
   build: {
     chunkSizeWarningLimit: 1000
   },

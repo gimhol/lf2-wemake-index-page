@@ -37,6 +37,7 @@ import { ModFormModal } from "./ModFormModal"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
 import { VideoModal } from "./VideoModal"
+import { editModRecord } from "@/api/editModRecord"
 
 export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const { t } = useTranslation()
@@ -121,7 +122,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
 
   const del_file = (target: IFileInfo) => {
     set_pending(true)
-    ApiHttp.delete(`${API_BASE}lf2wmods/delete`, { id: target.id }).then((r) => {
+    ApiHttp.delete(`${API_BASE}lfwm/delete`, { id: target.id }).then((r) => {
       toast.success(`deleted count: ${r.data}`)
       return refresh_files()
     }).catch(e => {
@@ -221,7 +222,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       interrupt_event(e);
       set_dragover(void 0);
       set_pending(true);
-      ApiHttp.post(`${API_BASE}lf2wmods/move`, null, {
+      ApiHttp.post(`${API_BASE}lfwm/move`, null, {
         id: dragging.id,
         parent: dragover,
       }).then(() => {
@@ -264,7 +265,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
 
   const unpublish = (me: IFileInfo) => {
     set_pending(true)
-    ApiHttp.post(`${API_BASE}lf2wmods/unpublish`, {}, { id: me.id }).then(r => {
+    ApiHttp.post(`${API_BASE}lfwm/unpublish`, {}, { id: me.id }).then(r => {
       return r.data && refresh_files()
     }).finally(() => {
       set_pending(false)
@@ -273,7 +274,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
 
   const publish = (me: IFileInfo) => {
     set_pending(true)
-    ApiHttp.post(`${API_BASE}lf2wmods/publish`, {}, { id: me.id }).then(r => {
+    ApiHttp.post(`${API_BASE}lfwm/publish`, {}, { id: me.id }).then(r => {
       return r.data && refresh_files()
     }).finally(() => {
       set_pending(false)
@@ -431,7 +432,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 onDrop={e => onDrop(e, me)}
                 onNameChanged={async (name) => {
                   if (name === me.name) {
-                    if (new_dir == me.id && me.type == 'mod') {
+                    if (new_dir == me.id && (me.type == 'mod' || me.type == 'omod')) {
                       edit_mod(me)
                     }
                     set_new_dir(0)
@@ -455,7 +456,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                     })
                     if (!ok) return ok
                   }
-                  const ok = await ApiHttp.post(`${API_BASE}lf2wmods/save`, null, {
+                  const ok = await editModRecord({
                     id: me.id,
                     name: name
                   }).then(() => {

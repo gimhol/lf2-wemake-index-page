@@ -38,34 +38,38 @@ export interface IMod {
   owner: IUserInfo;
   strings: ReturnType<typeof get_mod_paths_names>
 }
-
+const TAG = '[get_mod]'
 export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
-
-
+  console.debug(`${TAG} opts:`, opts)
   const { mod_id, oss, sts } = opts;
-  if (!mod_id || !oss || !sts) throw new Error('!');
-
+  if (!mod_id) throw new Error(`${TAG} mod_id got ${mod_id}`);
+  if (!sts) throw new Error(`${TAG} oss got ${oss}`);
+  if (!oss) throw new Error(`${TAG} sts got ${oss}`);
   const record = await findModRecord({ id: mod_id });
   const { owner_id, oss_name } = record;
   if (!owner_id) throw new Error('mod not found!');
   const owner = await getUserInfo({ id: record.owner_id });
+
+
+  
   const raw_info: IInfo = {
     author_url: owner?.home_url || owner?.gitee_url || owner?.github_url,
     author: owner.username || owner.username,
     title: record.name,
   }
   if (oss_name) {
-    Object.assign(
-      raw_info,
-      await fetch(join_url(STORAGE_URL_BASE, oss_name)).then<IInfo>(r => {
-        if (!r.ok) throw new Error(`[${r.status}]${r.statusText}`)
-        return r.json()
-      })
-    )
+    const exists_info = await fetch(join_url(STORAGE_URL_BASE, oss_name)).then<IInfo>(r => {
+      if (!r.ok) throw new Error(`[${r.status}]${r.statusText}`)
+      return r.json()
+    })
+    console.debug(`[get_mod] exists_info:`, exists_info)
+    Object.assign(raw_info, exists_info)
+  } else {
+    console.debug(`[get_mod] info not exists, will make an empty one.`)
   }
   const strings = get_mod_paths_names(owner.id, mod_id);
   const info = new Info(raw_info, '', null, oss_name || null);
   info.id = '' + mod_id;
-  console.log({ info })
   return { strings, info, record, owner };
 }
+

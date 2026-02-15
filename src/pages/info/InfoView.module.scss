@@ -58,7 +58,7 @@
     margin     : 0;
 
     .title_link {
-      height       : var(--icon-button-height, 1.8rem);
+      height       : var(--size-h-icon-btn, 1.8rem);
       padding-left : 5px;
       padding-right: 5px;
     }
@@ -83,7 +83,7 @@
     display        : flex;
     align-items    : center;
     justify-content: center;
-    width          : calc(var(--icon-button-width, 1.8rem) * 2 + 8);
+    width          : calc(var(--size-w-icon-btn) * 2 + 8);
   }
 
   .content_zone {

@@ -8,7 +8,7 @@ export interface IFileInfo {
   deleted?: number;
   parent?: number;
   path?: string;
-  type?: 'dir' | 'mod' | 'file';
+  type?: 'dir' | 'mod' | 'file' | 'omod';
   content_type?: string;
   url?: string;
   size?: number;
@@ -22,7 +22,7 @@ export interface IListModRecordsBody {
   id?: number;
 }
 export async function listModRecords(body?: IListModRecordsBody, opts?: RequestInit): Promise<IFileInfo[]> {
-  const r = await ApiHttp.post(`${API_BASE}lf2wmods/mine`, null, body ?? {}, opts);
+  const r = await ApiHttp.post(`${API_BASE}lfwm/mine`, null, body ?? {}, opts);
   return r.data;
 }
 

@@ -13,14 +13,14 @@ import { ossUploadModRecords } from "@/hooks/ossUploadModRecords";
 import { useOSS } from "@/hooks/useOSS";
 import { useOSSUploadModImages } from "@/hooks/useOSSUploadModImages";
 import { interrupt_event } from "@/utils/interrupt_event";
-import { read_blob_as_md5 } from "@/utils/read_blob_as_md5";
 import classnames from "classnames";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useImmer } from "use-immer";
 import csses from "./ModFormView.module.scss";
 import { get_mod, type IMod } from "./get_mod";
-import { join_url, replace_one } from "./join_url";
+import { replace_one } from "./join_url";
+import { save_mod } from "./save_mod";
 export interface IModFormViewProps {
   mod_id?: number;
 }
@@ -61,7 +61,7 @@ export function ModFormView(props: IModFormViewProps) {
           set_covers([{ url: r.info.full_cover_url }])
       }).catch(e => {
         if (ab.signal.aborted) return;
-        toast(e)
+        toast.error(e)
       }).finally(() => {
         if (ab.signal.aborted) return;
         set_loading(false)
@@ -70,26 +70,28 @@ export function ModFormView(props: IModFormViewProps) {
   }, [mod_id, toast, oss, sts, set_mod, set_draft])
 
   const tool_tips_container = () => document.getElementsByClassName(csses.mod_form_view).item(0)!
+
   const save = () => {
     if (!mod) return;
-    if (!oss || !sts || !mod.strings || !mod_id) return;
     set_loading(true)
-    const next = mod.info.load(draft).clone().set_id('' + mod_id)
-    const json_blob = new Blob([JSON.stringify(next.raw)], { type: 'application/json; charset=utf-8' })
-    const oss_obj_name = join_url(sts.dir, mod_id, read_blob_as_md5(json_blob))
-    console.log(oss_obj_name)
-    oss.put(oss_obj_name, json_blob).then(() => {
-      return oss.head(oss_obj_name)
-    }).then(r => {
-      return r
-    }).then(r => {
-      alert(r)
-    }).catch(e => {
-      toast.error(e)
-    }).finally(() => {
-      set_loading(false)
-    })
+    const next = mod.info.load(draft).clone().set_id('' + mod_id);
+    save_mod({ mod_id, oss, sts, info: next })
+      .then(() => {
+        return get_mod({ mod_id, oss, sts })
+      }).then(r => {
+        set_draft(r.info.raw)
+        set_mod(r)
+        if (r.info.full_cover_url)
+          set_covers([{ url: r.info.full_cover_url }])
+      }).catch(e => {
+        toast.error(e)
+      }).finally(() => {
+        set_loading(false)
+      }).finally(() => {
+        set_loading(false)
+      })
   }
+
   return (
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
       {toast_ctx}

@@ -1,0 +1,9 @@
+@use "@/theme/common.module.scss"as *;
+
+.right_top {
+  @extend .actions_row;
+  padding : var(--padding-t) var(--padding-r) var(--padding-b) var(--padding-l);
+  position: absolute;
+  right   : 0px;
+  top     : 0px;
+}

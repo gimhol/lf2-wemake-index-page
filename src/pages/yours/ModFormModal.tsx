@@ -2,6 +2,8 @@ import { IconButton } from "@/components/button/IconButton";
 import { ModFormView } from "./ModFormView";
 import { Mask, type IMaskProps } from "@/components/mask";
 import { interrupt_event } from "@/utils/interrupt_event";
+import csses from "./ModFormModal.module.scss";
+import { LangButton } from "@/components/LangButton";
 
 export interface IModFormModalProps extends IMaskProps {
   _?: never;
@@ -12,10 +14,13 @@ export function ModFormModal(props: IModFormModalProps) {
   return (
     <Mask container={container} onClose={onClose} {..._p}>
       <ModFormView mod_id={mod_id} />
-      <IconButton
-        style={{ position: 'absolute', right: 10, top: 10 }}
-        letter='✖︎'
-        onClick={e => { interrupt_event(e); onClose?.() }} />
+      <div className={csses.right_top}>
+        <LangButton />
+        <IconButton
+          letter='✖︎'
+          onClick={e => { interrupt_event(e); onClose?.() }} />
+      </div>
+
     </Mask>
   );
 }

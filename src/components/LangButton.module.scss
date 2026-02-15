@@ -1,7 +1,13 @@
+.lang_btn {
+  width  : var(--size-w-icon-btn);
+  padding: 0;
+}
+
 .lang_btn_inner {
   position: relative;
   width   : 24px;
   height  : 24px;
+  overflow: visible;
 }
 
 .lang_span {

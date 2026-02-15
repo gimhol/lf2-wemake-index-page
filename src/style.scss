@@ -18,14 +18,18 @@
   --color-tooltip        : black;
 
   --small-screen-width-min: 0px;
-  --icon-button-width     : 1.8rem;
-  --icon-button-height    : 1.8rem;
+  --size-w-icon-btn       : 1.8rem;
+  --size-h-icon-btn       : 1.8rem;
 
   --font-size-txt    : 14px;
   --font-size-small  : 10px;
   --font-size-tiny   : 8px;
   --font-size-tooltip: 12px;
 
+  --padding-t: 5px;
+  --padding-r: 5px;
+  --padding-b: 5px;
+  --padding-l: 5px;
 }
 
 #root {
