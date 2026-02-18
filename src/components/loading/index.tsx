@@ -8,6 +8,7 @@ import csses from "./index.module.scss";
 export interface ILoadingProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'loading'> {
   loading?: boolean;
   big?: boolean;
+  tiny?: boolean;
   fixed?: boolean;
   absolute?: boolean;
   center?: boolean;
@@ -19,7 +20,7 @@ export interface ILoadingProps extends Omit<React.ImgHTMLAttributes<HTMLImageEle
 export function Loading(props: ILoadingProps) {
   const {
     loading, big = false, center, fixed, absolute, className,
-    top, bottom, left, right, ..._p
+    top, bottom, left, right, tiny = false, ..._p
   } = props;
 
   const [logic, src] = useMemo(() => {
@@ -37,16 +38,19 @@ export function Loading(props: ILoadingProps) {
   }, [loading, logic]);
 
   const cls = useMemo(() => {
-    return classNames(className, big ? csses.loading_img_l : csses.loading_img_s, {
-      [csses.fixed]: fixed,
-      [csses.absolute]: absolute,
-      [csses.center]: center,
-      [csses.top]: top,
-      [csses.bottom]: bottom,
-      [csses.left]: left,
-      [csses.right]: right
-    })
-  }, [big, fixed, absolute, className, center, top, bottom, left, right])
+    return classNames(className,
+      big ? csses.loading_img_l : csses.loading_img_s,
+      tiny ? csses.tiny : void 0,
+      {
+        [csses.fixed]: fixed,
+        [csses.absolute]: absolute,
+        [csses.center]: center,
+        [csses.top]: top,
+        [csses.bottom]: bottom,
+        [csses.left]: left,
+        [csses.right]: right
+      })
+  }, [big, fixed, absolute, className, center, top, bottom, left, right, tiny])
   return (
     <img
       src={src}

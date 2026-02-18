@@ -28,6 +28,15 @@
   transform: translate(-50%, -50%);
 }
 
+.loading_img_s.tiny {
+  transform: scale(0.6);
+}
+
+.absolute.tiny,
+.fixed.tiny {
+  transform: translate(-50%, -50%) scale(0.6);
+}
+
 .absolute {
   position : absolute;
   top      : 50%;

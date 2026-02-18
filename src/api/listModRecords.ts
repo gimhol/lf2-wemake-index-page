@@ -13,7 +13,7 @@ export interface IFileInfo {
   url?: string;
   size?: number;
   oss_name?: string;
-  status?: 'published' | 'reviewing'
+  status?: 'published' | 'publishing' | 'unpublishing' | 'reviewing'
   brief?: string;
 }
 

@@ -12,6 +12,7 @@
   height         : var(--size-h-icon-btn, 1.8rem);
   outline        : none;
   padding        : 2px 5px;
+  position       : relative;
 
   >.icon_button_href {
     display: none;
@@ -27,9 +28,9 @@
   }
 }
 
-.icon_button>* {
-  transition: all 200ms;
-}
+// .icon_button>* {
+//   transition: all 200ms;
+// }
 
 .icon_button:hover:not(.disabled)>* .icon_button:hover:not(:disabled)>* {
   transform: scale(1.2);

@@ -14,6 +14,7 @@ import img_unpublish from "@/assets/svg/unpublish.svg"
 import { IconButton } from "@/components/button/IconButton"
 import { ImagesViewer } from "@/components/images/Viewer"
 import { Loading } from "@/components/loading"
+import Show from "@/gimd/Show"
 import Toast from "@/gimd/Toast"
 import GlobalStore from "@/GlobalStore"
 import { get_content_disposition } from "@/hooks/ossUploadFiles"
@@ -32,8 +33,8 @@ import { useNavigate } from "react-router"
 import { useImmer } from "use-immer"
 import { FileRow } from "./FileRow"
 import { get_icon, get_icon_title } from "./get_icon"
-import { ModPreviewModal } from "./ModPreviewModal"
 import { ModFormModal } from "./ModFormModal"
+import { ModPreviewModal } from "./ModPreviewModal"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
 import { VideoModal } from "./VideoModal"
@@ -54,7 +55,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [editing_mod, set_editing_mod] = useState<{ open?: boolean, data?: IFileInfo }>({})
   const ref_root = useRef<HTMLDivElement>(null);
   const [progress, set_progress] = useState<[string, number, number]>()
-  const { value: { session_id, nickname, username } } = useContext(GlobalStore.context);
+  const { value: { session_id, nickname, username, admin } } = useContext(GlobalStore.context);
   const nav = useNavigate();
   const { search } = LocationParams.useAll();
   const [previewing, set_previewing] = useImmer({ open: false, mod_id: 0 })
@@ -255,8 +256,10 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
 
   const unpublish = (me: IFileInfo) => {
     set_pending(true)
-    ApiHttp.post(`${API_BASE}lfwm/unpublish`, {}, { id: me.id }).then(r => {
-      return r.data && refresh_files()
+    ApiHttp.post(`${API_BASE}lfwm/unpublish`, {}, { id: me.id }).then(() => {
+      return refresh_files()
+    }).catch(e => {
+      toast.error(e)
     }).finally(() => {
       set_pending(false)
     })
@@ -264,8 +267,10 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
 
   const publish = (me: IFileInfo) => {
     set_pending(true)
-    ApiHttp.post(`${API_BASE}lfwm/publish`, {}, { id: me.id }).then(r => {
-      return r.data && refresh_files()
+    ApiHttp.post(`${API_BASE}lfwm/publish`, {}, { id: me.id }).then(() => {
+      return refresh_files()
+    }).catch(e => {
+      toast.error(e)
     }).finally(() => {
       set_pending(false)
     })
@@ -336,10 +341,18 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         <IconButton
           icon={img_create_file}
           disabled={pending}
-          title={t("create_mod_info")}
+          title={t("create_mod")}
           onClick={e => {
             interrupt_event(e)
             add_dir(dir.id, 'mod')
+          }} />
+        <IconButton
+          icon="🔄"
+          disabled={pending}
+          title={t("refresh")}
+          onClick={e => {
+            interrupt_event(e)
+            refresh_files()
           }} />
       </div>
       <div
@@ -367,7 +380,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 onMouseDown={e => {
                   const el = (e.target as HTMLElement);
                   if (el.tagName !== 'DIV') {
-                    console.log(el.tagName)
                     e.stopPropagation()
                     e.preventDefault()
                   }
@@ -383,41 +395,51 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 }}
                 owner={<OwnerName owner_id={me.owner_id} />}
                 download={me.type == 'file' ? me.url : void 0}
-                actions={<>
-                  {me.type !== 'mod' ? null :
-                    <IconButton
-                      icon={img_edit}
-                      title={t('edit_mod_info')}
-                      disabled={pending}
-                      onClick={() => edit_mod(me)} />
-                  }
-                  {me.type !== 'mod' || !mod_id ? null :
-                    <IconButton
-                      icon={img_preview}
-                      title={t('preview_mod_info')}
-                      disabled={pending}
-                      onClick={() => set_previewing({ open: true, mod_id })} />
-                  }
-                  {(me.type !== 'mod' || me.status) ? null :
+                actions={((me.type !== 'mod' && me.type !== 'omod') || !mod_id) ? null : <>
+                  <IconButton
+                    icon={img_edit}
+                    title={t('edit_mod_info')}
+                    disabled={pending}
+                    onClick={() => edit_mod(me)} />
+                  <IconButton
+                    icon={img_preview}
+                    title={t('preview_mod_info')}
+                    disabled={pending}
+                    onClick={() => set_previewing({ open: true, mod_id })} />
+                  <Show yes={!me.status || (me.status === 'reviewing' && admin & 1)}>
                     <IconButton
                       icon={img_publish}
-                      title={t('publish_mod')}
+                      title={t('publish')}
                       disabled={pending}
                       onClick={() => publish(me)} />
-                  }
-                  {(me.type !== 'mod' || !me.status) ? null :
+                  </Show>
+
+                  <Show yes={me.status === 'published'}>
+                    <IconButton
+                      icon={img_publish}
+                      title={t('republish')}
+                      disabled={pending}
+                      onClick={() => publish(me)} />
                     <IconButton
                       icon={img_unpublish}
-                      title={t('unpublish_mod')}
+                      title={t('unpublish')}
                       disabled={pending}
                       onClick={() => unpublish(me)} />
-                  }
-                  {(me.type !== 'mod' || me.status !== 'reviewing') ? null :
+                  </Show>
+                  <Show yes={me.status === 'reviewing' && !(admin & 1)}>
                     <IconButton
                       disabled
                       icon={img_reviewing}
-                      title={t('mod_reviewing')} />
-                  }
+                      title={t('reviewing')} />
+                  </Show>
+                  <Show yes={(
+                    me.status === 'publishing' ||
+                    me.status === 'unpublishing'
+                  )}>
+                    <IconButton
+                      icon={<Loading loading absolute center tiny />}
+                      title={t(`${me.status}_pls_refresh_later`)} />
+                  </Show>
                 </>}
                 onDragOver={e => onDragOver(e, me)}
                 onDrop={e => onDrop(e, me)}
