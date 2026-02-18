@@ -21,12 +21,8 @@ export function useOSS() {
   const oss = useMemo(() => {
     if (!sts?.securityToken) return;
     const options: OSS.Options = {
-      endpoint: 'oss-cn-guangzhou.aliyuncs.com',
-      region: "oss-cn-guangzhou",
-      accessKeyId: sts.accessKeyId,
-      accessKeySecret: sts.accessKeySecret,
+      ...sts,
       stsToken: sts.securityToken,
-      bucket: sts.bucket,
       refreshSTSToken: async () => {
         const sts = await getSTSToken()
         set_value(prev => ({ ...prev, sts }))

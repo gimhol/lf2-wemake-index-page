@@ -7,7 +7,7 @@ import { Mask, type IMaskProps } from "@/components/mask";
 import Toast from "@/gimd/Toast";
 import { interrupt_event } from "@/utils/interrupt_event";
 import cns from "classnames";
-import { useEffect, useState, type HTMLAttributes } from "react";
+import { useEffect, useState, type HTMLAttributes, type ReactNode } from "react";
 import { useImmer } from "use-immer";
 import { InfoView } from "../info/InfoView";
 import { get_mod, type IMod } from "./get_mod";
@@ -23,7 +23,11 @@ export function ModPreviewModal(props: IInfoViewModalProps) {
 
   return (
     <Mask container={container} onClose={onClose} className={csses.mod_preview_modal} {..._p} >
-      <ModPreview mod_id={mod_id} info={info} />
+      <ModPreview mod_id={mod_id} info={info} head={
+        <div className={cns(csses.head)}>
+          <h1 className={csses.title}>previewing</h1>
+        </div>
+      } />
       <IconButton
         style={{ position: 'absolute', right: 10, top: 10 }}
         icon='✖︎'
@@ -36,9 +40,10 @@ export interface IInfoViewProps extends HTMLAttributes<HTMLDivElement> {
   _?: never;
   mod_id?: number;
   info?: Info;
+  head?: ReactNode;
 }
 export function ModPreview(props: IInfoViewProps) {
-  const { mod_id, info, ..._p } = props;
+  const { mod_id, info, head, ..._p } = props;
   const [toast, toast_ctx] = Toast.useToast()
   const [mod, set_mod] = useImmer<IMod | undefined>(void 0)
   const [loading, set_loading] = useState(false)
@@ -65,9 +70,7 @@ export function ModPreview(props: IInfoViewProps) {
   return (
     <div className={csses.mod_preview} {..._p} >
       {toast_ctx}
-      <div className={cns(csses.head)}>
-        <h1 className={csses.title}>previewing</h1>
-      </div>
+      {head}
       <div className={cns(csses.main)}>
         <InfoCard info={info ?? mod?.info} />
         <div className={cns(csses.info_viewscrollview, csses.scrollview)}>

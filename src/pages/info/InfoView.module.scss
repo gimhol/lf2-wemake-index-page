@@ -60,7 +60,7 @@
     margin     : 0;
 
     .title_link {
-      height       : var(--size-h-icon-btn, 1.8rem);
+      height: var(--size-h-icon-btn, 1.8rem);
     }
 
     >* {
@@ -145,6 +145,7 @@
   flex-wrap      : wrap;
   flex           : 1;
   align-items    : flex-start;
+  align-content  : flex-start;
 
   @media screen and (min-width: 0px) and (max-width: 480px) {
     flex-wrap     : nowrap;

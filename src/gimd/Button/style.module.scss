@@ -2,14 +2,14 @@
   background : none;
   outline    : none;
   border     : none;
-  color      : #40454e;
+  color      : var(--color-btn);
   transition : color 200ms;
   position   : relative;
   white-space: nowrap;
 
   &:hover {
     cursor: pointer;
-    color : white;
+    color : var(--color-btn-hover);
   }
 
   &:disabled {
@@ -25,7 +25,6 @@
     position       : relative;
     z-index        : 1;
     white-space    : nowrap;
-    fill           : red
   }
 
   &>.back_decorator {
@@ -33,9 +32,8 @@
   }
 }
 
-
 .btn_kind_underline {
-  
+
   & .back_decorator {
     background-color: #00000044;
     bottom          : 0px;
@@ -130,7 +128,6 @@
   }
 }
 
-
 .btn_kind_normal {
   .back_decorator {
     bottom    : 0px;
@@ -142,7 +139,7 @@
   }
 
   &:hover:not(:disabled) .back_decorator {
-    background-color: #00000088;
+    background-color: var(--color-btn-bg-hover);
     height          : 100%;
     border-radius   : 2px;
     left            : 0px;
@@ -150,7 +147,7 @@
   }
 
   &:active .back_decorator {
-    background-color: #000000FF;
+    background-color: var(--color-btn-bg-hover);
   }
 
   &:disabled .back_decorator {
@@ -166,8 +163,15 @@
   }
 
   &.btn_size_l {
-    padding: 10px 15px;
+    padding     : 10px 15px;
   }
+}
+
+.btn_kind_dashed {
+  @extend .btn_kind_normal;
+    border-style: dashed;
+    border-width: 2px;
+    border-color: var(--color-btn-border);
 }
 
 .btn_delete_line {

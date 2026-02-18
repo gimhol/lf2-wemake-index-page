@@ -2,7 +2,6 @@
 import { Info, type IInfo } from "@/base/Info";
 import { CollapseButton } from "@/components/button/CollapseButton";
 import { IconButton } from "@/components/button/IconButton";
-import { InfoCard } from "@/components/cards/InfoCard";
 import { Collapse } from "@/components/collapse/Collapse";
 import { ImagesViewer } from "@/components/images/Viewer";
 import { Loading } from "@/components/loading";
@@ -16,14 +15,16 @@ import { useOSSUploadModImages } from "@/hooks/useOSSUploadModImages";
 import { interrupt_event } from "@/utils/interrupt_event";
 import classnames from "classnames";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useImmer } from "use-immer";
-import { InfoView } from "../info/InfoView";
 import csses from "./ModFormView.module.scss";
+import { ModPreview } from "./ModPreviewModal";
 import { get_mod, type IMod } from "./get_mod";
 import { replace_one } from "./join_url";
 import { save_mod } from "./save_mod";
+import { Dropdown } from "@/gimd/Dropdown";
+import { all_info_url_type, InfoUrlType as InfoUrlType } from "./InfoUrlType";
 export interface IModFormViewProps {
   mod_id?: number;
 }
@@ -80,7 +81,7 @@ export function ModFormView(props: IModFormViewProps) {
     } else {
       set_previewing({ info: mod.info.load(draft).clone().set_id('' + mod_id).set_date(dayjs().format(`YYYY-MM-DD HH:mm:ss`)) })
     }
-    set_opens({ base: open, brief: open, desc: open, changelog: open, preview: !open })
+    set_opens(d => { d.preview = !open })
   }
 
   const save = () => {
@@ -103,6 +104,29 @@ export function ModFormView(props: IModFormViewProps) {
         set_loading(false)
       })
   }
+  const ref_main = useRef<HTMLDivElement>(null);
+  const ref_animating = useRef(false)
+  const ref_scroll_top = useRef(0)
+  const on_scroll = () => {
+    const el = ref_main.current;
+    if (!el || opens.preview || ref_animating.current) return;
+    ref_scroll_top.current = el.scrollTop;
+  }
+  useEffect(() => {
+    const el = ref_main.current;
+    if (!el) return;
+    ref_animating.current = true
+    const tid = setTimeout(() => {
+      if (opens.preview) {
+        const t = document.getElementById('preview_head')!.offsetTop
+        el.scrollTo({ top: t, behavior: 'smooth' })
+      } else {
+        el.scrollTo({ top: ref_scroll_top.current, behavior: 'smooth' })
+      }
+      ref_animating.current = false
+    }, 300)
+    return () => clearTimeout(tid)
+  }, [opens.preview])
 
   return <>
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
@@ -112,21 +136,18 @@ export function ModFormView(props: IModFormViewProps) {
           {t('edit_mod_info')}
         </h1>
       </div>
-      <div className={classnames(csses.main, csses.scrollview)}>
+      <div className={classnames(csses.main, csses.scrollview)} ref={ref_main} onScroll={on_scroll}>
         <h2 className={csses.title}>
-          <CollapseButton open={opens.base} onClick={() => set_opens(d => { d.base = !d.base })} />
+          <CollapseButton open={opens.base && !opens.preview} onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.base = !d.base; })} />
           {t("mod_base_info")}
         </h2>
-        <Collapse open={opens.base} classNames={{ inner: csses.base_info }}>
+        <Collapse open={opens.base && !opens.preview} classNames={{ inner: csses.base_info }}>
           <div className={csses.form_row}>
             <span>{t('data_zip_title')}:</span>
             <input
               className={csses.txt_input}
               value={draft.title}
-              onChange={e => {
-                interrupt_event(e)
-                set_draft(d => { d.title = e.target.value })
-              }}
+              onChange={e => { interrupt_event(e); set_draft(d => { d.title = e.target.value }) }}
               type="text"
               placeholder={t("edit_title_here")}
               maxLength={50} />
@@ -136,10 +157,7 @@ export function ModFormView(props: IModFormViewProps) {
             <input
               className={csses.txt_input}
               value={draft.author}
-              onChange={e => {
-                interrupt_event(e)
-                set_draft(d => { d.author = e.target.value })
-              }}
+              onChange={e => { interrupt_event(e); set_draft(d => { d.author = e.target.value }) }}
               type="text"
               placeholder={t("edit_author_here")}
               maxLength={50} />
@@ -150,10 +168,7 @@ export function ModFormView(props: IModFormViewProps) {
               className={csses.txt_input}
               value={draft.author_url}
               type="text"
-              onChange={e => {
-                interrupt_event(e)
-                set_draft(d => { d.author_url = e.target.value })
-              }}
+              onChange={e => { interrupt_event(e); set_draft(d => { d.author_url = e.target.value }) }}
               placeholder={t("edit_author_url_here")}
               maxLength={255} />
           </div>
@@ -195,49 +210,54 @@ export function ModFormView(props: IModFormViewProps) {
           </div>
           <div className={csses.form_row}>
             <span>{t('attachment')}:</span>
-            <PickFile
-              max={1}
-              accept=".zip"
-              value={attachments}
-              whenChange={records => {
-                set_attachments(records)
-                if (!records?.length) return;
-                set_attachment_uploading(true);
-                ossUploadModRecords({
-                  mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
-                    'application/x-zip-compressed': { max_size: 100 * 1024 * 1024 },
-                    'application/zip': { max_size: 100 * 1024 * 1024 },
-                  },
-                  progress: (progress, { file }) => {
-                    const record = uploaded_map.get(file);
-                    if (!record) uploaded_map.set(file, { file, url: "", progress, name: file.name });
-                    else uploaded_map.set(file, { ...record, progress })
-                    set_attachments(prev => replace_one(prev, v => {
-                      return v.file == file ? { ...v, progress } : null
-                    }))
-                  }
-                }).then(r => {
-                  if (!r.length) throw 'upload nothings'
-                  const name = r[0].url.split('/').pop();
-                  set_draft(d => {
-                    d.url = name;
-                    d.url_type = 'download'
+            <div className={csses.url_row}>
+              <Dropdown.Select
+                value={InfoUrlType.Download}
+                options={all_info_url_type.map(v => ({ value: v, label: t(v) }))} />
+              <PickFile
+                max={1}
+                accept=".zip"
+                value={attachments}
+                whenChange={records => {
+                  set_attachments(records)
+                  if (!records?.length) return;
+                  set_attachment_uploading(true);
+                  ossUploadModRecords({
+                    mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
+                      'application/x-zip-compressed': { max_size: 100 * 1024 * 1024 },
+                      'application/zip': { max_size: 100 * 1024 * 1024 },
+                    },
+                    progress: (progress, { file }) => {
+                      const record = uploaded_map.get(file);
+                      if (!record) uploaded_map.set(file, { file, url: "", progress, name: file.name });
+                      else uploaded_map.set(file, { ...record, progress })
+                      set_attachments(prev => replace_one(prev, v => {
+                        return v.file == file ? { ...v, progress } : null
+                      }))
+                    }
+                  }).then(r => {
+                    if (!r.length) throw 'upload nothings'
+                    const name = r[0].url.split('/').pop();
+                    set_draft(d => {
+                      d.url = name;
+                      d.url_type = 'download'
+                    })
+                  }).catch((err) => {
+                    toast.error(err)
+                  }).finally(() => {
+                    set_attachment_uploading(false);
                   })
-                }).catch((err) => {
-                  toast.error(err)
-                }).finally(() => {
-                  set_attachment_uploading(false);
-                })
-              }}>
-              <PickFile.Files />
-            </PickFile>
+                }}>
+                <PickFile.Files />
+              </PickFile>
+            </div>
           </div>
         </Collapse>
         <h2 className={csses.title}>
-          <CollapseButton open={opens.brief} onClick={() => set_opens(d => { d.brief = !d.brief })} />
+          <CollapseButton open={opens.brief && !opens.preview} onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.brief = !d.brief })} />
           {t("mod_brief")}
         </h2>
-        <Collapse open={opens.brief} classNames={{ inner: csses.collapse_inner }}>
+        <Collapse open={opens.brief && !opens.preview} classNames={{ inner: csses.collapse_inner }}>
           <div className={csses.brief_editor}>
             <EditorView
               uploadImages={upload_images}
@@ -247,10 +267,10 @@ export function ModFormView(props: IModFormViewProps) {
           </div>
         </Collapse>
         <h2 className={csses.title}>
-          <CollapseButton open={opens.desc} onClick={() => set_opens(d => { d.desc = !d.desc })} />
+          <CollapseButton open={!opens.preview && opens.desc} onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.desc = !d.desc })} />
           {t("mod_description")}
         </h2>
-        <Collapse open={opens.desc} classNames={{ inner: csses.collapse_inner }}>
+        <Collapse open={!opens.preview && opens.desc} classNames={{ inner: csses.collapse_inner }}>
           <div className={csses.md_editor}>
             <EditorView
               uploadImages={upload_images}
@@ -260,10 +280,10 @@ export function ModFormView(props: IModFormViewProps) {
           </div>
         </Collapse>
         <h2 className={csses.title}>
-          <CollapseButton open={opens.changelog} onClick={() => set_opens(d => { d.changelog = !d.changelog })} />
+          <CollapseButton open={!opens.preview && opens.changelog} onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.changelog = !d.changelog })} />
           {t("mod_changelog")}
         </h2>
-        <Collapse open={opens.changelog} classNames={{ inner: csses.collapse_inner }}>
+        <Collapse open={!opens.preview && opens.changelog} classNames={{ inner: csses.collapse_inner }}>
           <div className={csses.md_editor}>
             <EditorView
               uploadImages={upload_images}
@@ -272,16 +292,14 @@ export function ModFormView(props: IModFormViewProps) {
               placeholder={t("edit_changelog_here")} />
           </div>
         </Collapse>
-        <h2 className={csses.title}>
+        <h2 className={csses.title} id="preview_head">
           <CollapseButton open={opens.preview} onClick={preview} />
           {t("mod_preview")}
         </h2>
         <Collapse open={opens.preview} classNames={{ inner: csses.collapse_inner }}>
-          <div style={{ display: 'flex', gap: 10, padding: 10, alignItems: 'flex-start' }}>
-            <InfoCard info={previewing.info} />
-            <InfoView info={previewing.info} className='bg' style={{ flex: 1 }} />
-          </div>
+          <ModPreview info={previewing.info} />
         </Collapse>
+        <div style={{ height: '100vh' }} />
       </div>
 
       <div className={csses.foot}>
@@ -307,3 +325,5 @@ export function ModFormView(props: IModFormViewProps) {
     </div>
   </>
 }
+
+

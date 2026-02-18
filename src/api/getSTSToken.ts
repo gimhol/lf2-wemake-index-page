@@ -1,15 +1,6 @@
+import GlobalStore from "@/GlobalStore";
 import { ApiHttp } from "@/network/ApiHttp";
 import { PIO } from "./PIO";
-import GlobalStore from "@/GlobalStore";
-export interface IOSSStsInfo {
-  accessKeyId: string;
-  accessKeySecret: string;
-  expiration: string;
-  securityToken: string;
-  bucket: string;
-  dir: string;
-  base: string;
-}
 
 export const sts_pio = new PIO<string, IOSSStsInfo>({ cache: true });
 sts_pio.name = 'sts_pio'

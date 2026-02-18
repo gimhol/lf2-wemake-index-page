@@ -6,10 +6,10 @@ import Anchor from '../SEO/Anchor';
 import Show from '../Show';
 import { SizeEnum, type SizeType } from '../SizeEnum';
 import { Text } from '../Text';
-import styles from './style.module.scss';
+import csses from './style.module.scss';
 
 export interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  kind?: 'underline' | 'icon' | 'normal';
+  kind?: 'underline' | 'icon' | 'normal' | 'dashed';
   shortcut_key?: string;
   shortcut?: TShortcutCombines;
   onClick?: (e: React.MouseEvent | KeyboardEvent) => void;
@@ -50,11 +50,11 @@ export default function Button(props: IButtonProps) {
 
   const _className = useMemo(() => {
     return classnames(
-      styles.btn,
-      styles[`btn_kind_${kind}`],
-      styles[`btn_size_${size}`],
+      csses.btn,
+      csses[`btn_kind_${kind}`],
+      csses[`btn_size_${size}`],
       {
-        [styles.btn_delete_line]: _delete
+        [csses.btn_delete_line]: _delete
       },
       className
     )
@@ -64,11 +64,11 @@ export default function Button(props: IButtonProps) {
   return (
     <button className={_className} onClick={_on_click} disabled={disabled} type={type} {..._p} >
       <Anchor href={open || href} title={_p.title} />
-      <Text className={styles.btn_inner} size={size} delete={_delete} disabled={disabled}>
+      <Text className={csses.btn_inner} size={size} delete={_delete} disabled={disabled}>
         {children}{shrotcut_visible ? `(${shortcut_str})` : ''}
       </Text>
       <Show yes>
-        <div className={styles.back_decorator} />
+        <div className={csses.back_decorator} />
       </Show>
     </button>
   )

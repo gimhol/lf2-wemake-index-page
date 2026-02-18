@@ -42,6 +42,7 @@ export function makeStore<V, A extends Action<V>>(opts: {
   const inner_reducer = (state: V, action: A | Action<V>): V => {
     let ret = reducer ? reducer(state, action) : state
     if (state !== ret) {
+      store.value = ret
       saver?.(ret)
       return ret;
     }
@@ -51,6 +52,7 @@ export function makeStore<V, A extends Action<V>>(opts: {
       case 'merge': ret = { ...state, ...action.value }; break
       default: return ret;
     }
+    store.value = ret
     saver?.(ret);
     return ret
   };

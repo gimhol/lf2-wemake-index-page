@@ -101,6 +101,7 @@ export function Dropdown(props: DropdownProps) {
     if (triggers.indexOf('contextmenu') >= 0)
       innper_props.onContextMenu = fire('contextmenu', onContextMenu)
 
+    // eslint-disable-next-line react-hooks/refs
     inner = cloneElement(children, innper_props);
   } else {
     inner = children;
@@ -139,26 +140,29 @@ export interface DropdownSelectProps<Value> extends Omit<DropdownProps, 'onChang
   defaultValue?: Value
 }
 Dropdown.Select = function Select<Value>(props: DropdownSelectProps<Value>) {
-  const { menu, options, onChange, value, style, defaultValue, className, onPointerDown, ..._p } = props;
+  const {
+    menu, options,
+    onChange: __onChange,
+    value: __value,
+    style, defaultValue, className, onPointerDown, ..._p
+  } = props;
 
-  const [_inner_value, _set_inner_value] = useState(defaultValue)
-  const _value = 'value' in props ? value : _inner_value;
-
+  const [_value, _set_inner_value] = usePropState(__value ?? defaultValue, __onChange)
   const [real_menu] = useMemo(() => {
     const ret = { ...menu }
     if (!options?.length) return [ret];
     ret.items = options.map(v => {
       return {
-        children: v.label ?? v.children,
+        children: v.label ?? v.children ?? ('' + v.value),
         onClick: (e) => {
           v.onClick?.(e)
-          onChange?.(v.value)
+          __onChange?.(v.value)
           _set_inner_value(v.value)
         }
       }
     })
     return [ret]
-  }, [menu, options, onChange])
+  }, [menu, options, __onChange, _set_inner_value])
 
   const [selected_options] = useMemo(() => {
     if (!options) return [[{ value: _value, label: '' + _value }]] as const;
@@ -167,8 +171,8 @@ Dropdown.Select = function Select<Value>(props: DropdownSelectProps<Value>) {
 
   return (
     <Dropdown {..._p} menu={real_menu}>
-      <Button style={style} className={className} onPointerDown={onPointerDown}>
-        {selected_options.map(v => v?.label)}
+      <Button style={style} kind='dashed' className={className} onPointerDown={onPointerDown}>
+        {selected_options.map(v => v?.label ?? ('' + v?.value))}
       </Button>
     </Dropdown>
   )
