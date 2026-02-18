@@ -10,6 +10,7 @@ export interface IEditModRecordBody {
   url?: string;
   oss_name?: string;
   size?: number;
+  brief?: string;
 }
 export async function editModRecord(body: IEditModRecordBody, opts?: RequestInit): Promise<number> {
   const r = await ApiHttp.post(`${API_BASE}lfwm/update`, null, body, opts);

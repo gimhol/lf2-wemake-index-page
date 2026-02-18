@@ -31,7 +31,7 @@ export async function ossUploadModRecords(opts: IOssUploadModRecordsOpts): Promi
       parent: mod_id,
       type: 'file',
       url: join_url(base, result.name),
-      oss_name: result.name,
+      oss_name: result.name.startsWith('/') ? result.name.substring(1) : result.name,
       size: file.size,
     });
   }

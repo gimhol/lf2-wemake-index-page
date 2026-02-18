@@ -28,7 +28,7 @@ export async function save_mod(opts: ISaveModFormOpts) {
 
   const oss_name = join_url(sts.dir, mod_id, await read_blob_as_md5(json_blob))
   await oss.put(oss_name, json_blob)
-  await editModRecord({ id: mod_id, oss_name })
+  await editModRecord({ id: mod_id, oss_name, brief: info.brief })
 
   // const record = await findModRecord({ id: mod_id });
   // const { owner_id } = record;
