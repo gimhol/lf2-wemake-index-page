@@ -16,7 +16,7 @@ import { useOSSUploadModImages } from "@/hooks/useOSSUploadModImages";
 import { interrupt_event } from "@/utils/interrupt_event";
 import classnames from "classnames";
 import dayjs from "dayjs";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useImmer } from "use-immer";
 import { all_info_url_type, InfoUrlType } from "./InfoUrlType";
@@ -29,13 +29,13 @@ export interface IModFormViewProps {
   mod_id?: number;
 }
 const uploaded_map = new Map<File, IPickedFile>();
-
+const langs = [{ value: '' as const, label: 'EN' }, { value: 'zh' as const, label: '中' }]
 export function ModFormView(props: IModFormViewProps) {
   const { mod_id } = props;
   const { t } = useTranslation();
   const upload_images = useOSSUploadModImages({ mod_id })
   const [oss, sts] = useOSS()
-  const [draft, set_draft] = useImmer<IInfo>({})
+  const [drafts, set_drafts] = useImmer<{ '': IInfo, 'zh': IInfo }>(() => ({ '': {}, zh: {} }))
   const [mod, set_mod] = useImmer<IMod | null>(null)
   const [loading, set_loading] = useState(!!mod_id);
   const [cover_uploading, set_cover_uploading] = useState(false);
@@ -44,6 +44,9 @@ export function ModFormView(props: IModFormViewProps) {
   const [attachment_uploading, set_attachment_uploading] = useState(false);
   const small = !document.firstElementChild?.classList.contains('small-screen')
   const [opens, set_opens] = useImmer({ base: true, brief: small, desc: small, changelog: small, preview: false })
+  const [lang, set_lang] = useState<'zh' | ''>('')
+  const draft = drafts[lang];
+
   useEffect(() => {
     if (!mod_id || !sts) {
       set_loading(false)
@@ -54,10 +57,10 @@ export function ModFormView(props: IModFormViewProps) {
     get_mod({ mod_id })
       .then(r => {
         if (ab.signal.aborted) return;
-        set_draft(r.info.raw)
         set_mod(r)
         if (r.info.full_cover_url)
           set_covers([{ url: r.info.full_cover_url }])
+        set_drafts({ '': r.info.raw, zh: r.info.raw.i18n?.['zh'] ?? {} })
       }).catch(e => {
         if (ab.signal.aborted) return;
         Toast.error(e)
@@ -66,35 +69,54 @@ export function ModFormView(props: IModFormViewProps) {
         set_loading(false)
       })
     return () => ab.abort()
-  }, [mod_id, oss, sts, set_mod, set_draft])
+  }, [mod_id, oss, sts, set_mod, set_drafts])
 
   const tool_tips_container = () => document.getElementsByClassName(csses.mod_form_view).item(0)!
 
   const [previewing, set_previewing] = useImmer({ info: void 0 as undefined | Info })
 
-  const preview = () => {
+
+  const preview = useCallback((open: boolean, l = lang) => {
     if (!mod) return;
-    const open = opens.preview;
-    if (open) {
+    if (!open) {
       set_previewing({ info: void 0 })
     } else {
-      set_previewing({ info: mod.info.load(draft).clone().set_id('' + mod_id).set_date(dayjs().format(`YYYY-MM-DD HH:mm:ss`)) })
+      const raw: IInfo = {
+        ...drafts[''],
+        i18n: { zh: { ...drafts.zh } }
+      }
+      set_previewing({
+        info: mod
+          .info
+          .load(raw)
+          .with_lang(l)
+          .clone()
+          .set_id('' + mod_id)
+          .set_date(dayjs().format(`YYYY-MM-DD HH:mm:ss`))
+      })
     }
-    set_opens(d => { d.preview = !open })
-  }
+    set_opens(d => { d.preview = open })
+  }, [drafts, mod, lang, mod_id, set_opens, set_previewing])
 
   const save = () => {
     if (!mod) return;
     set_loading(true)
-    const next = mod.info.load(draft).clone().set_id('' + mod_id).set_date(dayjs().format(`YYYY-MM-DD HH:mm:ss`));
+    const raw: IInfo = {
+      ...drafts[''],
+      i18n: { zh: { ...drafts.zh } }
+    }
+    const next = mod.info.load(raw)
+      .clone()
+      .set_id('' + mod_id)
+      .set_date(dayjs().format(`YYYY-MM-DD HH:mm:ss`));
     save_mod({ mod_id, oss, sts, info: next })
       .then(() => {
         return get_mod({ mod_id })
       }).then(r => {
-        set_draft(r.info.raw)
-        set_mod(r)
         if (r.info.full_cover_url)
           set_covers([{ url: r.info.full_cover_url }])
+        set_drafts({ '': r.info.raw, zh: r.info.raw.i18n?.['zh'] ?? {} })
+        set_mod(r)
       }).catch(e => {
         Toast.error(e)
       }).finally(() => {
@@ -126,13 +148,17 @@ export function ModFormView(props: IModFormViewProps) {
     }, 300)
     return () => clearTimeout(tid)
   }, [opens.preview])
-
-
   return <>
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
       <div className={csses.head}>
         <h1 className={csses.title}>
           {t('edit_mod_info')}
+          <Dropdown.Select options={langs}
+            value={lang}
+            onChange={v => {
+              preview(opens.preview, v ?? '')
+              set_lang(v ?? '')
+            }} />
         </h1>
       </div>
       <div className={classnames(csses.main, csses.scrollview)} ref={ref_main} onScroll={on_scroll}>
@@ -151,14 +177,14 @@ export function ModFormView(props: IModFormViewProps) {
               <input
                 className={csses.short}
                 value={draft.short_title}
-                onChange={e => { interrupt_event(e); set_draft(d => { d.short_title = e.target.value }) }}
+                onChange={e => { interrupt_event(e); set_drafts(d => { d[lang].short_title = e.target.value }) }}
                 type="text"
                 placeholder={t("short_title")}
                 maxLength={50} />
               <input
                 className={csses.long}
                 value={draft.title}
-                onChange={e => { interrupt_event(e); set_draft(d => { d.title = e.target.value }) }}
+                onChange={e => { interrupt_event(e); set_drafts(d => { d[lang].title = e.target.value }) }}
                 type="text"
                 placeholder={t("full_title")}
                 maxLength={255} />
@@ -171,7 +197,7 @@ export function ModFormView(props: IModFormViewProps) {
               <input
                 className={csses.short}
                 value={draft.author}
-                onChange={e => { interrupt_event(e); set_draft(d => { d.author = e.target.value }) }}
+                onChange={e => { interrupt_event(e); set_drafts(d => { d[lang].author = e.target.value }) }}
                 type="text"
                 placeholder={t("author")}
                 maxLength={50} />
@@ -179,7 +205,7 @@ export function ModFormView(props: IModFormViewProps) {
                 className={csses.long}
                 value={draft.author_url}
                 type="text"
-                onChange={e => { interrupt_event(e); set_draft(d => { d.author_url = e.target.value }) }}
+                onChange={e => { interrupt_event(e); set_drafts(d => { d[lang].author_url = e.target.value }) }}
                 placeholder={t("author_url")}
                 maxLength={255} />
             </div>
@@ -208,7 +234,7 @@ export function ModFormView(props: IModFormViewProps) {
                 }).then(r => {
                   if (!r.length) throw 'upload nothings'
                   const name = r[0].url.split('/').pop();
-                  set_draft(d => { d.cover_url = name })
+                  set_drafts(d => { d[lang].cover_url = name })
                 }).catch((err) => {
                   Toast.error(err)
                 }).finally(() => {
@@ -250,9 +276,9 @@ export function ModFormView(props: IModFormViewProps) {
                   }).then(r => {
                     if (!r.length) throw 'upload nothings'
                     const name = r[0].url.split('/').pop();
-                    set_draft(d => {
-                      d.url = name;
-                      d.url_type = 'download'
+                    set_drafts(d => {
+                      d[lang].url = name;
+                      d[lang].url_type = 'download'
                     })
                   }).catch((err) => {
                     Toast.error(err)
@@ -277,7 +303,7 @@ export function ModFormView(props: IModFormViewProps) {
           <div className={csses.brief_editor}>
             <EditorView
               value={draft.brief}
-              onChange={v => set_draft(d => { d.brief = v })}
+              onChange={v => set_drafts(d => { d[lang].brief = v })}
               placeholder={t("edit_brief_here")} />
           </div>
         </Collapse>
@@ -294,7 +320,7 @@ export function ModFormView(props: IModFormViewProps) {
             <EditorView
               uploadImages={upload_images}
               value={draft.desc}
-              onChange={v => set_draft(d => { d.desc = v })}
+              onChange={v => set_drafts(d => { d[lang].desc = v })}
               placeholder={t("edit_description_here")} />
           </div>
         </Collapse>
@@ -311,7 +337,7 @@ export function ModFormView(props: IModFormViewProps) {
             <EditorView
               uploadImages={upload_images}
               value={draft.changelog}
-              onChange={v => set_draft(d => { d.changelog = v })}
+              onChange={v => set_drafts(d => { d[lang].changelog = v })}
               placeholder={t("edit_changelog_here")} />
           </div>
         </Collapse>
@@ -319,7 +345,7 @@ export function ModFormView(props: IModFormViewProps) {
           id="preview_head"
           className={csses.title_button}
           open={opens.preview}
-          onClick={preview} >
+          onClick={() => preview(!opens.preview)} >
           <h2 className={csses.title} >
             {t("mod_preview")}
           </h2>
@@ -337,7 +363,7 @@ export function ModFormView(props: IModFormViewProps) {
           title={t('save_mod_info')}
           container={tool_tips_container}
           disabled={loading || cover_uploading || attachment_uploading}
-          onClick={preview}>
+          onClick={() => preview(!opens.preview)}>
           {t('preview')}
         </IconButton>
         <IconButton
