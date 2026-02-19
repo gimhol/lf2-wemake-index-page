@@ -7,13 +7,14 @@ import { LangButton } from "@/components/LangButton";
 
 export interface IModFormModalProps extends IMaskProps {
   _?: never;
+  type?: RecordType;
   mod_id?: number;
 }
 export function ModFormModal(props: IModFormModalProps) {
-  const { container = document.body, onClose, mod_id, ..._p } = props;
+  const { container = document.body,type, onClose, mod_id, ..._p } = props;
   return (
     <Mask container={container} onClose={onClose} {..._p}>
-      <ModFormView mod_id={mod_id} />
+      <ModFormView type={type} mod_id={mod_id} />
       <div className={csses.right_top}>
         <LangButton />
         <IconButton

@@ -1,6 +1,6 @@
   {
     "id": "tools",
-    "type": "cards",
+    "children_look": "cards",
     "date": "2026-02-04",
     "short_title": "Mod Tool",
     "title": "Mod Tool",

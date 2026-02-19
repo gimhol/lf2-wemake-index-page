@@ -1,6 +1,6 @@
 {
   "id": "origin",
-  "type": "cards",
+  "children_look": "cards",
   "date": "2026-01-15",
   "short_title": "LFW",
   "title": "Little Fighter Wemake",

@@ -40,7 +40,7 @@ export function InfoView(props: IInfoViewProps) {
     className,
     open,
     whenOpen,
-    listLike = curr_list_like(info?.type),
+    listLike = curr_list_like(info?.children_look),
     whenListLike,
     ..._p
   } = props;
@@ -49,7 +49,7 @@ export function InfoView(props: IInfoViewProps) {
 
   useEffect(() => {
     if (whenListLike) return;
-    const listlike = curr_list_like(info?.type)
+    const listlike = curr_list_like(info?.children_look)
     __set_listLike(listlike)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [info])

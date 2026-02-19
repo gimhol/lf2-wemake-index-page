@@ -23,11 +23,9 @@ import classnames from "classnames";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { fetch_info_list } from "./fetch_info_list";
+import { fetch_info_list2 } from "./fetch_info_list";
 import { main_context } from "./main_context";
 import csses from "./styles.module.scss";
-
-const time_str = Math.floor(Date.now() / 60000);
 
 export default function MainPage() {
   useEffect(() => { submit_visit_event(); })
@@ -105,8 +103,15 @@ export default function MainPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     set_loading(true)
     const ab = new AbortController();
+    // ApiHttp.post(`${API_BASE}lfwm/list`, null, {
+    //   parent: 0,
+    //   status: ['published'],
+    //   type: ['product'],
+    //   signal: ab.signal
+    // })
     const lang = i18n.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    fetch_info_list(`games.json?time=${time_str}`, null, lang, { signal: ab.signal })
+    // fetch_info_list(`games.json?time=${time_str}`, null, lang, { signal: ab.signal })
+    fetch_info_list2(lang, { signal: ab.signal })
       .then((list) => {
         if (ab.signal.aborted) return;
         set_games(list)

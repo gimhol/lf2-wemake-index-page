@@ -84,3 +84,5 @@ declare module "classnames" {
   declare type Argument = Value | Mapping | ArgumentArray | ReadonlyArgumentArray;
   export default function cns(...args: ArgumentArray): string
 }
+
+declare type RecordType = 'dir' | 'mod' | 'file' | 'omod' | 'product' | 'version'

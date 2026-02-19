@@ -1,12 +1,10 @@
 import { ApiHttp } from "@/network/ApiHttp";
-
-export type ModRecordType = 'mod' | 'omod' | 'file';
 export interface IAddModRecordBody {
   overwrite?: 1 | 0;
   name: string;
   content_type?: string;
   parent?: number;
-  type?: ModRecordType;
+  type?: RecordType;
   url?: string;
   oss_name?: string;
   size?: number;

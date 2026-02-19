@@ -3,9 +3,7 @@
 import { addModRecord } from "@/api/addModRecord"
 import { editModRecord } from "@/api/editModRecord"
 import { listModPath } from "@/api/listModPath"
-import { is_dir, is_info, listModRecords, type IFileInfo } from "@/api/listModRecords"
-import img_create_dir from "@/assets/svg/create_dir.svg"
-import img_create_file from "@/assets/svg/create_file.svg"
+import { children_type, is_dir, is_publishable, listModRecords, type IRecord, type RecordType } from "@/api/listModRecords"
 import img_edit from "@/assets/svg/edit.svg"
 import img_preview from "@/assets/svg/preview.svg"
 import img_publish from "@/assets/svg/publish.svg"
@@ -44,14 +42,14 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [oss, sts] = useOSS();
   const [viewing_video, set_viewing_video] = useState<string>()
   const [viewing_video_open, set_viewing_video_open] = useState<boolean>()
-  const [path, set_path] = useState<IFileInfo[]>([]);
-  const dir: IFileInfo = useMemo(() => path.at(path.length - 1) ?? { id: 0 }, [path])
+  const [path, set_path] = useState<IRecord[]>([]);
+  const dir: IRecord = useMemo(() => path.at(path.length - 1) ?? { id: 0, type: 'dir' }, [path])
   const [pending, set_pending] = useState(false);
-  const [files, set_files] = useState<IFileInfo[]>([]);
+  const [files, set_files] = useState<IRecord[]>([]);
   const [new_dir, set_new_dir] = useState(0);
-  const ref_dragging = useRef<IFileInfo | undefined>(void 0);
+  const ref_dragging = useRef<IRecord | undefined>(void 0);
   const [dragover, set_dragover] = useState<number | undefined>(void 0);
-  const [editing_mod, set_editing_mod] = useState<{ open?: boolean, data?: IFileInfo }>({})
+  const [editing_mod, set_editing_mod] = useState<{ open?: boolean, data?: IRecord }>({})
   const ref_root = useRef<HTMLDivElement>(null);
   const [progress, set_progress] = useState<[string, number, number]>()
   const { value: { session_id, nickname, username, admin } } = useContext(GlobalStore.context);
@@ -105,7 +103,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     if (!session_id) nav(Paths.All.main)
   }, [session_id, nav])
 
-  const add_dir = (parent: number = 0, type?: 'mod' | 'omod') => {
+  const add_dir = useCallback((parent: number = 0, type?: RecordType) => {
     set_pending(true)
     addModRecord({ name: '' + Date.now(), parent, type }).then((r) => {
       set_new_dir(r);
@@ -115,9 +113,9 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     }).finally(() => {
       set_pending(false)
     })
-  }
+  }, [refresh_files])
 
-  const del_file = (target: IFileInfo) => {
+  const del_file = (target: IRecord) => {
     set_pending(true)
     ApiHttp.delete(`${API_BASE}lfwm/delete`, { id: target.id }).then((r) => {
       Toast.success(`deleted count: ${r.data}`)
@@ -129,7 +127,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     })
   }
 
-  const open_any = (target: IFileInfo) => {
+  const open_any = (target: IRecord) => {
     if (is_dir(target)) {
       open_dir(target)
     } else if (target.type === 'file') {
@@ -139,7 +137,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     }
   }
 
-  const open_image = (target: IFileInfo) => {
+  const open_image = (target: IRecord) => {
     const imgs = files.filter(v => v.url && v.content_type?.startsWith('image/')).map(v => ({
       url: v.url!,
       alt: v.name
@@ -148,12 +146,12 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     ImagesViewer.open(imgs, idx)
   }
 
-  const edit_mod = (target: IFileInfo) => {
+  const edit_mod = (target: IRecord) => {
     set_editing_mod({ open: true, data: target });
   }
 
 
-  const open_file = (target: IFileInfo) => {
+  const open_file = (target: IRecord) => {
     if (target.content_type?.startsWith('image/') && target.url) {
       open_image(target)
     } else if (target.content_type?.startsWith('video/') && target.url) {
@@ -162,7 +160,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     }
   }
 
-  const open_dir = (target?: IFileInfo) => {
+  const open_dir = (target?: IRecord) => {
     if (!target) {
       const s = search.clone().delele('path').to_query()
       return nav({ search: s });
@@ -172,7 +170,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     nav({ search: s })
   }
 
-  const onDragOver = (e: React.DragEvent, me: IFileInfo) => {
+  const onDragOver = (e: React.DragEvent, me: IRecord) => {
     const not_allow = () => { e.stopPropagation() }
     if (pending || typeof me.id !== 'number') return not_allow();
     if (!is_dir(me)) return not_allow();
@@ -193,7 +191,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     return;
   }
 
-  const onDrop = (e: React.DragEvent, me: IFileInfo) => {
+  const onDrop = (e: React.DragEvent, me: IRecord) => {
     const not_allow = () => {
       set_dragover(void 0);
       e.stopPropagation();
@@ -248,7 +246,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     }
   }
 
-  const unpublish = (me: IFileInfo) => {
+  const unpublish = (me: IRecord) => {
     set_pending(true)
     ApiHttp.post(`${API_BASE}lfwm/unpublish`, {}, { id: me.id }).then(() => {
       return refresh_files(dir.id)
@@ -259,7 +257,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     })
   }
 
-  const publish = (me: IFileInfo) => {
+  const publish = (me: IRecord) => {
     set_pending(true)
     ApiHttp.post(`${API_BASE}lfwm/publish`, {}, { id: me.id }).then(() => {
       return refresh_files(dir.id)
@@ -269,6 +267,28 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       set_pending(false)
     })
   }
+  const actions = useMemo(() => {
+    return children_type(dir)?.map(type => {
+      switch (type) {
+        case "file": return null;
+        case "dir":
+        case "product":
+        case "version":
+        case "mod":
+        case "omod": return <IconButton
+          key={type}
+          icon='+'
+          disabled={pending}
+          title={t("add_" + type)}
+          onClick={e => {
+            interrupt_event(e)
+            add_dir(dir.id, type)
+          }}>
+          {t('d_' + type)}
+        </IconButton>
+      }
+    })
+  }, [add_dir, dir, pending, t])
 
   return (
     <div {...props} className={classNames(csses.mine_page, props.className)} style={props.style} ref={ref_root} >
@@ -323,22 +343,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
           }
         </div>
         <Loading loading={pending} style={{ alignSelf: 'center' }} />
-        <IconButton
-          icon={img_create_dir}
-          disabled={pending}
-          title={t("create_dir")}
-          onClick={e => {
-            interrupt_event(e)
-            add_dir(dir.id)
-          }} />
-        <IconButton
-          icon={img_create_file}
-          disabled={pending}
-          title={t("create_mod")}
-          onClick={e => {
-            interrupt_event(e)
-            add_dir(dir.id, 'mod')
-          }} />
+        {actions}
         <IconButton
           icon="🔄"
           disabled={pending}
@@ -388,7 +393,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 }}
                 owner={<OwnerName owner_id={me.owner_id} />}
                 download={me.type == 'file' ? me.url : void 0}
-                actions={(!is_info(me) || !mod_id) ? null : <>
+                actions={(!is_publishable(me) || !mod_id) ? null : <>
                   <IconButton
                     icon={img_edit}
                     title={t('edit_mod_info')}
@@ -437,7 +442,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 onDrop={e => onDrop(e, me)}
                 onNameChanged={async (name) => {
                   if (name === me.name) {
-                    if (new_dir == me.id && is_info(me))
+                    if (new_dir == me.id && is_publishable(me))
                       edit_mod(me)
                     set_new_dir(0)
                     return true;
@@ -466,7 +471,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                   }).then(() => {
                     Toast.success('done')
                     me.name = name;
-                    if (new_dir == me.id && is_info(me)) {
+                    if (new_dir == me.id && is_publishable(me)) {
                       edit_mod(me)
                     }
                     set_new_dir(0)
@@ -487,6 +492,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
             )
           })}
         <ModFormModal
+          type={editing_mod?.data?.type}
           mod_id={editing_mod?.data?.id}
           open={editing_mod?.open}
           onClose={() => set_editing_mod(p => ({ ...p, open: false }))}

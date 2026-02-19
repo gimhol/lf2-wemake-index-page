@@ -12,8 +12,9 @@ export interface IProviderProps extends IToastOpts, PropsWithChildren {
 export function _Provider(props: IProviderProps) {
   const [toast, toastCtx] = _useToast();
 
-
+  Toast.show = toast
   Object.assign(Toast, toast);
+
   Toast.useError = useCallback((text: unknown) => {
     useEffect(() => {
       if (text == void 0 || text === null || text === '') return;

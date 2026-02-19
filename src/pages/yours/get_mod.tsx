@@ -1,6 +1,6 @@
 import { findModRecord } from "@/api/findModRecord";
 import { getUserInfo, type IUserInfo } from "@/api/getUserInfo";
-import { type IFileInfo } from "@/api/listModRecords";
+import { type IRecord } from "@/api/listModRecords";
 import { Info, type IInfo } from "@/base/Info";
 import { MD5 } from "crypto-js";
 import { join_url } from "./join_url";
@@ -31,7 +31,7 @@ export interface IGetModFormOpts {
 }
 export interface IMod {
   info: Info;
-  record: IFileInfo;
+  record: IRecord;
   owner: IUserInfo;
   strings: ReturnType<typeof get_mod_paths_names>
 }
@@ -48,6 +48,7 @@ export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
     author_url: owner?.home_url || owner?.gitee_url || owner?.github_url,
     author: owner.username || owner.username,
     title: record.name,
+    type: record.type,
   }
   if (oss_name) {
     const exists_info = await fetch(join_url(STORAGE_URL_BASE, oss_name)).then<IInfo>(r => {

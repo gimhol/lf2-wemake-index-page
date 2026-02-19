@@ -26,6 +26,7 @@ import { get_mod, type IMod } from "./get_mod";
 import { replace_one } from "./join_url";
 import { save_mod } from "./save_mod";
 export interface IModFormViewProps {
+  type?: RecordType;
   mod_id?: number;
 }
 const uploaded_map = new Map<File, IPickedFile>();
@@ -46,6 +47,7 @@ export function ModFormView(props: IModFormViewProps) {
   const [opens, set_opens] = useImmer({ base: true, brief: small, desc: small, changelog: small, preview: false })
   const [lang, set_lang] = useState<'zh' | ''>('')
   const draft = drafts[lang];
+  const type = mod?.record.type
 
   useEffect(() => {
     if (!mod_id || !sts) {
@@ -100,15 +102,17 @@ export function ModFormView(props: IModFormViewProps) {
 
   const save = () => {
     if (!mod) return;
-    set_loading(true)
     const raw: IInfo = {
       ...drafts[''],
       i18n: { zh: { ...drafts.zh } }
     }
-    const next = mod.info.load(raw)
-      .clone()
-      .set_id('' + mod_id)
-      .set_date(dayjs().format(`YYYY-MM-DD HH:mm:ss`));
+    const next = mod.info.clone().load(raw).set_id('' + mod_id)
+    if (JSON.stringify(mod.info.raw) === JSON.stringify(next.raw)) {
+      Toast.show('Nothings Changed.')
+      return;
+    }
+    set_loading(true)
+    next.set_date(dayjs().format(`YYYY-MM-DD HH:mm:ss`));
     save_mod({ mod_id, oss, sts, info: next })
       .then(() => {
         return get_mod({ mod_id })
@@ -152,7 +156,7 @@ export function ModFormView(props: IModFormViewProps) {
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
       <div className={csses.head}>
         <h1 className={csses.title}>
-          {t('edit_mod_info')}
+          {t('edit_mod_info').replace('%1', type ? t('d_' + type) : '')}
           <Dropdown.Select options={langs}
             value={lang}
             onChange={v => {

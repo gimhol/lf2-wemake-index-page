@@ -1,6 +1,6 @@
 {
   "id": "mods",
-  "type": "cards",
+  "children_look": "cards",
   "date": "2026-02-02",
   "short_title": "LFW Mods",
   "title": "LFW Mods",

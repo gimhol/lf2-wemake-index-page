@@ -1,10 +1,10 @@
-import type { IFileInfo } from "@/api/listModRecords";
+import type { IRecord } from "@/api/listModRecords";
 import type { ReactNode } from "react";
 import { Picture } from "./Picture";
 import img_lf2_mod from "@/assets/svg/lf2_mod.svg"
 import img_lfw_mod from "@/assets/svg/lfw_mod.svg"
 
-export function get_icon(me: IFileInfo): ReactNode {
+export function get_icon(me: IRecord): ReactNode {
   const { type, content_type } = me;
   if (!type) return '📂'
   switch (type) {
@@ -21,7 +21,7 @@ export function get_icon(me: IFileInfo): ReactNode {
   }
   return '⁉️';
 }
-export function get_icon_title(me: IFileInfo): string {
+export function get_icon_title(me: IRecord): string {
   const { type, content_type } = me;
   if (!type) return 'open_dir'
   switch (type) {
@@ -41,7 +41,7 @@ export function get_icon_title(me: IFileInfo): string {
 
 // https://lfwm.gim.ink/user/2/220/ea6ad6da776da18b7153db0721f8196e?x-oss-process=image/resize,w_50
 
-const img_icon = (me: IFileInfo): ReactNode => {
+const img_icon = (me: IRecord): ReactNode => {
   if (!me.url) return '🖼️';
   const s = 20
   return (
@@ -52,7 +52,7 @@ const img_icon = (me: IFileInfo): ReactNode => {
       alt={`open file: ${me.name}`} />
   )
 }
-const title_map: { [x in string]?: string | ((me: IFileInfo) => string) } = {
+const title_map: { [x in string]?: string | ((me: IRecord) => string) } = {
   'image/apng': 'view_picture',
   'image/avif': 'view_picture',
   'image/bmp': 'view_picture',
@@ -63,7 +63,7 @@ const title_map: { [x in string]?: string | ((me: IFileInfo) => string) } = {
   'image/svg+xml': 'view_picture',
   'image/webp': 'view_picture'
 }
-const icon_map: { [x in string]?: ReactNode | ((me: IFileInfo) => ReactNode) } = {
+const icon_map: { [x in string]?: ReactNode | ((me: IRecord) => ReactNode) } = {
   'application/zip': '📦️',
   'application/x-zip': '📦️',
   'application/x-zip-compressed': '📦️',

@@ -11,11 +11,12 @@ export interface InfoProp {
   max?: number;
   placeholder?: 'string'
 }
-export type TInfoType = "cards" | "list"
+export type TInfoChildrenLook = "cards" | "list"
 export interface IInfo {
   id?: string;
   title?: string;
   short_title?: string;
+  type?: RecordType;
   brief?: string;
   author?: string;
   author_url?: string;
@@ -27,8 +28,8 @@ export interface IInfo {
   changelog_url?: string;
   children_title?: string;
   children_url?: string;
+  children_look?: string;
   children?: IInfo[];
-  type?: string;
   date?: string;
   cover_url?: string;
   unavailable?: string;
@@ -51,6 +52,9 @@ const { Cls, Str } = makeI18N();
   set id(v: string | undefined) { this.raw.id = v }
   get id(): string | undefined { return this.raw.id }
   set_id(v: string | undefined) { this.id = v; return this; }
+  set type(v: RecordType | undefined) { this.raw.type = v }
+  get type(): RecordType | undefined { return this.raw.type }
+  set_type(v: RecordType | undefined) { this.type = v; return this; }
 
   @Str title            !: string | undefined; set_title          !: TSetStr<this>
   @Str short_title      !: string | undefined; set_short_title    !: TSetStr<this>
@@ -68,7 +72,7 @@ const { Cls, Str } = makeI18N();
   @Str date             !: string | undefined; set_date           !: TSetStr<this>
   @Str cover_url        !: string | undefined; set_cover_url      !: TSetStr<this>
   @Str unavailable      !: string | undefined; set_unavailable    !: TSetStr<this>
-  @Str type             !: string | undefined; set_type           !: TSetStr<this>
+  @Str children_look    !: string | undefined; set_children_look  !: TSetStr<this>
 
   lang: string;
   private _md?: string;
@@ -164,7 +168,7 @@ const { Cls, Str } = makeI18N();
       text += `visit [author](${this.author_url})\n\n`
     }
     // text += `[中文](CHANGELOG.MD) | [English](CHANGELOG.EN.MD)\n\n`
-    if(this.brief) text += `${this.brief}\n\n`
+    if (this.brief) text += `${this.brief}\n\n`
     text += await this.fetch_desc().then(r => r ? `${r}\n\n` : '')
     text += await this.fetch_changelog().then(r => r ? `${r}\n\n` : '')
 
