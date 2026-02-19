@@ -8,7 +8,7 @@ export interface IFileInfo {
   deleted?: number;
   parent?: number;
   path?: string;
-  type?: 'dir' | 'mod' | 'file' | 'omod';
+  type?: 'dir' | 'mod' | 'file' | 'omod' | 'root' | '';
   content_type?: string;
   url?: string;
   size?: number;
@@ -17,6 +17,14 @@ export interface IFileInfo {
   brief?: string;
 }
 
+export const is_dir = (f: IFileInfo | undefined | null) => {
+  if (!f) return false;
+  return f.type == 'mod' || f.type == 'omod' || f.type == 'root' || f.type == 'dir'
+}
+export const is_info = (f: IFileInfo | undefined | null) => {
+  if (!f) return false;
+  return f.type == 'mod' || f.type == 'omod' || f.type == 'root'
+}
 export interface IListModRecordsBody {
   parent?: number;
   id?: number;

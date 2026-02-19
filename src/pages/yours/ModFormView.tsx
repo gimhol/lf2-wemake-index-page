@@ -127,6 +127,7 @@ export function ModFormView(props: IModFormViewProps) {
     return () => clearTimeout(tid)
   }, [opens.preview])
 
+
   return <>
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
       <div className={csses.head}>
@@ -135,40 +136,53 @@ export function ModFormView(props: IModFormViewProps) {
         </h1>
       </div>
       <div className={classnames(csses.main, csses.scrollview)} ref={ref_main} onScroll={on_scroll}>
-        <h2 className={csses.title}>
-          <CollapseButton open={opens.base && !opens.preview} onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.base = !d.base; })} />
-          {t("mod_base_info")}
-        </h2>
+        <CollapseButton
+          className={csses.title_button}
+          open={opens.base && !opens.preview}
+          onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.base = !d.base; })} >
+          <h2 className={csses.title}>
+            {t("mod_base_info")}
+          </h2>
+        </CollapseButton>
         <Collapse open={opens.base && !opens.preview} classNames={{ inner: csses.base_info }}>
           <div className={csses.form_row}>
             <span>{t('data_zip_title')}:</span>
-            <input
-              className={csses.txt_input}
-              value={draft.title}
-              onChange={e => { interrupt_event(e); set_draft(d => { d.title = e.target.value }) }}
-              type="text"
-              placeholder={t("edit_title_here")}
-              maxLength={50} />
+            <div className={csses.short_and_long}>
+              <input
+                className={csses.short}
+                value={draft.short_title}
+                onChange={e => { interrupt_event(e); set_draft(d => { d.short_title = e.target.value }) }}
+                type="text"
+                placeholder={t("short_title")}
+                maxLength={50} />
+              <input
+                className={csses.long}
+                value={draft.title}
+                onChange={e => { interrupt_event(e); set_draft(d => { d.title = e.target.value }) }}
+                type="text"
+                placeholder={t("full_title")}
+                maxLength={255} />
+
+            </div>
           </div>
           <div className={csses.form_row}>
             <span>{t('author')}:</span>
-            <input
-              className={csses.txt_input}
-              value={draft.author}
-              onChange={e => { interrupt_event(e); set_draft(d => { d.author = e.target.value }) }}
-              type="text"
-              placeholder={t("edit_author_here")}
-              maxLength={50} />
-          </div>
-          <div className={csses.form_row}>
-            <span>{t('author_url')}:</span>
-            <input
-              className={csses.txt_input}
-              value={draft.author_url}
-              type="text"
-              onChange={e => { interrupt_event(e); set_draft(d => { d.author_url = e.target.value }) }}
-              placeholder={t("edit_author_url_here")}
-              maxLength={255} />
+            <div className={csses.short_and_long}>
+              <input
+                className={csses.short}
+                value={draft.author}
+                onChange={e => { interrupt_event(e); set_draft(d => { d.author = e.target.value }) }}
+                type="text"
+                placeholder={t("author")}
+                maxLength={50} />
+              <input
+                className={csses.long}
+                value={draft.author_url}
+                type="text"
+                onChange={e => { interrupt_event(e); set_draft(d => { d.author_url = e.target.value }) }}
+                placeholder={t("author_url")}
+                maxLength={255} />
+            </div>
           </div>
           <div className={csses.form_row}>
             <span>{t('cover_img')}:</span>
@@ -251,23 +265,30 @@ export function ModFormView(props: IModFormViewProps) {
             </div>
           </div>
         </Collapse>
-        <h2 className={csses.title}>
-          <CollapseButton open={opens.brief && !opens.preview} onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.brief = !d.brief })} />
-          {t("mod_brief")}
-        </h2>
+        <CollapseButton
+          className={csses.title_button}
+          open={opens.brief && !opens.preview}
+          onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.brief = !d.brief })} >
+          <h2 className={csses.title}>
+            {t("mod_brief")}
+          </h2>
+        </CollapseButton>
         <Collapse open={opens.brief && !opens.preview} classNames={{ inner: csses.collapse_inner }}>
           <div className={csses.brief_editor}>
             <EditorView
-              uploadImages={upload_images}
               value={draft.brief}
               onChange={v => set_draft(d => { d.brief = v })}
               placeholder={t("edit_brief_here")} />
           </div>
         </Collapse>
-        <h2 className={csses.title}>
-          <CollapseButton open={!opens.preview && opens.desc} onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.desc = !d.desc })} />
-          {t("mod_description")}
-        </h2>
+        <CollapseButton
+          className={csses.title_button}
+          open={!opens.preview && opens.desc}
+          onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.desc = !d.desc })} >
+          <h2 className={csses.title}>
+            {t("mod_description")}
+          </h2>
+        </CollapseButton>
         <Collapse open={!opens.preview && opens.desc} classNames={{ inner: csses.collapse_inner }}>
           <div className={csses.md_editor}>
             <EditorView
@@ -277,10 +298,14 @@ export function ModFormView(props: IModFormViewProps) {
               placeholder={t("edit_description_here")} />
           </div>
         </Collapse>
-        <h2 className={csses.title}>
-          <CollapseButton open={!opens.preview && opens.changelog} onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.changelog = !d.changelog })} />
-          {t("mod_changelog")}
-        </h2>
+        <CollapseButton
+          className={csses.title_button}
+          open={!opens.preview && opens.changelog}
+          onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.changelog = !d.changelog })} >
+          <h2 className={csses.title}>
+            {t("mod_changelog")}
+          </h2>
+        </CollapseButton>
         <Collapse open={!opens.preview && opens.changelog} classNames={{ inner: csses.collapse_inner }}>
           <div className={csses.md_editor}>
             <EditorView
@@ -290,10 +315,15 @@ export function ModFormView(props: IModFormViewProps) {
               placeholder={t("edit_changelog_here")} />
           </div>
         </Collapse>
-        <h2 className={csses.title} id="preview_head">
-          <CollapseButton open={opens.preview} onClick={preview} />
-          {t("mod_preview")}
-        </h2>
+        <CollapseButton
+          id="preview_head"
+          className={csses.title_button}
+          open={opens.preview}
+          onClick={preview} >
+          <h2 className={csses.title} >
+            {t("mod_preview")}
+          </h2>
+        </CollapseButton>
         <Collapse open={opens.preview} classNames={{ inner: csses.collapse_inner }}>
           <ModPreview info={previewing.info} />
         </Collapse>

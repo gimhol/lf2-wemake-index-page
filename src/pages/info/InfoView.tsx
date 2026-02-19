@@ -91,12 +91,18 @@ export function InfoView(props: IInfoViewProps) {
             title="Cards or List"
             icon={__next_list_like === 'cards' ? img_cards_view : img_list_view} />
           {info ? <MarkdownButton info={info} /> : null}
+          <div className={csses.el_date}>
+            <Link
+              href={info.author_url}
+              title={t('visit_author_link')}>
+              {info.author}
+            </Link>
+          </div>
           {date ? <div className={csses.el_date}> {date} </div> : null}
         </div>
       </div>
 
       <Viewer className={csses.content_zone} emptyAsGone content={brief} />
-
       <Collapse open={__open && has_content} >
         <Viewer
           emptyAsGone

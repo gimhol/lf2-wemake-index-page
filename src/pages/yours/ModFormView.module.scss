@@ -38,10 +38,6 @@
   }
 }
 
-.title {
-  margin : 0px;
-  display: flex;
-}
 
 .foot {
   display: flex;
@@ -109,20 +105,22 @@
 }
 
 .brief_editor {
-  height     : 255px;
+  height     : 200px;
   flex-shrink: 0;
 }
 
 .md_editor {
-  height     : 400px;
+  height     : 500px;
   flex-shrink: 0;
 }
 
+.brief_editor>*,
 .md_editor>* {
   width : 100% !important;
   height: 100% !important;
 }
 
+.brief_editor>*>*,
 .md_editor>*>* {
   border-radius: 5px;
   overflow     : hidden;
@@ -135,4 +133,32 @@
   flex-direction: row;
   align-items   : stretch;
   gap           : 5px;
+}
+
+.short_and_long {
+  display       : flex;
+  flex-direction: row;
+  gap           : 5px;
+  flex-wrap     : wrap;
+
+  .short {
+    @extend .txt_input;
+    width: 100px;
+  }
+
+  .long {
+    @extend .txt_input;
+    flex: 1;
+  }
+}
+
+.title_button {
+  display        : flex;
+  align-items    : center;
+  justify-content: flex-start;
+}
+
+.title {
+  margin : 0px;
+  display: flex;
 }

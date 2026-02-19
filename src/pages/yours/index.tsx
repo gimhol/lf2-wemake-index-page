@@ -3,7 +3,7 @@
 import { addModRecord } from "@/api/addModRecord"
 import { editModRecord } from "@/api/editModRecord"
 import { listModPath } from "@/api/listModPath"
-import { listModRecords, type IFileInfo } from "@/api/listModRecords"
+import { is_dir, is_info, listModRecords, type IFileInfo } from "@/api/listModRecords"
 import img_create_dir from "@/assets/svg/create_dir.svg"
 import img_create_file from "@/assets/svg/create_file.svg"
 import img_edit from "@/assets/svg/edit.svg"
@@ -130,7 +130,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   }
 
   const open_any = (target: IFileInfo) => {
-    if (target.type == 'mod' || !target.type) {
+    if (is_dir(target)) {
       open_dir(target)
     } else if (target.type === 'file') {
       open_file(target)
@@ -372,7 +372,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 create_time={me.create_time ? dayjs(me.create_time).format('YYYY-MM-DD HH:mm:ss') : void 0}
                 renameing={new_dir == me.id}
                 draggable
-                desc={me.size ? `Size: ${file_size_txt(me.size)}` : `Type: ${me.type ?? 'dir'}`}
+                desc={me.size ? `Size: ${file_size_txt(me.size)}` : `Type: ${me.type}`}
                 onMouseDown={e => {
                   const el = (e.target as HTMLElement);
                   if (el.tagName !== 'DIV') {
@@ -391,7 +391,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 }}
                 owner={<OwnerName owner_id={me.owner_id} />}
                 download={me.type == 'file' ? me.url : void 0}
-                actions={((me.type !== 'mod' && me.type !== 'omod') || !mod_id) ? null : <>
+                actions={(!is_info(me) || !mod_id) ? null : <>
                   <IconButton
                     icon={img_edit}
                     title={t('edit_mod_info')}
@@ -409,7 +409,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                       disabled={pending}
                       onClick={() => publish(me)} />
                   </Show>
-
                   <Show yes={me.status === 'published'}>
                     <IconButton
                       icon={img_publish}
@@ -441,9 +440,8 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 onDrop={e => onDrop(e, me)}
                 onNameChanged={async (name) => {
                   if (name === me.name) {
-                    if (new_dir == me.id && (me.type == 'mod' || me.type == 'omod')) {
+                    if (new_dir == me.id && is_info(me)) 
                       edit_mod(me)
-                    }
                     set_new_dir(0)
                     return true;
                   }

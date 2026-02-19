@@ -55,6 +55,7 @@ export function DetailCard(props: IDetailCardProps) {
           {
             !full_cover_url ? null : <img className={classnames(csses.pic_zone)} draggable={false} src={full_cover_url} />
           }
+          <Viewer className={csses.content_zone} emptyAsGone content={info.brief} />
           {
             !(desc || changelog || desc_url || changelog_url) ? null :
               <div className={classnames(csses.info_zone, csses.scrollview)}>

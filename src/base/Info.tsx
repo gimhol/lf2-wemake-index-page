@@ -163,8 +163,8 @@ const { Cls, Str } = makeI18N();
     } else if (this.author_url) {
       text += `visit [author](${this.author_url})\n\n`
     }
-    text += `[中文](CHANGELOG.MD) | [English](CHANGELOG.EN.MD)\n\n`
-
+    // text += `[中文](CHANGELOG.MD) | [English](CHANGELOG.EN.MD)\n\n`
+    if(this.brief) text += `${this.brief}\n\n`
     text += await this.fetch_desc().then(r => r ? `${r}\n\n` : '')
     text += await this.fetch_changelog().then(r => r ? `${r}\n\n` : '')
 
