@@ -5,11 +5,5 @@ import csses from "./index.module.scss"
 
 export default function InfoViewPage() {
   const { info } = useContext(main_context)
-  
-  return (
-    <InfoView
-      info={info}
-      className={csses.main_right}
-      open={window.innerWidth > 480} />
-  )
+  return (<InfoView info={info} className={csses.main_right} open={false} />)
 }

@@ -8,6 +8,7 @@ import { Loading } from "@/components/loading";
 import { EditorView } from "@/components/markdown/editor/EditorView";
 import { PickFile } from "@/components/pickfile";
 import type { IPickedFile } from "@/components/pickfile/_Common";
+import { Dropdown } from "@/gimd/Dropdown";
 import Toast from "@/gimd/Toast";
 import { ossUploadModRecords } from "@/hooks/ossUploadModRecords";
 import { useOSS } from "@/hooks/useOSS";
@@ -18,13 +19,12 @@ import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useImmer } from "use-immer";
+import { all_info_url_type, InfoUrlType } from "./InfoUrlType";
 import csses from "./ModFormView.module.scss";
 import { ModPreview } from "./ModPreviewModal";
 import { get_mod, type IMod } from "./get_mod";
 import { replace_one } from "./join_url";
 import { save_mod } from "./save_mod";
-import { Dropdown } from "@/gimd/Dropdown";
-import { all_info_url_type, InfoUrlType as InfoUrlType } from "./InfoUrlType";
 export interface IModFormViewProps {
   mod_id?: number;
 }
@@ -33,8 +33,7 @@ const uploaded_map = new Map<File, IPickedFile>();
 export function ModFormView(props: IModFormViewProps) {
   const { mod_id } = props;
   const { t } = useTranslation();
-  const [toast, toast_ctx] = Toast.useToast()
-  const upload_images = useOSSUploadModImages({ mod_id, toast })
+  const upload_images = useOSSUploadModImages({ mod_id })
   const [oss, sts] = useOSS()
   const [draft, set_draft] = useImmer<IInfo>({})
   const [mod, set_mod] = useImmer<IMod | null>(null)
@@ -61,13 +60,13 @@ export function ModFormView(props: IModFormViewProps) {
           set_covers([{ url: r.info.full_cover_url }])
       }).catch(e => {
         if (ab.signal.aborted) return;
-        toast.error(e)
+        Toast.error(e)
       }).finally(() => {
         if (ab.signal.aborted) return;
         set_loading(false)
       })
     return () => ab.abort()
-  }, [mod_id, toast, oss, sts, set_mod, set_draft])
+  }, [mod_id, oss, sts, set_mod, set_draft])
 
   const tool_tips_container = () => document.getElementsByClassName(csses.mod_form_view).item(0)!
 
@@ -97,7 +96,7 @@ export function ModFormView(props: IModFormViewProps) {
         if (r.info.full_cover_url)
           set_covers([{ url: r.info.full_cover_url }])
       }).catch(e => {
-        toast.error(e)
+        Toast.error(e)
       }).finally(() => {
         set_loading(false)
       }).finally(() => {
@@ -130,7 +129,6 @@ export function ModFormView(props: IModFormViewProps) {
 
   return <>
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
-      {toast_ctx}
       <div className={csses.head}>
         <h1 className={csses.title}>
           {t('edit_mod_info')}
@@ -198,7 +196,7 @@ export function ModFormView(props: IModFormViewProps) {
                   const name = r[0].url.split('/').pop();
                   set_draft(d => { d.cover_url = name })
                 }).catch((err) => {
-                  toast.error(err)
+                  Toast.error(err)
                 }).finally(() => {
                   set_cover_uploading(false);
                 })
@@ -243,7 +241,7 @@ export function ModFormView(props: IModFormViewProps) {
                       d.url_type = 'download'
                     })
                   }).catch((err) => {
-                    toast.error(err)
+                    Toast.error(err)
                   }).finally(() => {
                     set_attachment_uploading(false);
                   })

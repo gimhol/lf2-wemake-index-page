@@ -30,7 +30,6 @@ import csses from "./styles.module.scss";
 const time_str = Math.floor(Date.now() / 60000);
 
 export default function MainPage() {
-  const [toast, toast_ctx] = Toast.useToast()
   useEffect(() => { submit_visit_event(); })
   useMovingBg(document.documentElement)
   const { t, i18n } = useTranslation()
@@ -72,7 +71,7 @@ export default function MainPage() {
     if (!session) return;
     dispatch({ type: 'merge', value: { session_id: session } })
     set_location({})
-  }, [set_location, search, dispatch, toast])
+  }, [set_location, search, dispatch])
 
   useEffect(() => {
     const c = new AbortController()
@@ -96,10 +95,10 @@ export default function MainPage() {
       .catch(e => {
         KnownError.is(e)
       }).catch((e) => {
-        toast(e)
+        Toast.show(e)
       })
     return () => c.abort()
-  }, [session_id, dispatch, set_location, toast])
+  }, [session_id, dispatch, set_location])
 
   const actived = useMemo(() => games?.find(v => v.id === game_id), [game_id, games])
   useEffect(() => {
@@ -113,13 +112,13 @@ export default function MainPage() {
         set_games(list)
       }).catch(e => {
         if (ab.signal.aborted) return;
-        toast.error(e)
+        Toast.error(e)
       }).finally(() => {
         if (ab.signal.aborted) return;
         set_loading(false)
       })
     return () => ab.abort()
-  }, [i18n, toast])
+  }, [i18n])
 
   const [game_list_open, set_game_list_open] = useState(false);
 
@@ -154,7 +153,6 @@ export default function MainPage() {
     <div className={csses.main_page}
       onDragOver={e => { e.stopPropagation(); e.preventDefault() }}
       onDrop={e => { e.stopPropagation(); e.preventDefault() }} >
-      {toast_ctx}
       <div className={csses.head}>
         <IconButton
           className={csses.btn_toggle_game_list}

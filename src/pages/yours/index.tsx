@@ -27,7 +27,7 @@ import { interrupt_event } from "@/utils/interrupt_event"
 import { LocationParams } from "@/utils/LocationParams"
 import { default as classnames, default as classNames } from "classnames"
 import dayjs from "dayjs"
-import { Fragment, useContext, useEffect, useMemo, useRef, useState } from "react"
+import { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router"
 import { useImmer } from "use-immer"
@@ -44,7 +44,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [oss, sts] = useOSS();
   const [viewing_video, set_viewing_video] = useState<string>()
   const [viewing_video_open, set_viewing_video_open] = useState<boolean>()
-  const [toast, toast_ctx] = Toast.useToast()
   const [path, set_path] = useState<IFileInfo[]>([]);
   const dir: IFileInfo = useMemo(() => path.at(path.length - 1) ?? { id: 0 }, [path])
   const [pending, set_pending] = useState(false);
@@ -60,30 +59,28 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const { search } = LocationParams.useAll();
   const [previewing, set_previewing] = useImmer({ open: false, mod_id: 0 })
 
-  const refresh_files = (parent = dir?.id) => {
+  const refresh_files = useCallback((parent: number = 0, init: RequestInit = {}) => {
     set_pending(true)
-    listModRecords({ parent })
+    listModRecords({ parent }, init)
       .then(r => {
+        if (init.signal?.aborted) return;
         set_files(r ?? [])
       }).catch(e => {
-        toast.error(e)
+        if (init.signal?.aborted) return;
+        Toast.error(e)
       }).finally(() => {
+        if (init.signal?.aborted) return;
         set_pending(false)
       })
-  }
+  }, [])
+
   useEffect(() => {
     const path = search.get_numbers('path') ?? []
     const ab = new AbortController();
     set_pending(true)
     if (!path.length) {
-      listModRecords({ parent: 0 }, { signal: ab.signal }).then(r => {
-        if (ab.signal.aborted) return;
-        set_path([])
-        set_files(r ?? [])
-      }).finally(() => {
-        if (ab.signal.aborted) return;
-        set_pending(false)
-      })
+      set_path([])
+      refresh_files(0, { signal: ab.signal })
       return () => ab.abort()
     }
     listModPath({ path }, { signal: ab.signal }).then(r => {
@@ -92,7 +89,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       return listModRecords({ parent: r[r.length - 1].id }, { signal: ab.signal })
     }).catch(e => {
       if (ab.signal.aborted) return;
-      toast.error(e);
+      Toast.error(e);
       nav({ search: search.clone().delele('path').to_query() })
     }).then(r => {
       if (ab.signal.aborted) return;
@@ -102,7 +99,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       set_pending(false)
     })
     return () => ab.abort()
-  }, [nav, search, toast])
+  }, [nav, refresh_files, search])
 
   useEffect(() => {
     if (!session_id) nav(Paths.All.main)
@@ -114,7 +111,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       set_new_dir(r);
       return refresh_files(parent)
     }).catch(e => {
-      toast.error(e)
+      Toast.error(e)
     }).finally(() => {
       set_pending(false)
     })
@@ -123,10 +120,10 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const del_file = (target: IFileInfo) => {
     set_pending(true)
     ApiHttp.delete(`${API_BASE}lfwm/delete`, { id: target.id }).then((r) => {
-      toast.success(`deleted count: ${r.data}`)
-      return refresh_files()
+      Toast.success(`deleted count: ${r.data}`)
+      return refresh_files(dir.id)
     }).catch(e => {
-      toast.error(e)
+      Toast.error(e)
     }).finally(() => {
       set_pending(false)
     })
@@ -219,13 +216,13 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       }).then(() => {
         return true
       }).catch(e => {
-        toast.error(e)
+        Toast.error(e)
         return false
       }).then(ok => {
         if (!ok) return;
         return refresh_files(dir.id)
       }).catch(e => {
-        toast.error(e)
+        Toast.error(e)
       }).finally(() => {
         set_pending(false)
       })
@@ -241,13 +238,13 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       }).then(() => {
         return (dir.id !== me.id) || (!dir != !me.id)
       }).catch(e => {
-        toast.error(e)
+        Toast.error(e)
         return false
       }).then(ok => {
         if (!ok) return
         return refresh_files(me.parent)
       }).catch(e => {
-        toast.error(e)
+        Toast.error(e)
       }).finally(() => {
         set_pending(false)
       })
@@ -257,9 +254,9 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const unpublish = (me: IFileInfo) => {
     set_pending(true)
     ApiHttp.post(`${API_BASE}lfwm/unpublish`, {}, { id: me.id }).then(() => {
-      return refresh_files()
+      return refresh_files(dir.id)
     }).catch(e => {
-      toast.error(e)
+      Toast.error(e)
     }).finally(() => {
       set_pending(false)
     })
@@ -268,9 +265,9 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const publish = (me: IFileInfo) => {
     set_pending(true)
     ApiHttp.post(`${API_BASE}lfwm/publish`, {}, { id: me.id }).then(() => {
-      return refresh_files()
+      return refresh_files(dir.id)
     }).catch(e => {
-      toast.error(e)
+      Toast.error(e)
     }).finally(() => {
       set_pending(false)
     })
@@ -278,7 +275,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
 
   return (
     <div {...props} className={classNames(csses.mine_page, props.className)} style={props.style} ref={ref_root} >
-      {toast_ctx}
       <VideoModal
         open={!!(viewing_video_open && viewing_video)}
         src={viewing_video}
@@ -352,7 +348,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
           title={t("refresh")}
           onClick={e => {
             interrupt_event(e)
-            refresh_files()
+            refresh_files(dir.id)
           }} />
       </div>
       <div
@@ -464,7 +460,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                       return true
                     }).catch(e => {
                       set_pending(false)
-                      toast.error(e)
+                      Toast.error(e)
                       return false
                     })
                     if (!ok) return ok
@@ -473,7 +469,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                     id: me.id,
                     name: name
                   }).then(() => {
-                    toast.success('done')
+                    Toast.success('done')
                     me.name = name;
                     if (new_dir == me.id && me.type == 'mod') {
                       edit_mod(me)
@@ -483,7 +479,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                   }).catch(e => {
                     set_new_dir(0)
                     console.log(e)
-                    toast.error(e)
+                    Toast.error(e)
                     return false
                   }).finally(() => {
                     set_pending(false)

@@ -1,14 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import classnames from "classnames";
 import { useEffect, useRef, useState, type PropsWithChildren } from "react";
 import { Badge } from "../Badge";
 import { Space } from "../Space";
-import type { ToastInfo } from "./_ToastInfo";
+import type { IToastFunc, IToastInfo } from "./_Common";
 import styles from "./index.module.scss";
-import type { IUseToastOpts, IUseToastRet } from "./_useToast";
 
 export interface IToastProps {
-  info: ToastInfo;
-  onDead: (info: ToastInfo) => void;
+  info: IToastInfo;
+  onDead: (info: IToastInfo) => void;
 }
 export function Toast(props: IToastProps) {
   const { info, onDead } = props
@@ -48,17 +48,18 @@ export function Toast(props: IToastProps) {
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-Toast.show = (_msg: string | ToastInfo): void => void 0
+
+
+
+Toast.show = (() => { }) as IToastFunc
+Toast.success = (() => { }) as IToastFunc
+Toast.error = (() => { }) as IToastFunc
+Toast.useError = function useAuto(v: any) {
+  useEffect(() => { Toast.error(v) }, [v])
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 Toast.Provider = (_props: PropsWithChildren): React.ReactNode => void 0
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-Toast.useToast = (_opts?: IUseToastOpts): IUseToastRet => [
-  Object.assign(() => { }, {
-    success: () => { },
-    error: () => { }
-  }), <></>, () => { },]
 
 

@@ -1,33 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Toast } from ".";
-import type { ToastInfo } from "./_ToastInfo";
+import { Toast, } from ".";
+import type { IUseToastOpts, IUseToastRet, IToastInfo } from "./_Common";
 import styles from "./index.module.scss";
-
-export interface IUseToastOpts {
-  container?: null | HTMLElement;
-}
-export interface IToast {
-  (msg: string | ToastInfo): void;
-  success(msg: string | ToastInfo): void;
-  error(msg: string | ToastInfo): void;
-}
-
-export type IUseToastRet = readonly [
-  IToast,
-  React.ReactNode,
-  (text: string | Error | number | boolean | undefined | unknown) => void
-]
 
 export const _useToast = function useToast(opts?: null | IUseToastOpts): IUseToastRet {
   const container = opts?.container ?? document.body
   const ref_new_id = useRef(0);
-  const ref_msg_list = useRef<ToastInfo[]>([]);
-  const [msg_list, set_msg_list] = useState<ToastInfo[]>([]);
+  const ref_msg_list = useRef<IToastInfo[]>([]);
+  const [msg_list, set_msg_list] = useState<IToastInfo[]>([]);
 
-  const toast = useCallback((msg: string | ToastInfo | Error, type?: string) => {
+  const toast = useCallback((msg: string | IToastInfo | Error, type?: string) => {
     const prev_msg_list = ref_msg_list.current;
-    let next_msg_list: ToastInfo[];
+    let next_msg_list: IToastInfo[];
     if (typeof msg === 'string') {
       const idx = prev_msg_list.findIndex(v => v.msg === msg);
       if (idx < 0) {
@@ -35,7 +20,7 @@ export const _useToast = function useToast(opts?: null | IUseToastOpts): IUseToa
       } else {
         const [item] = prev_msg_list.splice(idx, 1);
         const count = (item.count || 0) + 1;
-        const new_item: ToastInfo = { ...item, count }
+        const new_item: IToastInfo = { ...item, count }
         next_msg_list = [new_item, ...prev_msg_list]
       }
     } else if ('message' in msg) {
@@ -62,7 +47,7 @@ export const _useToast = function useToast(opts?: null | IUseToastOpts): IUseToa
     set_msg_list(ref_msg_list.current = next_msg_list)
   }, [])
 
-  const remove_toast = useCallback((target: ToastInfo) => {
+  const remove_toast = useCallback((target: IToastInfo) => {
     set_msg_list(ref_msg_list.current = ref_msg_list.current.filter(v => v.id !== target.id))
   }, [])
 
@@ -76,18 +61,11 @@ export const _useToast = function useToast(opts?: null | IUseToastOpts): IUseToa
     return container ? createPortal(ele, container) : ele
   }, [container, msg_list, remove_toast])
 
-  const useAuto = useCallback(function useAutoToast(text: unknown) {
-    useEffect(() => {
-      if (text == void 0 || text === null || text === '') return;
-      toast('' + text)
-    }, [text])
-  }, [toast])
-
   return useMemo<IUseToastRet>(() => [
     Object.assign(toast, {
-      success: (r: string | Error | ToastInfo) => toast(r, 'success'),
-      error: (r: string | Error | ToastInfo) => toast(r, 'error')
+      success: (r: string | Error | IToastInfo) => toast(r, 'success'),
+      error: (r: string | Error | IToastInfo) => toast(r, 'error')
     }),
-    ctx, useAuto] as const,
-    [toast, ctx, useAuto])
+    ctx] as const,
+    [toast, ctx])
 }

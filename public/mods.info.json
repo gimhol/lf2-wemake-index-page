@@ -4,8 +4,8 @@
   "date": "2026-02-02",
   "short_title": "LFW Mods",
   "title": "LFW Mods",
+  "brief": "The mods here are for \"Little Fighter Wemake\".",
   "desc": [
-    "The mods here are for \"Little Fighter Wemake\".",
     "Download Mod, then Open LFWemake and drag the Mod onto the Game.",
     "Playable after loading completes.\n",
     "> Don't need to unzip it after downloading from here.",
@@ -20,10 +20,8 @@
   "children_url": "mods.info-list.json",
   "i18n": {
     "zh": {
-      "short_title": "LFW Mods",
-      "title": "LFW Mods",
+      "brief":  "适用于 Little Fighter Wemake 的 Mod。",
       "desc": [
-        "适用于 Little Fighter Wemake 的 Mod，",
         "下载后，打开 LFWemake，将 Mod 拖拽至 LFWemake 中，加载完成后即可游玩。\n",
         "> 下载后无需解压。使用方式参考视频：",
         "<video width='320' src='https://lf.gim.ink/docs/video/download_and_use_extra_data.mp4' controls></video>\n",

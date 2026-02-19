@@ -4,13 +4,15 @@
   "date": "2026-02-02",
   "short_title": "LF2 Mods",
   "title": "LF2 Mods",
+  "brief": "The mods here are for Little Fighter 2.",
   "desc": [
-    "The mods here are for Little Fighter 2. See the documentation in the reference zip package for installation instructions."
+    "See the documentation in the reference zip package for installation instructions."
   ],
   "children_url": "mods.info-list.json",
   "i18n": {
     "zh": {
-      "desc": "适用于《Little Fighter 2》的Mod，安装方法见参考Mod简介或压缩包内的文档。"
+      "brief": "适用于 Little Fighter 2 的Mod。",
+      "desc": "安装方法见参考Mod简介或压缩包内的文档。"
     },
     "zh-hans": "zh",
     "zh-hant": "zh",

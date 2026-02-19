@@ -44,7 +44,6 @@ export interface IInfoViewProps extends HTMLAttributes<HTMLDivElement> {
 }
 export function ModPreview(props: IInfoViewProps) {
   const { mod_id, info, head, ..._p } = props;
-  const [toast, toast_ctx] = Toast.useToast()
   const [mod, set_mod] = useImmer<IMod | undefined>(void 0)
   const [loading, set_loading] = useState(false)
   useEffect(() => {
@@ -60,16 +59,15 @@ export function ModPreview(props: IInfoViewProps) {
       set_mod(r)
     }).catch(e => {
       if (ab.signal.aborted) return;
-      toast.error(e)
+      Toast.error(e)
     }).finally(() => {
       set_loading(false)
     })
     return () => ab.abort()
-  }, [info, mod_id, set_mod, toast])
+  }, [info, mod_id, set_mod])
 
   return (
     <div className={csses.mod_preview} {..._p} >
-      {toast_ctx}
       {head}
       <div className={cns(csses.main)}>
         <InfoCard info={info ?? mod?.info} />
