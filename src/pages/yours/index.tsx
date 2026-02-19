@@ -175,10 +175,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const onDragOver = (e: React.DragEvent, me: IFileInfo) => {
     const not_allow = () => { e.stopPropagation() }
     if (pending || typeof me.id !== 'number') return not_allow();
-    switch (me.type) {
-      case 'dir': case 'mod': case null: case void 0: break
-      default: return not_allow();
-    }
+    if (!is_dir(me)) return not_allow();
     const dragging = ref_dragging.current
     if (dragging) {
       if (dragging.id == me.id) return not_allow();
@@ -440,7 +437,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 onDrop={e => onDrop(e, me)}
                 onNameChanged={async (name) => {
                   if (name === me.name) {
-                    if (new_dir == me.id && is_info(me)) 
+                    if (new_dir == me.id && is_info(me))
                       edit_mod(me)
                     set_new_dir(0)
                     return true;
@@ -469,7 +466,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                   }).then(() => {
                     Toast.success('done')
                     me.name = name;
-                    if (new_dir == me.id && me.type == 'mod') {
+                    if (new_dir == me.id && is_info(me)) {
                       edit_mod(me)
                     }
                     set_new_dir(0)

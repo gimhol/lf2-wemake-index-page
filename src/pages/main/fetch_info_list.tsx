@@ -1,11 +1,13 @@
 import { Info } from "@/base/Info";
 import { fetch_info } from "./fetch_info";
+import { join_url } from "../yours/join_url";
 
 export async function fetch_info_list(url: string, parent: Info | null, lang: string, init: RequestInit & { histories?: Map<string, Info>; } = {}) {
   const { signal, histories = new Map<string, Info>() } = init;
   const resp = await fetch(url, init);
   const raw_list = await resp.json();
   if (!Array.isArray(raw_list)) throw new Error(`[fetch_info_list] failed, got ${raw_list}`);
+  raw_list.unshift(join_url(API_BASE, 'lfwm/published?id=1'))
   if (signal?.aborted) return;
   const cooked_list: Info[] = [];
   for (const raw_item of raw_list) {
