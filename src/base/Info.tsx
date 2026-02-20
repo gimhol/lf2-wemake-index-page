@@ -132,7 +132,7 @@ const { Cls, Str } = makeI18N();
   }
   get_str<K extends keyof IInfo>(key: K): string | undefined {
     const value =
-      this._bros[this.lang]?.get_str(key) ??
+      this._bros[this.lang]?.get_str(key) ||
       this.raw[key];
     if (value === void 0 || value === null) return void 0
     if (Array.isArray(value)) return value.join('\n')

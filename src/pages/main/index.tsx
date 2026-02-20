@@ -196,7 +196,6 @@ export default function MainPage() {
               title={t('logout')}
               icon={img_logout}
               onClick={() => {
-                console.debug('click logout')
                 dispatch({ type: 'reset' })
               }} />
           </Show>
