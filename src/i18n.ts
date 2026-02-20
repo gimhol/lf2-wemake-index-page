@@ -43,7 +43,12 @@ const zh = {
   "edit_brief_here": "再此编辑简介(500字内)",
   "workspace": "工作间",
   "attachment": "附件",
-  "latest_build_time": "最近构建"
+  "latest_build_time": "最近构建",
+  "d_product": "产品",
+  "d_dir": "目录",
+  "d_mod": "LFW Mod",
+  "d_omod": "LF2 Mod",
+  "d_version": "版本"
 }
 const en = {
   "author": "author",
@@ -87,7 +92,12 @@ const en = {
   "edit_brief_here": "Edit Brief Here (Within 500 Characters)",
   "workspace": "Workspace",
   "attachment": "Attachment",
-  "latest_build_time": "Latest Build"
+  "latest_build_time": "Latest Build",
+  "d_product": "Product",
+  "d_dir": "Dir",
+  "d_mod": "LFW Mod",
+  "d_omod": "LF2 Mod",
+  "d_version": "Version"
 }
 const resources = {
   "zh": { translation: zh },

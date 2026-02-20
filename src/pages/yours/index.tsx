@@ -396,7 +396,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 actions={(!is_publishable(me) || !mod_id) ? null : <>
                   <IconButton
                     icon={img_edit}
-                    title={t('edit_mod_info')}
+                    title={t('edit_mod_info').replace('%1', t(`d_${me.type}`))}
                     disabled={pending}
                     onClick={() => edit_mod(me)} />
                   <IconButton

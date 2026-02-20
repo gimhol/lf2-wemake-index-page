@@ -156,7 +156,7 @@ export function ModFormView(props: IModFormViewProps) {
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
       <div className={csses.head}>
         <h1 className={csses.title}>
-          {t('edit_mod_info').replace('%1', type ? t('d_' + type) : '')}
+          {t('edit_mod_info').replace('%1', t(`d_${type}`))}
           <Dropdown.Select options={langs}
             value={lang}
             onChange={v => {
