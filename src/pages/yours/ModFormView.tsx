@@ -252,46 +252,57 @@ export function ModFormView(props: IModFormViewProps) {
           </div>
           <div className={csses.form_row}>
             <span>{t('attachment')}:</span>
-            <div className={csses.url_row}>
+            <div className={csses.short_and_long}>
               <Dropdown.Select
-                value={InfoUrlType.Download}
+                value={drafts[''].url_type}
+                onChange={v => set_drafts(d => { d[''].url_type = v })}
                 options={all_info_url_type.map(v => ({ value: v, label: t(v) }))} />
-              <PickFile
-                max={1}
-                accept=".zip"
-                value={attachments}
-                whenChange={records => {
-                  set_attachments(records)
-                  if (!records?.length) return;
-                  set_attachment_uploading(true);
-                  ossUploadModRecords({
-                    mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
-                      'application/x-zip-compressed': { max_size: 100 * 1024 * 1024 },
-                      'application/zip': { max_size: 100 * 1024 * 1024 },
-                    },
-                    progress: (progress, { file }) => {
-                      const record = uploaded_map.get(file);
-                      if (!record) uploaded_map.set(file, { file, url: "", progress, name: file.name });
-                      else uploaded_map.set(file, { ...record, progress })
-                      set_attachments(prev => replace_one(prev, v => {
-                        return v.file == file ? { ...v, progress } : null
-                      }))
-                    }
-                  }).then(r => {
-                    if (!r.length) throw 'upload nothings'
-                    const name = r[0].url.split('/').pop();
-                    set_drafts(d => {
-                      d[lang].url = name;
-                      d[lang].url_type = 'download'
+              {drafts[''].url_type === InfoUrlType.Download ?
+                <PickFile
+                  max={1}
+                  accept=".zip"
+                  value={attachments}
+                  whenChange={records => {
+                    set_attachments(records)
+                    if (!records?.length) return;
+                    set_attachment_uploading(true);
+                    ossUploadModRecords({
+                      mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
+                        'application/x-zip-compressed': { max_size: 100 * 1024 * 1024 },
+                        'application/zip': { max_size: 100 * 1024 * 1024 },
+                      },
+                      progress: (progress, { file }) => {
+                        const record = uploaded_map.get(file);
+                        if (!record) uploaded_map.set(file, { file, url: "", progress, name: file.name });
+                        else uploaded_map.set(file, { ...record, progress })
+                        set_attachments(prev => replace_one(prev, v => {
+                          return v.file == file ? { ...v, progress } : null
+                        }))
+                      }
+                    }).then(r => {
+                      if (!r.length) throw 'upload nothings'
+                      const name = r[0].url.split('/').pop();
+                      set_drafts(d => {
+                        d[lang].url = name;
+                        d[lang].url_type = 'download'
+                      })
+                    }).catch((err) => {
+                      Toast.error(err)
+                    }).finally(() => {
+                      set_attachment_uploading(false);
                     })
-                  }).catch((err) => {
-                    Toast.error(err)
-                  }).finally(() => {
-                    set_attachment_uploading(false);
-                  })
-                }}>
-                <PickFile.Files />
-              </PickFile>
+                  }}>
+                  <PickFile.Files />
+                </PickFile> :
+                <input
+                  className={csses.long}
+                  value={drafts[''].url}
+                  type="text"
+                  onChange={e => { interrupt_event(e); 
+                    set_drafts(d => { d[''].url = e.target.value.trim() }) }}
+                  placeholder={t("author_url")}
+                  maxLength={255} />
+              }
             </div>
           </div>
         </Collapse>
