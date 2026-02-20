@@ -55,12 +55,12 @@ export function InfoView(props: IInfoViewProps) {
   }, [info])
 
   const { t } = useTranslation()
-  const { children_title, date, unavailable, desc, brief, desc_url, title, changelog, changelog_url } = info ?? {};
+  const { children_title, date, unavailable, desc, brief, desc_url, title } = info ?? {};
   const win_x64_url = info?.get_download_url('win_x64')
   const open_in_browser = t('open_in_browser')
   const dl_win_x64 = t('dl_win_x64')
   const ref_el_children = useRef<HTMLDivElement>(null);
-  const has_content = !!(desc || desc_url || changelog || changelog_url)
+  const has_content = !!(desc || desc_url)
   const [children, , children_error] = useInfoChildren(info)
   Toast.useError(children_error)
   const __next_list_like = next_list_like(__listLike)
@@ -110,12 +110,6 @@ export function InfoView(props: IInfoViewProps) {
           content={desc}
           url={desc_url}
           whenLoaded={t => info?.set_desc(t)} />
-        <Viewer
-          emptyAsGone
-          className={csses.content_zone}
-          content={changelog}
-          url={changelog_url}
-          whenLoaded={t => info?.set_changelog(t)} />
       </Collapse>
       {
         children.length ?

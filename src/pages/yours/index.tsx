@@ -3,7 +3,7 @@
 import { addModRecord } from "@/api/addModRecord"
 import { editModRecord } from "@/api/editModRecord"
 import { listModPath } from "@/api/listModPath"
-import { children_type, is_dir, is_publishable, listModRecords, type IRecord, type RecordType } from "@/api/listModRecords"
+import { children_type, is_dir, is_publishable, listModRecords, type IRecord } from "@/api/listModRecords"
 import img_edit from "@/assets/svg/edit.svg"
 import img_preview from "@/assets/svg/preview.svg"
 import img_publish from "@/assets/svg/publish.svg"

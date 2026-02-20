@@ -24,8 +24,8 @@ export interface IInfo {
   url_type?: string;
   desc?: string;
   desc_url?: string;
-  changelog?: string;
-  changelog_url?: string;
+  // changelog?: string;
+  // changelog_url?: string;
   children_title?: string;
   children_url?: string;
   children_look?: string;
@@ -63,8 +63,8 @@ const { Cls, Str } = makeI18N();
   @Str brief            !: string | undefined; set_brief          !: TSetStr<this>
   @Str desc             !: string | undefined; set_desc           !: TSetStr<this>
   @Str desc_url         !: string | undefined; set_desc_url       !: TSetStr<this>
-  @Str changelog        !: string | undefined; set_changelog      !: TSetStr<this>
-  @Str changelog_url    !: string | undefined; set_changelog_url  !: TSetStr<this>
+  // @Str changelog        !: string | undefined; set_changelog      !: TSetStr<this>
+  // @Str changelog_url    !: string | undefined; set_changelog_url  !: TSetStr<this>
   @Str children_title   !: string | undefined; set_children_title !: TSetStr<this>
   @Str children_url     !: string | undefined; set_children_url   !: TSetStr<this>
   @Str url              !: string | undefined; set_url            !: TSetStr<this>
@@ -170,7 +170,7 @@ const { Cls, Str } = makeI18N();
     // text += `[中文](CHANGELOG.MD) | [English](CHANGELOG.EN.MD)\n\n`
     if (this.brief) text += `${this.brief}\n\n`
     text += await this.fetch_desc().then(r => r ? `${r}\n\n` : '')
-    text += await this.fetch_changelog().then(r => r ? `${r}\n\n` : '')
+    // text += await this.fetch_changelog().then(r => r ? `${r}\n\n` : '')
 
     if (this.children?.length) {
       text += `## ${this.children_title}\n\n`
@@ -178,7 +178,7 @@ const { Cls, Str } = makeI18N();
         text += `### ${version.title}\n\n`
         if (version.date) text += `${version.date}\n\n`
         text += await version.fetch_desc().then(r => r ? `${r}\n\n` : '')
-        text += await version.fetch_changelog().then(r => r ? `${r}\n\n` : '')
+        // text += await version.fetch_changelog().then(r => r ? `${r}\n\n` : '')
       }
     }
     return text;
@@ -191,12 +191,12 @@ const { Cls, Str } = makeI18N();
       .then(v => this.desc = v)
       .catch(e => '' + e)
   }
-  async fetch_changelog() {
-    if (this.changelog) return this.changelog
-    if (!this.changelog_url) return '';
-    return await fetch(this.changelog_url, { mode: 'cors' })
-      .then(r => r.text())
-      .then(v => this.changelog = v)
-      .catch(e => '' + e)
-  }
+  // async fetch_changelog() {
+  //   if (this.changelog) return this.changelog
+  //   if (!this.changelog_url) return '';
+  //   return await fetch(this.changelog_url, { mode: 'cors' })
+  //     .then(r => r.text())
+  //     .then(v => this.changelog = v)
+  //     .catch(e => '' + e)
+  // }
 }

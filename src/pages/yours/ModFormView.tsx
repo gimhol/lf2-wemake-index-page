@@ -44,7 +44,7 @@ export function ModFormView(props: IModFormViewProps) {
   const [attachments, set_attachments] = useState<IPickedFile[]>()
   const [attachment_uploading, set_attachment_uploading] = useState(false);
   const small = !document.firstElementChild?.classList.contains('small-screen')
-  const [opens, set_opens] = useImmer({ base: true, brief: small, desc: small, changelog: small, preview: false })
+  const [opens, set_opens] = useImmer({ base: true, brief: small, desc: small, preview: false })
   const [lang, set_lang] = useState<'zh' | ''>('')
   const draft = drafts[lang];
   const type = mod?.record.type
@@ -326,23 +326,6 @@ export function ModFormView(props: IModFormViewProps) {
               value={draft.desc}
               onChange={v => set_drafts(d => { d[lang].desc = v })}
               placeholder={t("edit_description_here")} />
-          </div>
-        </Collapse>
-        <CollapseButton
-          className={csses.title_button}
-          open={!opens.preview && opens.changelog}
-          onClick={() => set_opens(d => { if (d.preview) d.preview = false; else d.changelog = !d.changelog })} >
-          <h2 className={csses.title}>
-            {t("mod_changelog")}
-          </h2>
-        </CollapseButton>
-        <Collapse open={!opens.preview && opens.changelog} classNames={{ inner: csses.collapse_inner }}>
-          <div className={csses.md_editor}>
-            <EditorView
-              uploadImages={upload_images}
-              value={draft.changelog}
-              onChange={v => set_drafts(d => { d[lang].changelog = v })}
-              placeholder={t("edit_changelog_here")} />
           </div>
         </Collapse>
         <CollapseButton

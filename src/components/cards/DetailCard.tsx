@@ -19,7 +19,7 @@ export function DetailCard(props: IDetailCardProps) {
   const { info, onClose, classNames, ..._p } = props;
   const { t } = useTranslation()
   const dl_win_x64 = t('dl_win_x64')
-  const { url, full_cover_url, desc, desc_url, changelog_url, changelog, unavailable, url_type } = info;
+  const { url, full_cover_url, desc, desc_url, unavailable, url_type } = info;
   const win_x64_url = info.get_download_url('win_x64');
   const ref_el = useRef<HTMLDivElement>(null)
   const title_suffix = t(unavailable || url_type || '');
@@ -57,14 +57,13 @@ export function DetailCard(props: IDetailCardProps) {
           }
           <Viewer className={csses.content_zone} emptyAsGone content={info.brief} />
           {
-            !(desc || changelog || desc_url || changelog_url) ? null :
+            !(desc || desc_url) ? null :
               <div className={classnames(csses.info_zone, csses.scrollview)}>
                 <Viewer content={desc} url={desc_url} emptyAsGone />
-                <Viewer content={changelog} url={changelog_url} emptyAsGone />
               </div>
           }
           {
-            (full_cover_url || desc || changelog || desc_url || changelog_url) ? null :
+            (full_cover_url || desc || desc_url) ? null :
               <div className={classnames(csses.no_content)}>
                 {t('no_content')}
               </div>
