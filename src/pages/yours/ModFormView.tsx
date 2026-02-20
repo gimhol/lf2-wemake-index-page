@@ -192,7 +192,6 @@ export function ModFormView(props: IModFormViewProps) {
                 type="text"
                 placeholder={t("full_title")}
                 maxLength={255} />
-
             </div>
           </div>
           <div className={csses.form_row}>
@@ -213,42 +212,6 @@ export function ModFormView(props: IModFormViewProps) {
                 placeholder={t("author_url")}
                 maxLength={255} />
             </div>
-          </div>
-          <div className={csses.form_row}>
-            <span>{t('cover_img')}:</span>
-            <PickFile
-              max={1}
-              accept=".png;.jpg;.webp"
-              value={covers}
-              whenChange={records => {
-                set_covers(records)
-                if (!records?.length) return;
-                set_cover_uploading(true);
-                ossUploadModRecords({
-                  mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
-                    'image/png': { max_size: 5 * 1024 * 1024 },
-                    'image/jpeg': { max_size: 5 * 1024 * 1024 },
-                    'image/webp': { max_size: 5 * 1024 * 1024 },
-                  },
-                  progress: (progress, { file }) => {
-                    set_covers(prev => replace_one(prev, v => {
-                      return v.file == file ? { ...v, progress } : null
-                    }))
-                  }
-                }).then(r => {
-                  if (!r.length) throw 'upload nothings'
-                  const name = r[0].url.split('/').pop();
-                  set_drafts(d => { d[lang].cover_url = name })
-                }).catch((err) => {
-                  Toast.error(err)
-                }).finally(() => {
-                  set_cover_uploading(false);
-                })
-              }}>
-              <PickFile.Images onFileClick={(_, r, { files }) => {
-                ImagesViewer.open(files, files?.findIndex(v => v.url === r.url))
-              }} />
-            </PickFile>
           </div>
           <div className={csses.form_row}>
             <span>{t('attachment')}:</span>
@@ -298,13 +261,52 @@ export function ModFormView(props: IModFormViewProps) {
                   className={csses.long}
                   value={drafts[''].url}
                   type="text"
-                  onChange={e => { interrupt_event(e); 
-                    set_drafts(d => { d[''].url = e.target.value.trim() }) }}
+                  onChange={e => {
+                    interrupt_event(e);
+                    set_drafts(d => { d[''].url = e.target.value.trim() })
+                  }}
                   placeholder={t("author_url")}
                   maxLength={255} />
               }
             </div>
           </div>
+          <div className={csses.form_row}>
+            <span>{t('cover_img')}:</span>
+            <PickFile
+              max={1}
+              accept=".png;.jpg;.webp"
+              value={covers}
+              whenChange={records => {
+                set_covers(records)
+                if (!records?.length) return;
+                set_cover_uploading(true);
+                ossUploadModRecords({
+                  mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
+                    'image/png': { max_size: 5 * 1024 * 1024 },
+                    'image/jpeg': { max_size: 5 * 1024 * 1024 },
+                    'image/webp': { max_size: 5 * 1024 * 1024 },
+                  },
+                  progress: (progress, { file }) => {
+                    set_covers(prev => replace_one(prev, v => {
+                      return v.file == file ? { ...v, progress } : null
+                    }))
+                  }
+                }).then(r => {
+                  if (!r.length) throw 'upload nothings'
+                  const name = r[0].url.split('/').pop();
+                  set_drafts(d => { d[lang].cover_url = name })
+                }).catch((err) => {
+                  Toast.error(err)
+                }).finally(() => {
+                  set_cover_uploading(false);
+                })
+              }}>
+              <PickFile.Images onFileClick={(_, r, { files }) => {
+                ImagesViewer.open(files, files?.findIndex(v => v.url === r.url))
+              }} />
+            </PickFile>
+          </div>
+          
         </Collapse>
         <CollapseButton
           className={csses.title_button}
