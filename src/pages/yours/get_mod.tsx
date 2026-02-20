@@ -42,7 +42,7 @@ export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
   const owner = await getUserInfo({ id: record.owner_id });
   const raw_info: IInfo = {
     author_url: owner?.home_url || owner?.gitee_url || owner?.github_url,
-    author: owner.username || owner.username,
+    author: owner.nickname || owner.username,
     title: record.name,
     type: record.type,
   }

@@ -16,7 +16,7 @@ export default function InfoViewPage() {
   const location = useLocation()
 
   const is_root = Paths.All.Info.replace(':game_id', '' + mod_id) === location.pathname
-  const open = is_root || !(info?.children_url || info?.children.length)
+  const open = is_root || !(info?.subs?.length)
 
   const [loading, set_loading] = useState(false)
   const [mod, set_mod] = useImmer<IMod | undefined>(void 0)

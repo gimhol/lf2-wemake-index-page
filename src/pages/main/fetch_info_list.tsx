@@ -47,3 +47,24 @@ export async function fetch_infos(lang: string, init: RequestInit = {}): Promise
   }
   return cooked_list;
 }
+export async function fetch_children(parent: number | string, lang: string, init: RequestInit = {}): Promise<Info[] | undefined> {
+  const { signal } = init;
+  const r = await ApiHttp.get(`${API_BASE}lfwm/list`, { parent }, init)
+  if (init.signal?.aborted) return;
+  const raw_list = r.data;
+  if (!Array.isArray(raw_list))
+    throw new Error(`[fetch_infos] failed, got ${raw_list}`);
+  const cooked_list: Info[] = [];
+  for (const raw_item of raw_list) {
+    if (!raw_item) continue;
+    if (typeof raw_item === 'object') {
+      cooked_list.push(new Info(raw_item, lang, null, null));
+      continue;
+    }
+    if (typeof raw_item === 'string') {
+      const item = await fetch_info(raw_item, null, lang, { signal })
+      cooked_list.push(item);
+    }
+  }
+  return cooked_list;
+}

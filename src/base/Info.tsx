@@ -30,7 +30,7 @@ export interface IInfo {
   children_title?: string;
   children_url?: string;
   children_look?: string;
-  children?: IInfo[];
+  subs?: IInfo[];
   date?: string;
   cover_url?: string;
   unavailable?: string;
@@ -91,9 +91,9 @@ const { Cls, Str } = makeI18N();
   lang: string;
   private _md?: string;
   private _bros: { [x in string]?: Info } = {}
-  private _subs: Info[] = [];
-  get children() { return this._subs; }
-  set children(v: Info[]) { this._subs = v; }
+  private _subs: Info[] | undefined;
+  get subs(): Info[] | undefined { return this._subs; }
+  set subs(v: Info[] | undefined) { this._subs = v; }
 
   get full_cover_url() {
     const { cover_url } = this
@@ -130,7 +130,7 @@ const { Cls, Str } = makeI18N();
     } else {
       delete this.raw.i18n
     }
-    const { children } = this.raw
+    const { subs: children } = this.raw
     if (Array.isArray(children))
       this._subs = children.map(c => new Info(c, this.lang, this, this.src))
 
@@ -158,7 +158,7 @@ const { Cls, Str } = makeI18N();
   }
   clone(): Info {
     const ret = new Info(this.raw, this.lang, this.parent, this.src);
-    ret.children = this.children.map(v => v.clone());
+    ret.subs = this.subs?.map(v => v.clone());
     return ret;
   }
   get_url_by_name(name: string) {
@@ -186,9 +186,9 @@ const { Cls, Str } = makeI18N();
     text += await this.fetch_desc().then(r => r ? `${r}\n\n` : '')
     // text += await this.fetch_changelog().then(r => r ? `${r}\n\n` : '')
 
-    if (this.children?.length) {
+    if (this.subs?.length) {
       text += `## ${this.children_title}\n\n`
-      for (const version of this.children) {
+      for (const version of this.subs) {
         text += `### ${version.title}\n\n`
         if (version.date) text += `${version.date}\n\n`
         text += await version.fetch_desc().then(r => r ? `${r}\n\n` : '')
