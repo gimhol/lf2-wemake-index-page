@@ -80,6 +80,7 @@
     flex    : 1;
     position: absolute;
     width   : 100%;
+    z-index : 0;
 
     img {
       display   : inline-block;
@@ -114,6 +115,7 @@
   user-select: text;
   padding    : 2px 5px;
   display    : flex;
+  gap        : 5px;
 
   .left {
     display    : flex;

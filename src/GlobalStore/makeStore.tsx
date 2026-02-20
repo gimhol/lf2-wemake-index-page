@@ -44,6 +44,7 @@ export function makeStore<V, A extends Action<V>>(opts: {
     if (state !== ret) {
       store.value = ret
       saver?.(ret)
+      console.log(ret)
       return ret;
     }
     switch (action.type) {
@@ -52,6 +53,7 @@ export function makeStore<V, A extends Action<V>>(opts: {
       case 'merge': ret = { ...state, ...action.value }; break
       default: return ret;
     }
+      console.log(ret)
     store.value = ret
     saver?.(ret);
     return ret

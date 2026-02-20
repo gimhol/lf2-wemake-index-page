@@ -9,6 +9,8 @@ import { Viewer } from "../markdown/Viewer";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import csses from "./DetailCard.module.scss";
 import { MarkdownButton } from "@/pages/main/MarkdownModal";
+import { Paths } from "@/Paths";
+import Show from "@/gimd/Show";
 
 export interface IDetailCardProps extends ICardBaseProps {
   info: Info;
@@ -53,15 +55,16 @@ export function DetailCard(props: IDetailCardProps) {
         </div>
         <div className={csses.detail_card_main}>
           {
-            !full_cover_url ? null : <img className={classnames(csses.pic_zone)} draggable={false} src={full_cover_url} />
+            !full_cover_url ? null :
+              <img
+                className={classnames(csses.pic_zone)}
+                draggable={false}
+                src={full_cover_url} />
           }
-          <Viewer className={csses.content_zone} emptyAsGone content={info.brief} />
-          {
-            !(desc || full_desc_url) ? null :
-              <div className={classnames(csses.info_zone, csses.scrollview)}>
-                <Viewer content={desc} url={full_desc_url} emptyAsGone />
-              </div>
-          }
+          <div className={classnames(csses.info_zone, csses.scrollview)}>
+            <Viewer className={csses.content_zone} emptyAsGone content={info.brief} />
+            <Viewer content={desc} url={full_desc_url} emptyAsGone />
+          </div>
           {
             (full_cover_url || desc || full_desc_url) ? null :
               <div className={classnames(csses.no_content)}>
@@ -82,6 +85,17 @@ export function DetailCard(props: IDetailCardProps) {
           </div>
           <div className={csses.mid}>
           </div>
+          <Show yes={!!info.id}>
+            <div className={csses.right}>
+              <span className={csses.prefix}>
+                {t('id')}
+              </span>
+              <a href={`${location.protocol}//${location.host}/#${Paths.All.Info.replace(':game_id', '' + info.id)}`}
+                target='_blank'>
+                {info.id}
+              </a>
+            </div>
+          </Show>
           <div className={csses.right}>
             <span className={csses.prefix}>
               {t('date')}

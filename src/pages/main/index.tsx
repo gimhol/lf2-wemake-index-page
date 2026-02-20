@@ -72,6 +72,7 @@ export default function MainPage() {
   }, [set_location, search, dispatch])
 
   useEffect(() => {
+    if (!session_id) return;
     const c = new AbortController()
     ApiHttp.post<any, any>(`user/info`, void 0, void 0, {
       headers: { authorization: session_id },

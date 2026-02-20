@@ -267,8 +267,10 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       set_pending(false)
     })
   }
+
   const actions = useMemo(() => {
     return children_type(dir)?.map(type => {
+      if (type == "product" && admin !== 7) return null
       switch (type) {
         case "file": return null;
         case "dir":
@@ -288,7 +290,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
         </IconButton>
       }
     })
-  }, [add_dir, dir, pending, t])
+  }, [add_dir, dir, pending, t, admin])
 
   return (
     <div {...props} className={classNames(csses.mine_page, props.className)} style={props.style} ref={ref_root} >

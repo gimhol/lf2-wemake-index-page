@@ -163,6 +163,9 @@ export function ModFormView(props: IModFormViewProps) {
               preview(opens.preview, v ?? '')
               set_lang(v ?? '')
             }} />
+          <Dropdown.Select options={[{ value: 'cards' }, { value: 'list' }]}
+            value={drafts[''].children_look ?? 'list'}
+            onChange={v => set_drafts(d => { d[''].children_look = v })} />
         </h1>
       </div>
       <div className={classnames(csses.main, csses.scrollview)} ref={ref_main} onScroll={on_scroll}>

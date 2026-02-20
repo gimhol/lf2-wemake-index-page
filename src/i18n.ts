@@ -54,6 +54,8 @@ const zh = {
   "republish": "重新发布",
   "unpublish": "取消发布",
   "refresh": "刷新列表",
+  "add_omod": "添加LF2 MOD",
+  "add_mod": "添加LFW MOD",
 }
 const en = {
   "author": "Author",
@@ -108,6 +110,9 @@ const en = {
   "republish": "Republish",
   "unpublish": "Unpublish",
   "refresh": "Refresh",
+  "add_dir": "Add Dir",
+  "add_omod": "Add LF2 MOD",
+  "add_mod": "Add LFW MOD",
 }
 const resources = {
   "zh": { translation: zh },
