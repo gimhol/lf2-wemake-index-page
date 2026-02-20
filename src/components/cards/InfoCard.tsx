@@ -22,7 +22,7 @@ export function InfoCard(props: IInfoCardProps) {
   const dl_win_x64 = t('dl_win_x64')
   const { info = empty_info } = props;
   const { url, url_type, full_cover_url, unavailable } = info;
-  const win_x64_url = info.get_download_url('win_x64');
+  const win_x64_url = info.get_url_by_name('win_x64');
   const ref_el = useRef<HTMLDivElement>(null)
   const [detail_style, set_detail_style] = useState<React.CSSProperties>({})
   const [detail_open, set_detail_open] = useState(false)
@@ -69,13 +69,13 @@ export function InfoCard(props: IInfoCardProps) {
           }
           <Viewer className={csses.content_zone} emptyAsGone content={info.brief} />
           {
-            !(info.desc || info.desc_url) ? null :
+            !(info.desc || info.full_desc_url) ? null :
               <div className={classnames(full_cover_url ? csses.info_zone_half : csses.info_zone, csses.scrollview)}>
-                <Viewer emptyAsGone plain content={info.desc} url={info.desc_url} whenLoaded={v => info.set_desc(v)} />
+                <Viewer emptyAsGone plain content={info.desc} url={info.full_desc_url} whenLoaded={v => info.set_desc(v)} />
               </div>
           }
           {
-            (full_cover_url || info.desc || info.desc_url) ? null :
+            (full_cover_url || info.desc || info.full_desc_url) ? null :
               <div className={classnames(csses.no_content)}>{t('no_content')}</div>
           }
         </div>

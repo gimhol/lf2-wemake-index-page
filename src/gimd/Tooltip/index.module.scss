@@ -4,13 +4,46 @@
   background-color: var(--color-tooltip-bg);
   font-size       : var(--font-size-tooltip);
   border-radius   : 5px;
-  padding         : 5px;
+  padding         : 3px;
   white-space     : nowrap;
   opacity         : 0;
   transition      : opacity 255ms;
   z-index         : 1000;
+  pointer-events  : none;
+  display         : flex;
+  align-items     : flex-start;
+  border          : 2px solid transparent;
+  box-shadow      : 2px 2px 5px 5px rgba(0, 0, 0, -.2);
+}
+
+.tooltip.pinned {
+  border: 2px solid black;
 }
 
 .tooltip.open {
-  opacity: 1;
+  opacity       : 1;
+  pointer-events: all;
+}
+
+.pin_btn {
+  color           : var(--color-tooltip);
+  background-color: var(--color-tooltip-bg);
+  font-size       : var(--font-size-tooltip);
+  padding         : 0;
+  cursor          : pointer;
+  background-color: transparent;
+  width           : 16px;
+  height          : 16px;
+  border-radius   : 50%;
+}
+
+.pin_btn:hover {
+  background-color: #88888888;
+  border-radius   : 50%;
+}
+
+.pin_btn_active {
+  @extend .pin_btn;
+  transform    : translate(0px, 0px) rotateZ(-45deg);
+  border-radius: 50%;
 }

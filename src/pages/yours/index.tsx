@@ -401,7 +401,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                     onClick={() => edit_mod(me)} />
                   <IconButton
                     icon={img_preview}
-                    title={t('preview_mod_info')}
+                    title={t('preview')}
                     disabled={pending}
                     onClick={() => set_previewing({ open: true, mod_id })} />
                   <Show yes={!me.status || (me.status === 'reviewing' && admin & 1)}>

@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import { marked } from "marked";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEventHandler } from "react";
 import { useNavigate } from "react-router";
 import csses from "./Viewer.module.scss";
 
@@ -32,7 +32,7 @@ export interface IViewerProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 export function Viewer(props: IViewerProps) {
   const {
-    content, className, emptyAsGone = false, plain = false, url, whenLoaded, ..._p
+    content, className, emptyAsGone = false, plain = false, url, whenLoaded, children, ..._p
   } = props;
   const ref_el = useRef<HTMLDivElement>(null);
   const [marked] = useMarked();
@@ -58,22 +58,25 @@ export function Viewer(props: IViewerProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url, content])
 
-  if (emptyAsGone && !__html) return <></>
+  if (emptyAsGone && !__html && !children) return <></>
+  const on_click: MouseEventHandler = (e) => {
+    const link = (e.target as Element).closest("a");
+    const href = link?.getAttribute('data-href')
+    if (href?.startsWith('/')) {
+      console.log(href)
+      nav({ pathname: href })
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
   return (
     <div
       {..._p}
       ref={ref_el}
       className={classnames(csses.viewer, { [csses.plain]: plain }, className)}
-      dangerouslySetInnerHTML={{ __html }}
-      onClick={e => {
-        const link = (e.target as Element).closest("a");
-        const href = link?.getAttribute('data-href')
-        if (href?.startsWith('/')) {
-          console.log(href)
-          nav({ pathname: href })
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }} />
+      dangerouslySetInnerHTML={__html ? { __html } : void 0}
+      onClick={e => on_click(e)} >
+      {children}
+    </div>
   )
 }

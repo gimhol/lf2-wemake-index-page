@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { join_url } from "@/pages/yours/join_url";
@@ -21,11 +22,11 @@ export interface IInfo {
   author?: string;
   author_url?: string;
   url?: string;
+  url_name?: string;
   url_type?: string;
+
   desc?: string;
   desc_url?: string;
-  // changelog?: string;
-  // changelog_url?: string;
   children_title?: string;
   children_url?: string;
   children_look?: string;
@@ -33,7 +34,7 @@ export interface IInfo {
   date?: string;
   cover_url?: string;
   unavailable?: string;
-  downloads?: { [x in string]: string };
+  more_urls?: [{ url_type: string, url: string, url_name: string }];
   i18n?: { [x in string]: IInfo };
 }
 
@@ -55,6 +56,19 @@ const { Cls, Str } = makeI18N();
   set type(v: RecordType | undefined) { this.raw.type = v }
   get type(): RecordType | undefined { return this.raw.type }
   set_type(v: RecordType | undefined) { this.type = v; return this; }
+
+  get raw_desc(): string | undefined { return this.raw.desc; }
+  get all_desc(): Map<string, string> {
+    const ret = new Map<string, string>();
+    if (this.raw.desc?.trim())
+      ret.set('', this.raw.desc.trim());
+    const subs = this.raw.i18n
+    if (subs) for (const key in subs) {
+      const desc = subs[key].desc?.trim();
+      if (desc) ret.set(key, desc);
+    }
+    return ret;
+  }
 
   @Str title            !: string | undefined; set_title          !: TSetStr<this>
   @Str short_title      !: string | undefined; set_short_title    !: TSetStr<this>
@@ -82,12 +96,9 @@ const { Cls, Str } = makeI18N();
   set children(v: Info[]) { this._subs = v; }
 
   get full_cover_url() {
-    const { cover_url: url, src } = this
-    if (!url) return void 0;
-    if (url.match(/^https?:\/\//)) return url;
-    if (url.includes('/')) return join_url(STORAGE_URL_BASE, url)
-    if (!src) return url
-    return join_url(STORAGE_URL_BASE, ...src.split('/').slice(0, -1), url)
+    const { cover_url } = this
+    if (!cover_url) return cover_url
+    return this.full_url(cover_url)
   }
   constructor(raw: IInfo, lang: string, parent: Info | null, src: string | null) {
     this.src = src;
@@ -150,9 +161,9 @@ const { Cls, Str } = makeI18N();
     ret.children = this.children.map(v => v.clone());
     return ret;
   }
-  get_download_url(type: string) {
-    if (typeof this.raw.downloads !== 'object') return void 0;
-    return this.raw.downloads[type] || '';
+  get_url_by_name(name: string) {
+    if (!Array.isArray(this.raw.more_urls)) return void 0;
+    return this.raw.more_urls.find(v => v.url_name == name)?.url || '';
   }
   async markdown() {
     const md = this._md
@@ -168,6 +179,9 @@ const { Cls, Str } = makeI18N();
       text += `visit [author](${this.author_url})\n\n`
     }
     // text += `[中文](CHANGELOG.MD) | [English](CHANGELOG.EN.MD)\n\n`
+
+    if (this.full_cover_url) text += `[!cover](${this.full_cover_url})\n\n`
+
     if (this.brief) text += `${this.brief}\n\n`
     text += await this.fetch_desc().then(r => r ? `${r}\n\n` : '')
     // text += await this.fetch_changelog().then(r => r ? `${r}\n\n` : '')
@@ -184,19 +198,36 @@ const { Cls, Str } = makeI18N();
     return text;
   }
   async fetch_desc() {
-    if (this.desc) return this.desc
-    if (!this.desc_url) return '';
-    return await fetch(this.desc_url, { mode: 'cors' })
-      .then(r => r.text())
-      .then(v => this.desc = v)
-      .catch(e => '' + e)
+    if (this.desc) return this.desc;
+    return await this.load_desc()
   }
-  // async fetch_changelog() {
-  //   if (this.changelog) return this.changelog
-  //   if (!this.changelog_url) return '';
-  //   return await fetch(this.changelog_url, { mode: 'cors' })
-  //     .then(r => r.text())
-  //     .then(v => this.changelog = v)
-  //     .catch(e => '' + e)
-  // }
+  get full_desc_url() {
+    const { desc_url } = this;
+    if (!desc_url) return desc_url
+    return this.full_url(desc_url)
+  }
+  private full_url(url: string) {
+    const _url: string = url.trim();
+    if (_url.startsWith('http://') || _url.startsWith('https://'))
+      return url
+    if (this.src?.startsWith(STORAGE_URL_BASE) && STORAGE_URL_BASE)
+      return join_url(STORAGE_URL_BASE, _url)
+    return url
+  }
+  async load_desc() {
+    do {
+      const { desc_url } = this.raw
+      if (desc_url) this.raw.desc = await this.fetch(desc_url).then(r => r.text());
+      if (!this.raw.i18n) break;
+      for (const key in this.raw.i18n) {
+        const { desc_url } = this.raw.i18n[key] ?? {}
+        if (!desc_url) continue;
+        this.raw.i18n[key].desc = await this.fetch(desc_url).then(r => r.text());
+      }
+    } while (false);
+    return this.desc;
+  }
+  private async fetch(url: string): Promise<Response> {
+    return fetch(this.full_url(url), { mode: 'cors' })
+  }
 }

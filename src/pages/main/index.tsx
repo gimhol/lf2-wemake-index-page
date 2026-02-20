@@ -23,7 +23,7 @@ import classnames from "classnames";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { fetch_info_list2 } from "./fetch_info_list";
+import { fetch_infos } from "./fetch_info_list";
 import { main_context } from "./main_context";
 import csses from "./styles.module.scss";
 
@@ -111,7 +111,7 @@ export default function MainPage() {
     // })
     const lang = i18n.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
     // fetch_info_list(`games.json?time=${time_str}`, null, lang, { signal: ab.signal })
-    fetch_info_list2(lang, { signal: ab.signal })
+    fetch_infos(lang, { signal: ab.signal })
       .then((list) => {
         if (ab.signal.aborted) return;
         set_games(list)

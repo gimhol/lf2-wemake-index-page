@@ -214,7 +214,7 @@ export function ModFormView(props: IModFormViewProps) {
             </div>
           </div>
           <div className={csses.form_row}>
-            <span>{t('attachment')}:</span>
+            <span>{t('link')}:</span>
             <div className={csses.short_and_long}>
               <Dropdown.Select
                 value={drafts[''].url_type}
@@ -265,7 +265,7 @@ export function ModFormView(props: IModFormViewProps) {
                     interrupt_event(e);
                     set_drafts(d => { d[''].url = e.target.value.trim() })
                   }}
-                  placeholder={t("author_url")}
+                  placeholder={`https://....`}
                   maxLength={255} />
               }
             </div>
@@ -274,11 +274,14 @@ export function ModFormView(props: IModFormViewProps) {
             <span>{t('cover_img')}:</span>
             <PickFile
               max={1}
-              accept=".png;.jpg;.webp"
+              accept=".png,.jpg,.webp"
               value={covers}
               whenChange={records => {
                 set_covers(records)
-                if (!records?.length) return;
+                if (!records?.length) {
+                  set_drafts(d => { d[lang].cover_url = void 0 })
+                  return;
+                }
                 set_cover_uploading(true);
                 ossUploadModRecords({
                   mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
@@ -293,8 +296,7 @@ export function ModFormView(props: IModFormViewProps) {
                   }
                 }).then(r => {
                   if (!r.length) throw 'upload nothings'
-                  const name = r[0].url.split('/').pop();
-                  set_drafts(d => { d[lang].cover_url = name })
+                  set_drafts(d => { d[lang].cover_url = r[0].url })
                 }).catch((err) => {
                   Toast.error(err)
                 }).finally(() => {
@@ -306,7 +308,7 @@ export function ModFormView(props: IModFormViewProps) {
               }} />
             </PickFile>
           </div>
-          
+
         </Collapse>
         <CollapseButton
           className={csses.title_button}
@@ -347,7 +349,7 @@ export function ModFormView(props: IModFormViewProps) {
           open={opens.preview}
           onClick={() => preview(!opens.preview)} >
           <h2 className={csses.title} >
-            {t("mod_preview")}
+            {t("preview")}
           </h2>
         </CollapseButton>
         <Collapse open={opens.preview} classNames={{ inner: csses.collapse_inner }}>

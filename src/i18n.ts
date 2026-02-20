@@ -42,13 +42,18 @@ const zh = {
   "mod_changelog": "更新日志",
   "edit_brief_here": "再此编辑简介(500字内)",
   "workspace": "工作间",
-  "attachment": "附件",
+  "link": "链接",
   "latest_build_time": "最近构建",
   "d_product": "产品",
   "d_dir": "目录",
   "d_mod": "LFW Mod",
   "d_omod": "LF2 Mod",
-  "d_version": "版本"
+  "d_version": "版本",
+  "preview": "预览",
+  "save": "保存",
+  "republish": "重新发布",
+  "unpublish": "取消发布",
+  "refresh": "刷新列表",
 }
 const en = {
   "author": "author",
@@ -91,13 +96,18 @@ const en = {
   "mod_changelog": "Changelog",
   "edit_brief_here": "Edit Brief Here (Within 500 Characters)",
   "workspace": "Workspace",
-  "attachment": "Attachment",
+  "link": "Link",
   "latest_build_time": "Latest Build",
   "d_product": "Product",
   "d_dir": "Dir",
   "d_mod": "LFW Mod",
   "d_omod": "LF2 Mod",
-  "d_version": "Version"
+  "d_version": "Version",
+  "preview": "Preview",
+  "save": "Save",
+  "republish": "Republish",
+  "unpublish": "Unpublish",
+  "refresh": "Refresh",
 }
 const resources = {
   "zh": { translation: zh },

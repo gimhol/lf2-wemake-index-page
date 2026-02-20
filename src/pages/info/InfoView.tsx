@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { MarkdownButton } from "../main/MarkdownModal";
 import csses from "./InfoView.module.scss";
 import { useInfoChildren } from "./useInfoChildren";
+import Show from "@/gimd/Show";
 type ListLike = 'cards' | 'list';
 function curr_list_like(v: string | undefined | null): ListLike {
   return v === 'cards' ? 'cards' : 'list'
@@ -55,12 +56,12 @@ export function InfoView(props: IInfoViewProps) {
   }, [info])
 
   const { t } = useTranslation()
-  const { children_title, date, unavailable, desc, brief, desc_url, title } = info ?? {};
-  const win_x64_url = info?.get_download_url('win_x64')
+  const { children_title, date, unavailable, desc, brief, full_desc_url, title } = info ?? {};
+  const win_x64_url = info?.get_url_by_name('win_x64')
   const open_in_browser = t('open_in_browser')
   const dl_win_x64 = t('dl_win_x64')
   const ref_el_children = useRef<HTMLDivElement>(null);
-  const has_content = !!(desc || desc_url)
+  const has_content = !!(desc || full_desc_url)
   const [children, , children_error] = useInfoChildren(info)
   Toast.useError(children_error)
   const __next_list_like = next_list_like(__listLike)
@@ -101,14 +102,18 @@ export function InfoView(props: IInfoViewProps) {
           {date ? <div className={csses.el_date}> {date} </div> : null}
         </div>
       </div>
-
       <Viewer className={csses.content_zone} emptyAsGone content={brief} />
       <Collapse open={__open && has_content} >
+        <Show yes={!!info.full_cover_url}>
+          <Viewer className={csses.content_zone}>
+            <img src={info.full_cover_url} style={{ maxWidth: '100%' }} />
+          </Viewer>
+        </Show>
         <Viewer
           emptyAsGone
           className={csses.content_zone}
           content={desc}
-          url={desc_url}
+          url={full_desc_url}
           whenLoaded={t => info?.set_desc(t)} />
       </Collapse>
       {

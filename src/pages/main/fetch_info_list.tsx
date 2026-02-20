@@ -24,16 +24,15 @@ export async function fetch_info_list(url: string, parent: Info | null, lang: st
   return cooked_list;
 }
 
-export async function fetch_info_list2(lang: string, init: RequestInit & { histories?: Map<string, Info>; } = {}) {
-  const { signal, histories = new Map<string, Info>() } = init;
+export async function fetch_infos(lang: string, init: RequestInit = {}): Promise<Info[] | undefined> {
+  const { signal } = init;
   const r = await ApiHttp.post(`${API_BASE}lfwm/list`, null, {
-    parent: 0,
-    status: ['published'],
-    type: ['product'],
-  }, { signal })
+    parent: 0, status: ['published'], type: ['product'],
+  }, init)
+  if (init.signal?.aborted) return;
   const raw_list = r.data;
-  if (!Array.isArray(raw_list)) throw new Error(`[fetch_info_list] failed, got ${raw_list}`);
-  if (signal?.aborted) return;
+  if (!Array.isArray(raw_list))
+    throw new Error(`[fetch_infos] failed, got ${raw_list}`);
   const cooked_list: Info[] = [];
   for (const raw_item of raw_list) {
     if (!raw_item) continue;
@@ -42,9 +41,8 @@ export async function fetch_info_list2(lang: string, init: RequestInit & { histo
       continue;
     }
     if (typeof raw_item === 'string') {
-      const history_key = `[${lang}]${raw_item}`;
-      const history = histories.get(history_key) || await fetch_info(raw_item, null, lang, { signal });
-      cooked_list.push(history);
+      const item = await fetch_info(raw_item, null, lang, { signal })
+      cooked_list.push(item);
     }
   }
   return cooked_list;

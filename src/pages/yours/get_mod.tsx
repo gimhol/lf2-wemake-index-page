@@ -7,20 +7,16 @@ import { join_url } from "./join_url";
 
 export function get_mod_paths_names(owner_id: number, mod_id: number) {
   const dir = `user/${owner_id}/${mod_id}`;
-  // const info_obj_name = MD5(`${mod_id}/info`).toString()
   const data_obj_name = MD5(`${mod_id}/data`).toString()
   const desc_obj_name = MD5(`${mod_id}/desc`).toString()
   const children_obj_name = MD5(`${mod_id}/children`).toString()
-  // const info_obj_path = dir + '/' + info_obj_name
   const data_obj_path = dir + '/' + data_obj_name
   const desc_obj_path = dir + '/' + desc_obj_name
   const children_obj_path = dir + '/' + children_obj_name
   return {
-    // info_obj_name,
     data_obj_name,
     desc_obj_name,
     children_obj_name,
-    // info_obj_path,
     data_obj_path,
     desc_obj_path,
     children_obj_path
@@ -50,8 +46,9 @@ export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
     title: record.name,
     type: record.type,
   }
-  if (oss_name) {
-    const exists_info = await fetch(join_url(STORAGE_URL_BASE, oss_name)).then<IInfo>(r => {
+  const oss_url = oss_name ? join_url(STORAGE_URL_BASE, oss_name) : void 0
+  if (oss_url) {
+    const exists_info = await fetch(oss_url).then<IInfo>(r => {
       if (!r.ok) throw new Error(`[${r.status}]${r.statusText}`)
       return r.json()
     })
@@ -61,7 +58,10 @@ export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
     console.debug(`[get_mod] info not exists, will make an empty one.`)
   }
   const strings = get_mod_paths_names(owner.id, mod_id);
-  const info = new Info(raw_info, '', null, oss_name || null);
+  console.debug(`[get_mod] oss_url: ${oss_url}`)
+  const info = new Info(raw_info, '', null, oss_url ?? null);
+  if (oss_url) await info.load_desc()
+
   info.id = '' + mod_id;
   return { strings, info, record, owner };
 }
