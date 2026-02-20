@@ -8,6 +8,7 @@ import { read_blob_as_md5 } from "@/utils/read_blob_as_md5";
 import type OSS from "ali-oss";
 import dayjs from "dayjs";
 import { join_url } from "./join_url";
+import { addModRecord } from "@/api/addModRecord";
 
 export interface ISaveModFormOpts {
   mod_id?: number;
@@ -19,7 +20,7 @@ export interface ISaveModFormOpts {
 const TAG = '[save_mod]'
 export async function save_mod(opts: ISaveModFormOpts) {
   console.debug(`${TAG} opts:`, opts)
-  const time = dayjs().format(`YYYYMMHHmmssSSS`);
+  const time = dayjs().format(`YYYY-MM-DD-HH-mm-ss-SSS`);
   const { mod_id, oss, sts, info } = opts;
   if (!mod_id) throw new Error(`${TAG} mod_id got ${mod_id}`);
   if (!sts) throw new Error(`${TAG} oss got ${oss}`);
@@ -40,6 +41,13 @@ export async function save_mod(opts: ISaveModFormOpts) {
         'Content-Disposition': get_content_disposition(file_name)
       },
     })
+    await addModRecord({
+      oss_name,
+      parent: mod_id,
+      name: file_name,
+      url: join_url(STORAGE_URL_BASE, oss_name),
+      type: 'file'
+    })
     m.set(l, oss_name)
   }
   const raw: IInfo = JSON.parse(JSON.stringify(info.raw))
@@ -49,9 +57,9 @@ export async function save_mod(opts: ISaveModFormOpts) {
       raw.desc_url = oss_name;
       continue;
     }
-    if (!raw.i18n?.[l]) continue
+    if (!raw.i18n?.[l]) continue;
     delete raw.i18n[l].desc;
-    raw.i18n[l].desc_url = oss_name
+    raw.i18n[l].desc_url = oss_name;
   }
   const blob = new Blob([JSON.stringify(raw)], { type: 'application/json; charset=utf-8' })
   const oss_name = join_url(sts.dir, mod_id, await read_blob_as_md5(blob))

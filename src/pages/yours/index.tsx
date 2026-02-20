@@ -100,7 +100,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   }, [nav, refresh_files, search])
 
   useEffect(() => {
-    if (!session_id) nav(Paths.All.main)
+    if (!session_id) nav(Paths.All.Main)
   }, [session_id, nav])
 
   const add_dir = useCallback((parent: number = 0, type?: RecordType) => {

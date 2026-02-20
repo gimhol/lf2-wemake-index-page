@@ -5,23 +5,26 @@ import { Loading } from "./components/loading"
 export namespace Paths {
   export enum All {
     _ = '',
-    main = '/',
-    yours = '/yours',
-    info = '/:game_id',
+    Main = '/',
+    Info = '/info/:game_id',
+    Workspace = '/yours',
+    InnerInfo = '/:game_id',
   }
   export const Components: Record<All, React.ComponentType | null> = {
     [All._]: null,
-    [All.main]: React.lazy(() => import("./pages/main")),
-    [All.yours]: React.lazy(() => import("./pages/yours")),
-    [All.info]: React.lazy(() => import("./pages/info")),
+    [All.Main]: React.lazy(() => import("./pages/main")),
+    [All.Workspace]: React.lazy(() => import("./pages/yours")),
+    [All.InnerInfo]: React.lazy(() => import("./pages/info")),
+    [All.Info]: React.lazy(() => import("./pages/info")),
   }
   export const Relations: { [x in All]?: All[] } = {
     [All._]: [
-      All.main
+      All.Info,
+      All.Main
     ],
-    [All.main]: [
-      All.yours,
-      All.info
+    [All.Main]: [
+      All.Workspace,
+      All.InnerInfo
     ]
   }
   export const gen_route_obj = (path: All, parent?: All): RouteObject => {

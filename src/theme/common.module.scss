@@ -42,3 +42,9 @@
   align-items    : center;
   justify-content: center;
 }
+
+.bg {
+  background-color : var(--color-primary);
+  background-image : url(../assets/img_bg.png);
+  background-repeat: repeat;
+}

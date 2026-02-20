@@ -56,8 +56,8 @@ const zh = {
   "refresh": "刷新列表",
 }
 const en = {
-  "author": "author",
-  "date": "date",
+  "author": "Author",
+  "date": "Date",
   "main_title": "LF-WeMakit",
   "unavailable": "Unavailable",
   "dl_win_x64": "Download Window x64 Application",

@@ -44,7 +44,7 @@ export default function MainPage() {
   const set_location = useCallback((opts: { game?: string }) => {
     const { game } = opts
     const pathname = typeof game === 'string' ?
-      Paths.All.info.replace(':game_id', game) :
+      Paths.All.InnerInfo.replace(':game_id', game) :
       void 0;
     const next_search = search.clone();
     next_search.delele('session');
@@ -58,7 +58,7 @@ export default function MainPage() {
   useEffect(() => {
     const session = search.get_string('session')
     if (session) return;
-    if (pathname === Paths.All.yours) return;
+    if (pathname === Paths.All.Workspace) return;
     if (!game_id || (!session_id && game_id === 'yours')) {
       set_location({ game: games?.find(v => v)?.id })
     }
@@ -131,7 +131,7 @@ export default function MainPage() {
     return (
       <div className={classnames(csses.game_list, csses.scrollview)}>
         <Show yes={!!session_id}>
-          <button className={pathname === Paths.All.yours ? csses.game_item_actived : csses.game_item} onClick={() => {
+          <button className={pathname === Paths.All.Workspace ? csses.game_item_actived : csses.game_item} onClick={() => {
             set_location({ game: 'yours' });
             set_game_list_open(false)
           }}>
@@ -155,81 +155,81 @@ export default function MainPage() {
   }, [games, game_id, session_id, t, set_location, loading, pathname])
 
   return <>
-    <div className={csses.main_page}
-      onDragOver={e => { e.stopPropagation(); e.preventDefault() }}
-      onDrop={e => { e.stopPropagation(); e.preventDefault() }} >
-      <div className={csses.head}>
-        <IconButton
-          className={csses.btn_toggle_game_list}
-          onClick={() => set_game_list_open(!game_list_open)}
-          icon={img_menu}
-          title={t('menu')} />
-        <h1 className={csses.main_title}>
-          {t("main_title")}
-        </h1>
-        <div className={csses.right_zone}>
-          <LangButton whenClick={next => games?.map(v => v.with_lang(next))} />
-          <Show yes={!session_id}>
-            <Dropdown
-              alignX={1}
-              anchorX={1}
-              menu={{
-                // 没搞懂为什么此处 window.location.toString() 没有立刻变化，故在onClik才获取地址 -Gim
-                items: [{
-                  children: t('github_login'),
-                  title: t('gitee_login'),
-                  onClick: () => document.location = `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
-                },
-                {
-                  children: t('gitee_login'),
-                  title: t('gitee_login'),
-                  onClick: () => document.location = `${API_BASE}user/gitee/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
-                }]
-              }}>
+    <main_context.Provider value={{ info: actived }}>
+      <div className={csses.main_page}
+        onDragOver={e => { e.stopPropagation(); e.preventDefault() }}
+        onDrop={e => { e.stopPropagation(); e.preventDefault() }} >
+        <div className={csses.head}>
+          <IconButton
+            className={csses.btn_toggle_game_list}
+            onClick={() => set_game_list_open(!game_list_open)}
+            icon={img_menu}
+            title={t('menu')} />
+          <h1 className={csses.main_title}>
+            {t("main_title")}
+          </h1>
+          <div className={csses.right_zone}>
+            <LangButton whenClick={next => games?.map(v => v.with_lang(next))} />
+            <Show yes={!session_id}>
+              <Dropdown
+                alignX={1}
+                anchorX={1}
+                menu={{
+                  // 没搞懂为什么此处 window.location.toString() 没有立刻变化，故在onClik才获取地址 -Gim
+                  items: [{
+                    children: t('github_login'),
+                    title: t('gitee_login'),
+                    onClick: () => document.location = `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
+                  },
+                  {
+                    children: t('gitee_login'),
+                    title: t('gitee_login'),
+                    onClick: () => document.location = `${API_BASE}user/gitee/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
+                  }]
+                }}>
+                <IconButton
+                  title={t('login')}
+                  icon={img_login} />
+              </Dropdown>
+            </Show>
+            <Show yes={!!session_id}>
               <IconButton
-                title={t('login')}
-                icon={img_login} />
-            </Dropdown>
-          </Show>
-          <Show yes={!!session_id}>
+                title={t('logout')}
+                icon={img_logout}
+                onClick={() => {
+                  dispatch({ type: 'reset' })
+                }} />
+            </Show>
             <IconButton
-              title={t('logout')}
-              icon={img_logout}
-              onClick={() => {
-                dispatch({ type: 'reset' })
-              }} />
-          </Show>
-          <IconButton
-            href="https://github.com/gimhol/little-fighter-2-WEMAKE"
-            title={t('goto_github')}
-            icon={img_github} />
-          <IconButton
-            href="https://gim.ink"
-            title={t('goto_gimink')}
-            icon={img_gimink} />
+              href="https://github.com/gimhol/little-fighter-2-WEMAKE"
+              title={t('goto_github')}
+              icon={img_github} />
+            <IconButton
+              href="https://gim.ink"
+              title={t('goto_gimink')}
+              icon={img_gimink} />
+          </div>
         </div>
-      </div>
-      <div className={csses.main}>
-        {game_list}
-        <main_context.Provider value={{ info: actived }}>
+        <div className={csses.main}>
+          {game_list}
           <Outlet />
-        </main_context.Provider>
-      </div>
-      <div className={csses.foot}>
-        <span className={csses.foot}>
-          {t('latest_build_time')}: {BUILD_TIME}
-        </span>
-      </div>
-    </div >
-    <Loading big loading={loading} style={{ position: 'absolute', margin: 'auto auto' }} />
-    <Mask
-      className={csses.game_list_mask}
-      container={() => document.body}
-      closeOnMask
-      open={game_list_open}
-      onClose={() => set_game_list_open(false)}>
-      {game_list}
-    </Mask>
+        </div>
+        <div className={csses.foot}>
+          <span className={csses.foot}>
+            {t('latest_build_time')}: {BUILD_TIME}
+          </span>
+        </div>
+      </div >
+      <Loading big loading={loading} style={{ position: 'absolute', margin: 'auto auto' }} />
+      <Mask
+        className={csses.game_list_mask}
+        container={() => document.body}
+        closeOnMask
+        open={game_list_open}
+        onClose={() => set_game_list_open(false)}>
+        {game_list}
+      </Mask>
+    </main_context.Provider>
   </>
 }
 

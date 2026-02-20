@@ -38,17 +38,19 @@
 
   :global {
 
+    .iframe-outer-container {
+      width     : 100%;
+      max-width : 1200px !important;
+      margin    : 0 auto;
+      padding   : 0;
+      box-sizing: border-box;
+    }
     .iframe-ratio-container {
-      position        : relative;
-      width           : 100%;
-      margin          : 0 auto;
-      box-sizing      : content-box;
+      position      : relative;
+      width         : 100%;
+      padding-bottom: 56.7%;
+      box-sizing    : border-box;
     }
-
-    .ratio-16-9 {
-      padding-bottom: 56.65%;
-    }
-
     .iframe-ratio-container iframe {
       position     : absolute;
       top          : 0px;

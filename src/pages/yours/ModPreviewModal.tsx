@@ -47,7 +47,7 @@ export function ModPreview(props: IInfoViewProps) {
   const [mod, set_mod] = useImmer<IMod | undefined>(void 0)
   const [loading, set_loading] = useState(false)
   useEffect(() => {
-    if (!mod_id || info) {
+    if (!mod_id) {
       set_mod(void 0);
       set_loading(false);
       return
@@ -64,7 +64,7 @@ export function ModPreview(props: IInfoViewProps) {
       set_loading(false)
     })
     return () => ab.abort()
-  }, [info, mod_id, set_mod])
+  }, [mod_id, set_mod])
 
   return (
     <div className={csses.mod_preview} {..._p} >
