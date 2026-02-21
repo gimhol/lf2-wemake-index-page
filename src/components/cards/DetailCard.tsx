@@ -12,6 +12,7 @@ import { Link } from "../link";
 import { Viewer } from "../markdown/Viewer";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import csses from "./DetailCard.module.scss";
+import { ShareButton } from "../button/ShareButton";
 
 export interface IDetailCardProps extends ICardBaseProps {
   info: Info;
@@ -51,6 +52,7 @@ export function DetailCard(props: IDetailCardProps) {
               icon={windows_x64}
               href={win_x64_url}
               gone={!win_x64_url} />
+            <ShareButton info={info} />
             <IconButton
               icon='✖︎'
               onClick={onClose}
@@ -111,3 +113,4 @@ export function DetailCard(props: IDetailCardProps) {
     </CardBase>
   </>
 }
+

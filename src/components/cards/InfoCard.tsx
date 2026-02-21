@@ -12,6 +12,7 @@ import { Mask } from "../mask";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import { DetailCard } from "./DetailCard";
 import csses from "./InfoCard.module.scss";
+import { ShareButton } from "../button/ShareButton";
 
 export interface IInfoCardProps extends ICardBaseProps {
   info?: Info
@@ -59,6 +60,7 @@ export function InfoCard(props: IInfoCardProps) {
           </Link>
           <Tags info={info} />
           <div className={csses.mid}>
+            <ShareButton info={info} />
             <IconButton
               title={dl_win_x64}
               href={win_x64_url}

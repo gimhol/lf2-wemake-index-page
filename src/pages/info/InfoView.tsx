@@ -21,6 +21,7 @@ import { MarkdownButton } from "../main/MarkdownModal";
 import csses from "./InfoView.module.scss";
 import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
+import { ShareButton } from "@/components/button/ShareButton";
 type ListLike = 'cards' | 'list';
 function curr_list_like(v: string | undefined | null): ListLike {
   return v === 'cards' ? 'cards' : 'list'
@@ -89,7 +90,9 @@ export function InfoView(props: IInfoViewProps) {
             onClick={() => __set_listLike(__next_list_like)}
             title="Cards or List"
             icon={__next_list_like === 'cards' ? img_cards_view : img_list_view} />
-          {info ? <MarkdownButton info={info} /> : null}
+
+          <MarkdownButton info={info} />
+          <ShareButton info={info} />
           <div className={csses.el_date}>
             <Link
               href={info.author_url}
