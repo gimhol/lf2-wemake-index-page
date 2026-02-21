@@ -56,6 +56,9 @@ const zh = {
   "refresh": "刷新列表",
   "add_omod": "添加LF2 MOD",
   "add_mod": "添加LFW MOD",
+  "rename": "重命名",
+  "delete": "删除",
+  "detail": "详情",
 }
 const en = {
   "author": "Author",
@@ -113,6 +116,9 @@ const en = {
   "add_dir": "Add Dir",
   "add_omod": "Add LF2 MOD",
   "add_mod": "Add LFW MOD",
+  "rename": "Rename",
+  "delete": "Delete",
+  "detail": "Detail",
 }
 const resources = {
   "zh": { translation: zh },

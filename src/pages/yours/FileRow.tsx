@@ -51,7 +51,7 @@ export function FileRow(props: IFileRowProps) {
           onClick: () => set_renaming(true),
           disabled: !renameable,
         }, {
-          children: t('delete'),
+          children: <span style={{ color: 'red' }}>{t('delete')}</span>,
           title: t('delete'),
           onClick: onDel,
         }, {
