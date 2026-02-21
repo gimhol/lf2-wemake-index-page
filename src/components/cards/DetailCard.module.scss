@@ -53,15 +53,10 @@
   }
 
   .mid {
-    flex: 1;
+    margin-left: auto;
+    display    : flex;
   }
 
-  .right {
-    color      : white;
-    display    : flex;
-    align-items: center;
-    gap        : 5px;
-  }
 }
 
 .detail_card_main {

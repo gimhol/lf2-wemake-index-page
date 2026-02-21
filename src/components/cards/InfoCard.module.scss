@@ -9,9 +9,10 @@
   .suffix {
     opacity    : 0.5;
     font-size  : var(--font-size-tiny);
-    font-weight : 100;
+    font-weight: 100;
     display    : inline-block;
     margin-left: 2px;
+    white-space: nowrap;
   }
 
   .prefix {
@@ -34,16 +35,17 @@
   padding      : 5px 5px;
   overflow     : hidden;
   text-overflow: ellipsis;
-  white-space  : nowrap;
   display      : flex;
   align-items  : center;
   color        : white;
+  flex-wrap    : wrap;
 
   .title {
     padding      : 0px 5px;
     font-size    : 1.2rem;
     text-overflow: ellipsis;
     overflow     : hidden;
+    display      : inline;
   }
 
   img {
@@ -52,13 +54,14 @@
   }
 
   .mid {
-    flex: 1;
+    margin-left: auto;
   }
 
   .right {
     display    : flex;
     align-items: center;
     gap        : 5px;
+    white-space: nowrap;
   }
 }
 

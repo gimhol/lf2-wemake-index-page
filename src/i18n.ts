@@ -51,6 +51,7 @@ const zh = {
   "d_version": "版本",
   "preview": "预览",
   "save": "保存",
+  "publish": "发布",
   "republish": "重新发布",
   "unpublish": "取消发布",
   "refresh": "刷新列表",
@@ -119,6 +120,7 @@ const en = {
   "rename": "Rename",
   "delete": "Delete",
   "detail": "Detail",
+  "publish": "Publish",
 }
 const resources = {
   "zh": { translation: zh },

@@ -1,5 +1,9 @@
 import windows_x64 from "@/assets/svg/windows_x64.svg";
 import { Info } from "@/base/Info";
+import Show from "@/gimd/Show";
+import { Tags } from "@/pages/info/Tags";
+import { MarkdownButton } from "@/pages/main/MarkdownModal";
+import { Paths } from "@/Paths";
 import classnames from "classnames";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,9 +12,6 @@ import { Link } from "../link";
 import { Viewer } from "../markdown/Viewer";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import csses from "./DetailCard.module.scss";
-import { MarkdownButton } from "@/pages/main/MarkdownModal";
-import { Paths } from "@/Paths";
-import Show from "@/gimd/Show";
 
 export interface IDetailCardProps extends ICardBaseProps {
   info: Info;
@@ -21,10 +22,9 @@ export function DetailCard(props: IDetailCardProps) {
   const { info, onClose, classNames, ..._p } = props;
   const { t } = useTranslation()
   const dl_win_x64 = t('dl_win_x64')
-  const { url, full_cover_url, desc, full_desc_url, unavailable, url_type } = info;
+  const { url, full_cover_url, desc, full_desc_url, url_type } = info;
   const win_x64_url = info.get_url_by_name('win_x64');
   const ref_el = useRef<HTMLDivElement>(null)
-  const title_suffix = t(unavailable || url_type || '');
   return <>
     <CardBase
       floating
@@ -42,15 +42,19 @@ export function DetailCard(props: IDetailCardProps) {
               {info.title}
               {url_type === Info.OPEN_IN_BROWSER && url ? ' ▸' : null}
             </Link>
-            <span className={csses.prefix}>
-              {title_suffix}
-            </span>
+            <Tags info={info} />
           </div>
-          <div className={csses.mid}></div>
-          <div className={csses.right}>
+          <div className={csses.mid}>
             <MarkdownButton info={info} />
-            <IconButton title={dl_win_x64} icon={windows_x64} href={win_x64_url} gone={!win_x64_url} />
-            <IconButton icon='✖︎' onClick={onClose} stopPropagation />
+            <IconButton
+              title={dl_win_x64}
+              icon={windows_x64}
+              href={win_x64_url}
+              gone={!win_x64_url} />
+            <IconButton
+              icon='✖︎'
+              onClick={onClose}
+              stopPropagation />
           </div>
         </div>
         <div className={csses.detail_card_main}>

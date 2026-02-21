@@ -1,0 +1,17 @@
+@use "@/theme/common.module.scss"as *;
+
+.tag {
+  opacity      : 0.75;
+  font-size    : var(--font-size-tiny);
+  display      : inline-block;
+  margin-left  : 2px;
+  border-radius: 2px;
+  border-width : 1px;
+  border-style : solid;
+  border-color : var(--color-txt);
+  padding      : 1px;
+  border-width : 1px;
+  border-style : solid;
+  border-color : var(--color-txt);
+  white-space  : nowrap;
+}

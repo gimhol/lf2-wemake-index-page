@@ -183,6 +183,7 @@ const { Cls, Str } = makeI18N();
     if (this.full_cover_url) text += `[!cover](${this.full_cover_url})\n\n`
 
     if (this.brief) text += `${this.brief}\n\n`
+    
     text += await this.fetch_desc().then(r => r ? `${r}\n\n` : '')
     // text += await this.fetch_changelog().then(r => r ? `${r}\n\n` : '')
 

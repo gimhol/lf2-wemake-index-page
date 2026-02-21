@@ -31,7 +31,7 @@ import { useNavigate } from "react-router"
 import { useImmer } from "use-immer"
 import { FileRow } from "./FileRow"
 import { get_icon, get_icon_title } from "./get_icon"
-import { ModFormModal } from "./ModFormModal"
+import { ModFormModal } from "../mod_form/ModFormModal"
 import { ModPreviewModal } from "./ModPreviewModal"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
@@ -270,7 +270,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
 
   const actions = useMemo(() => {
     return children_type(dir)?.map(type => {
-      if (type == "product" && admin !== 7) return null
+      if (type == "product" && (admin & 0b10000000)) return null
       switch (type) {
         case "file": return null;
         case "dir":
@@ -377,6 +377,20 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 renameing={new_dir == me.id}
                 draggable
                 desc={me.size ? `Size: ${file_size_txt(me.size)}` : `Type: ${me.type}`}
+                menu={[{
+                  children: t('detail'),
+                  title: t('detail'),
+                  onClick: () => alert(JSON.stringify(me, null, 2)),
+                }, {
+                  children: t('transfer'),
+                  title: t('transfer'),
+                  onClick: () => {
+                    ApiHttp.post(`${API_BASE}lfwm/transfer`, void 0, {
+                      id: me.id,
+                      owner: 10,
+                    })
+                  },
+                }]}
                 onMouseDown={e => {
                   const el = (e.target as HTMLElement);
                   if (el.tagName !== 'DIV') {
@@ -489,8 +503,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                   return ok;
                 }}
                 onOpen={() => open_any(me)}
-                onDel={() => del_file(me)}
-                onDetail={() => alert(JSON.stringify(me, null, 2))} />
+                onDel={() => del_file(me)} />
             )
           })}
         <ModFormModal

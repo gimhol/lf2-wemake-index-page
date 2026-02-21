@@ -1,5 +1,6 @@
 import windows_x64 from "@/assets/svg/windows_x64.svg";
 import { Info } from "@/base/Info";
+import { Tags } from "@/pages/info/Tags";
 import { submit_click_event } from "@/utils/events";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
@@ -21,12 +22,11 @@ export function InfoCard(props: IInfoCardProps) {
   const { t } = useTranslation()
   const dl_win_x64 = t('dl_win_x64')
   const { info = empty_info } = props;
-  const { url, url_type, full_cover_url, unavailable } = info;
+  const { url, full_cover_url } = info;
   const win_x64_url = info.get_url_by_name('win_x64');
   const ref_el = useRef<HTMLDivElement>(null)
   const [detail_style, set_detail_style] = useState<React.CSSProperties>({})
   const [detail_open, set_detail_open] = useState(false)
-  const title_suffix = t(unavailable || url_type || '');
   useEffect(() => {
     if (!detail_open) return void 0
     setTimeout(() => set_detail_style({}), 50)
@@ -57,11 +57,14 @@ export function InfoCard(props: IInfoCardProps) {
             {info.title}
             {info.url_type === Info.OPEN_IN_BROWSER && url ? ' ▸' : null}
           </Link>
-          <span className={csses.suffix}>
-            {title_suffix}
-          </span>
-          <div className={csses.mid}></div>
-          <IconButton title={dl_win_x64} href={win_x64_url} gone={!win_x64_url} icon={windows_x64} />
+          <Tags info={info} />
+          <div className={csses.mid}>
+            <IconButton
+              title={dl_win_x64}
+              href={win_x64_url}
+              gone={!win_x64_url}
+              icon={windows_x64} />
+          </div>
         </div>
         <div className={csses.info_card_main}>
           {

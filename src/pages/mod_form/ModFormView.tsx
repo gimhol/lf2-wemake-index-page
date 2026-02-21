@@ -13,18 +13,19 @@ import Toast from "@/gimd/Toast";
 import { ossUploadModRecords } from "@/hooks/ossUploadModRecords";
 import { useOSS } from "@/hooks/useOSS";
 import { useOSSUploadModImages } from "@/hooks/useOSSUploadModImages";
+import { ApiHttp } from "@/network/ApiHttp";
 import { interrupt_event } from "@/utils/interrupt_event";
 import classnames from "classnames";
 import dayjs from "dayjs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useImmer } from "use-immer";
-import { all_info_url_type, InfoUrlType } from "./InfoUrlType";
+import { all_info_url_type, InfoUrlType } from "../yours/InfoUrlType";
+import { ModPreview } from "../yours/ModPreviewModal";
+import { get_mod, type IMod } from "../yours/get_mod";
+import { replace_one } from "../yours/join_url";
+import { save_mod } from "../yours/save_mod";
 import csses from "./ModFormView.module.scss";
-import { ModPreview } from "./ModPreviewModal";
-import { get_mod, type IMod } from "./get_mod";
-import { replace_one } from "./join_url";
-import { save_mod } from "./save_mod";
 export interface IModFormViewProps {
   type?: RecordType;
   mod_id?: number;
@@ -77,7 +78,6 @@ export function ModFormView(props: IModFormViewProps) {
 
   const [previewing, set_previewing] = useImmer({ info: void 0 as undefined | Info })
 
-
   const preview = useCallback((open: boolean, l = lang) => {
     if (!mod) return;
     if (!open) {
@@ -100,8 +100,11 @@ export function ModFormView(props: IModFormViewProps) {
     set_opens(d => { d.preview = open })
   }, [drafts, mod, lang, mod_id, set_opens, set_previewing])
 
-  const save = () => {
-    if (!mod) return;
+  const save = async () => {
+    if (!mod) return false;
+    if (!mod_id) return false;
+    if (!oss) return false;
+    if (!mod.record.owner_id) return false;
     const raw: IInfo = {
       ...drafts[''],
       i18n: { zh: { ...drafts.zh } }
@@ -109,11 +112,11 @@ export function ModFormView(props: IModFormViewProps) {
     const next = mod.info.clone().load(raw).set_id('' + mod_id)
     if (JSON.stringify(mod.info.raw) === JSON.stringify(next.raw)) {
       Toast.show('Nothings Changed.')
-      return;
+      return false;
     }
     set_loading(true)
     next.set_date(dayjs().format(`YYYY-MM-DD HH:mm:ss`));
-    save_mod({ mod_id, oss, sts, info: next })
+    return await save_mod({ mod_id, oss, info: next, owner_id: mod.record.owner_id })
       .then(() => {
         return get_mod({ mod_id })
       }).then(r => {
@@ -121,10 +124,10 @@ export function ModFormView(props: IModFormViewProps) {
           set_covers([{ url: r.info.full_cover_url }])
         set_drafts({ '': r.info.raw, zh: r.info.raw.i18n?.['zh'] ?? {} })
         set_mod(r)
+        return true
       }).catch(e => {
         Toast.error(e)
-      }).finally(() => {
-        set_loading(false)
+        return false
       }).finally(() => {
         set_loading(false)
       })
@@ -152,6 +155,34 @@ export function ModFormView(props: IModFormViewProps) {
     }, 300)
     return () => clearTimeout(tid)
   }, [opens.preview])
+
+  const unpublish = async () => {
+    if (!mod) return;
+    set_loading(true)
+    ApiHttp.post(`${API_BASE}lfwm/unpublish`, {}, { id: mod.record.id }).then((r) => {
+      Toast.show('' + r.msg)
+    }).catch(e => {
+      Toast.error(e)
+    }).finally(() => {
+      set_loading(false)
+    })
+  }
+
+  const publish = async () => {
+    if (!mod) return;
+    set_loading(true)
+    save().then(() => {
+      return ApiHttp.post(`${API_BASE}lfwm/publish`, {}, { id: mod.record.id })
+    }).then((r) => {
+      Toast.show('' + r.msg)
+    }).catch(e => {
+      Toast.error(e)
+    }).finally(() => {
+      set_loading(false)
+    })
+  }
+
+  if (!mod && !loading) return <></>
   return <>
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
       <div className={csses.head}>
@@ -360,25 +391,42 @@ export function ModFormView(props: IModFormViewProps) {
         </Collapse>
         <div style={{ height: '100vh' }} />
       </div>
-
       <div className={csses.foot}>
         <div style={{ flex: 1 }} />
         <IconButton
-          style={{ fontSize: '2rem' }}
-          title={t('save_mod_info')}
+          style={{ fontSize: '1.5rem' }}
           container={tool_tips_container}
           disabled={loading || cover_uploading || attachment_uploading}
           onClick={() => preview(!opens.preview)}>
           {t('preview')}
         </IconButton>
         <IconButton
-          style={{ fontSize: '2rem' }}
-          title={t('save_mod_info')}
+          style={{ fontSize: '1.5rem' }}
           container={tool_tips_container}
           disabled={loading || cover_uploading || attachment_uploading}
           onClick={save}>
           {t('save')}
         </IconButton>
+        <IconButton
+          style={{ fontSize: '1.5rem' }}
+          container={tool_tips_container}
+          disabled={loading || cover_uploading || attachment_uploading}
+          onClick={async () => {
+            await unpublish()
+          }}>
+          {t('unpublish')}
+        </IconButton>
+        <IconButton
+          style={{ fontSize: '1.5rem' }}
+          container={tool_tips_container}
+          disabled={loading || cover_uploading || attachment_uploading}
+          onClick={async () => {
+            await save()
+            await publish()
+          }}>
+          {t('publish')}
+        </IconButton>
+
       </div>
       <Loading big absolute center loading={loading} />
     </div>

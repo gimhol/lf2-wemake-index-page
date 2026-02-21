@@ -8,6 +8,7 @@ import classnames from "classnames"
 import { useState, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import csses from "./FileRow.module.scss"
+import type { IMenuItem } from "@/gimd/Menu"
 export interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
   name?: string;
   modify_time?: ReactNode;
@@ -24,8 +25,8 @@ export interface IFileRowProps extends React.HTMLAttributes<HTMLDivElement> {
   owner?: ReactNode;
   download?: string;
   actions?: ReactNode;
-  onDetail?(): void;
   icon_title?: string;
+  menu?: IMenuItem[];
 }
 export function FileRow(props: IFileRowProps) {
   const { t } = useTranslation()
@@ -35,13 +36,13 @@ export function FileRow(props: IFileRowProps) {
     onNameChanged,
     renameing,
     className, draggable, desc, owner, download, actions,
-    disabled, onOpen, onDel, onDetail, icon, icon_title, modify_time, create_time, ..._p } = props;
+    disabled, menu, onOpen, onDel, icon, icon_title, modify_time, create_time, ..._p } = props;
   const [renaming, set_renaming] = useState(renameing);
   const [name, set_name] = useState(__name);
 
   return (
     <Dropdown
-      disabled={disabled}
+      disabled={disabled && !menu?.length}
       triggers={['contextmenu']}
       followPointer
       menu={{
@@ -50,15 +51,11 @@ export function FileRow(props: IFileRowProps) {
           title: t('rename'),
           onClick: () => set_renaming(true),
           disabled: !renameable,
-        }, {
+        }, ...(menu || []), {
           children: <span style={{ color: 'red' }}>{t('delete')}</span>,
           title: t('delete'),
           onClick: onDel,
-        }, {
-          children: t('detail'),
-          title: t('detail'),
-          onClick: onDetail,
-        }]
+        }, ]
       }}>
       <div
         className={classnames(csses.file_list_item, disabled ? csses.disbaled : void 0, className)}

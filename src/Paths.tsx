@@ -9,6 +9,7 @@ export namespace Paths {
     Info = '/info/:game_id',
     Workspace = '/yours',
     InnerInfo = '/:game_id',
+    ModForm = '/mod_form/:id',
   }
   export const Components: Record<All, React.ComponentType | null> = {
     [All._]: null,
@@ -16,10 +17,12 @@ export namespace Paths {
     [All.Workspace]: React.lazy(() => import("./pages/yours")),
     [All.InnerInfo]: React.lazy(() => import("./pages/info")),
     [All.Info]: React.lazy(() => import("./pages/info")),
+    [All.ModForm]: React.lazy(() => import("./pages/mod_form")),
   }
   export const Relations: { [x in All]?: All[] } = {
     [All._]: [
       All.Info,
+      All.ModForm,
       All.Main
     ],
     [All.Main]: [

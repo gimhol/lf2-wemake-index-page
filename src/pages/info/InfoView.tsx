@@ -11,6 +11,7 @@ import { InfoCard } from "@/components/cards/InfoCard";
 import { Collapse } from "@/components/collapse/Collapse";
 import { Link } from "@/components/link";
 import { Viewer } from "@/components/markdown/Viewer";
+import Show from "@/gimd/Show";
 import Toast from "@/gimd/Toast";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
@@ -18,8 +19,8 @@ import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { MarkdownButton } from "../main/MarkdownModal";
 import csses from "./InfoView.module.scss";
+import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
-import Show from "@/gimd/Show";
 type ListLike = 'cards' | 'list';
 function curr_list_like(v: string | undefined | null): ListLike {
   return v === 'cards' ? 'cards' : 'list'
@@ -56,7 +57,7 @@ export function InfoView(props: IInfoViewProps) {
   }, [info])
 
   const { t } = useTranslation()
-  const { children_title, date, unavailable, desc, brief, full_desc_url, title } = info ?? {};
+  const { children_title, date, url, desc, brief, full_desc_url, title } = info ?? {};
   const win_x64_url = info?.get_url_by_name('win_x64')
   const open_in_browser = t('open_in_browser')
   const dl_win_x64 = t('dl_win_x64')
@@ -66,9 +67,6 @@ export function InfoView(props: IInfoViewProps) {
   Toast.useError(children_error)
   const __next_list_like = next_list_like(__listLike)
   const cls_root = classnames(csses.info_view_root, className)
-  const url = info?.url ?? children?.find(v => v.url)?.url;
-  const url_type = info?.url ? info.url_type : children?.find(v => v.url)?.url_type;
-  const tags = [t(unavailable || url_type || '')].filter(Boolean);
   if (!info) return <></>;
   return (
     <div className={cls_root} {..._p}>
@@ -81,7 +79,7 @@ export function InfoView(props: IInfoViewProps) {
           <Link className={csses.title_link} href={url}>
             {title}
           </Link>
-          {tags?.map(v => <span className={csses.tag} key={v}> {v} </span>)}
+          <Tags info={info} />
         </h3>
         <div className={csses.head_right_zone}>
           <IconButton title={open_in_browser} href={url} gone={!url} icon={img_browser_mark_white} />
