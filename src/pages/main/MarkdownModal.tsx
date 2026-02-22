@@ -10,7 +10,7 @@ import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import csses from "./styles.module.scss";
 
-export function MarkdownModal(props: { info?: Info } & IMaskProps) {
+export function MarkdownModal(props: { info?: Info | null } & IMaskProps) {
   const { info, whenChange, open, container = () => document.body, ..._p } = props;
   const [loading, set_loading] = useState(false);
   const [markdown, set_markdown] = useState('');
@@ -69,7 +69,7 @@ export function MarkdownModal(props: { info?: Info } & IMaskProps) {
   )
 }
 
-export function MarkdownButton(props: { info?: Info }) {
+export function MarkdownButton(props: { info?: Info | null }) {
   const { info } = props;
   const [md_open, set_md_open] = useState<boolean>();
   return (

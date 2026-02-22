@@ -1,8 +1,8 @@
-import windows_x64 from "@/assets/svg/windows_x64.svg";
+import type { IRecord } from "@/api/listModRecords";
 import { Info } from "@/base/Info";
 import Show from "@/gimd/Show";
+import { InfoActions } from "@/pages/info/InfoActions";
 import { Tags } from "@/pages/info/Tags";
-import { MarkdownButton } from "@/pages/main/MarkdownModal";
 import { Paths } from "@/Paths";
 import classnames from "classnames";
 import { useRef } from "react";
@@ -12,24 +12,22 @@ import { Link } from "../link";
 import { Viewer } from "../markdown/Viewer";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import csses from "./DetailCard.module.scss";
-import { ShareButton } from "../button/ShareButton";
 
 export interface IDetailCardProps extends ICardBaseProps {
-  info: Info;
+  info?: Info | null;
+  record?: IRecord | null;
   onClose?(): void;
 }
 const private_classnames = { card: csses.detail_card }
 export function DetailCard(props: IDetailCardProps) {
-  const { info, onClose, classNames, ..._p } = props;
+  const { info, onClose, classNames, record, ..._p } = props;
   const { t } = useTranslation()
-  const dl_win_x64 = t('dl_win_x64')
-  const { url, full_cover_url, desc, full_desc_url, url_type } = info;
-  const win_x64_url = info.get_url_by_name('win_x64');
+  const { url, full_cover_url, desc, full_desc_url } = info || {};
   const ref_el = useRef<HTMLDivElement>(null)
   return <>
     <CardBase
       floating
-      key={info.id}
+      key={info?.id}
       classNames={{
         ...classNames,
         card: classnames(private_classnames.card, classNames?.card)
@@ -40,19 +38,12 @@ export function DetailCard(props: IDetailCardProps) {
         <div className={csses.detail_card_head}>
           <div className={csses.left}>
             <Link href={url} style={{ padding: `0px 5px` }}>
-              {info.title}
-              {url_type === Info.OPEN_IN_BROWSER && url ? ' ▸' : null}
+              {info?.title}
             </Link>
             <Tags info={info} />
           </div>
           <div className={csses.mid}>
-            <MarkdownButton info={info} />
-            <IconButton
-              title={dl_win_x64}
-              icon={windows_x64}
-              href={win_x64_url}
-              gone={!win_x64_url} />
-            <ShareButton info={info} />
+            <InfoActions info={info} record={record} />
             <IconButton
               icon='✖︎'
               onClick={onClose}
@@ -68,7 +59,7 @@ export function DetailCard(props: IDetailCardProps) {
                 src={full_cover_url} />
           }
           <div className={classnames(csses.info_zone, csses.scrollview)}>
-            <Viewer className={csses.content_zone} emptyAsGone content={info.brief} />
+            <Viewer className={csses.content_zone} emptyAsGone content={info?.brief} />
             <Viewer content={desc} url={full_desc_url} emptyAsGone />
           </div>
           {
@@ -84,21 +75,21 @@ export function DetailCard(props: IDetailCardProps) {
               {t('author')}
             </span>
             <Link
-              href={info.author_url}
+              href={info?.author_url}
               title={t('visit_author_link')}>
-              {info.author}
+              {info?.author}
             </Link>
           </div>
           <div className={csses.mid}>
           </div>
-          <Show yes={!!info.id}>
+          <Show yes={!!info?.id}>
             <div className={csses.right}>
               <span className={csses.prefix}>
                 {t('id')}
               </span>
-              <a href={`${location.protocol}//${location.host}/#${Paths.All.Info.replace(':game_id', '' + info.id)}`}
+              <a href={`${location.protocol}//${location.host}/#${Paths.All.Info.replace(':game_id', '' + info?.id)}`}
                 target='_blank'>
-                {info.id}
+                {info?.id}
               </a>
             </div>
           </Show>
@@ -106,7 +97,7 @@ export function DetailCard(props: IDetailCardProps) {
             <span className={csses.prefix}>
               {t('date')}
             </span>
-            {info.date}
+            {info?.date}
           </div>
         </div>
       </div>

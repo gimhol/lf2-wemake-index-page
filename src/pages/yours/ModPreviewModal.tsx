@@ -14,9 +14,8 @@ import { get_mod, type IMod } from "./get_mod";
 import csses from "./ModPreviewModal.module.scss";
 
 export interface IInfoViewModalProps extends IMaskProps {
-  _?: never;
-  mod_id?: number;
-  info?: Info;
+  mod_id?: number | null;
+  info?: Info | null;
 }
 export function ModPreviewModal(props: IInfoViewModalProps) {
   const { container = document.body, mod_id, info, whenChange, ..._p } = props;
@@ -42,8 +41,8 @@ export function ModPreviewModal(props: IInfoViewModalProps) {
 
 export interface IInfoViewProps extends HTMLAttributes<HTMLDivElement> {
   _?: never;
-  mod_id?: number;
-  info?: Info;
+  mod_id?: number | null;
+  info?: Info | null;
   head?: ReactNode;
 }
 export function ModPreview(props: IInfoViewProps) {

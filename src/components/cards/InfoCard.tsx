@@ -1,13 +1,11 @@
 import type { IRecord } from "@/api/listModRecords";
-import windows_x64 from "@/assets/svg/windows_x64.svg";
 import { Info } from "@/base/Info";
+import { InfoActions } from "@/pages/info/InfoActions";
 import { Tags } from "@/pages/info/Tags";
 import { submit_click_event } from "@/utils/events";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { IconButton } from "../button/IconButton";
-import { ShareButton } from "../button/ShareButton";
 import { Link } from "../link";
 import { Viewer } from "../markdown/Viewer";
 import { Mask } from "../mask";
@@ -23,10 +21,8 @@ const classNames = { card: csses.info_card }
 const empty_info = Info.empty()
 export function InfoCard(props: IInfoCardProps) {
   const { t } = useTranslation()
-  const dl_win_x64 = t('dl_win_x64')
-  const { info = empty_info } = props;
+  const { info = empty_info, record } = props;
   const { url, full_cover_url } = info;
-  const win_x64_url = info.get_url_by_name('win_x64');
   const ref_el = useRef<HTMLDivElement>(null)
   const [detail_style, set_detail_style] = useState<React.CSSProperties>({})
   const [detail_open, set_detail_open] = useState(false)
@@ -62,12 +58,7 @@ export function InfoCard(props: IInfoCardProps) {
           </Link>
           <Tags info={info} />
           <div className={csses.mid}>
-            <ShareButton info={info} />
-            <IconButton
-              title={dl_win_x64}
-              href={win_x64_url}
-              gone={!win_x64_url}
-              icon={windows_x64} />
+            <InfoActions info={info} record={record} />
           </div>
         </div>
         <div className={csses.info_card_main}>

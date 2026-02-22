@@ -16,6 +16,7 @@ import { useMovingBg } from "@/hooks/useMovingBg";
 import { ApiHttp } from "@/network/ApiHttp";
 import * as KnownError from "@/network/KnownError";
 import { Paths } from "@/Paths";
+import { useSmallScreen } from "@/useSmallScreen";
 import { submit_visit_event } from "@/utils/events";
 import { LocationParams } from "@/utils/LocationParams";
 import classnames from "classnames";
@@ -118,16 +119,15 @@ export default function MainPage() {
       })
     return () => ab.abort()
   }, [i18n])
-
-  const [game_list_open, set_game_list_open] = useState(false);
-
+  const small = useSmallScreen()
+  const [game_list_open, set_game_list_open] = useState(!small);
   const game_list = useMemo(() => {
     return (
-      <div className={classnames(csses.game_list, csses.scrollview)}>
+      <div className={classnames(csses.game_list, game_list_open ? void 0 : csses.close, csses.scrollview)}>
         <Show yes={!!session_id}>
           <button className={pathname === Paths.All.Workspace ? csses.game_item_actived : csses.game_item} onClick={() => {
             set_location({ game: 'yours' });
-            set_game_list_open(false)
+            if (small) set_game_list_open(false)
           }}>
             {t('workspace')}
           </button>
@@ -137,16 +137,16 @@ export default function MainPage() {
           return (
             <button className={cls_name} key={v.id} onClick={() => {
               set_location({ game: v.info.id });
-              set_game_list_open(false)
+              if (small) set_game_list_open(false)
             }}>
               {v.info.short_title}
             </button>
           )
         })}
-        <Loading loading={loading} center />
+        <Loading loading={loading} center absolute />
       </div>
     )
-  }, [games, game_id, session_id, t, set_location, loading, pathname])
+  }, [games, game_id, session_id, t, set_location, loading, pathname, game_list_open, small])
 
   return <>
     <MainContext.Provider value={{ info: actived?.info, record: actived }}>
@@ -155,10 +155,8 @@ export default function MainPage() {
         onDrop={e => { e.stopPropagation(); e.preventDefault() }} >
         <div className={csses.head}>
           <IconButton
-            className={csses.btn_toggle_game_list}
-            onClick={() => set_game_list_open(!game_list_open)}
             icon={img_menu}
-            title={t('menu')} />
+            onClick={() => set_game_list_open(!game_list_open)} />
           <h1 className={csses.main_title}>
             {t("main_title")}
           </h1>
@@ -205,7 +203,9 @@ export default function MainPage() {
           </div>
         </div>
         <div className={csses.main}>
-          {game_list}
+          <Show yes={!small}>
+            {game_list}
+          </Show>
           <Outlet />
         </div>
         <div className={csses.foot}>
@@ -215,14 +215,16 @@ export default function MainPage() {
         </div>
       </div >
       <Loading big loading={loading} style={{ position: 'absolute', margin: 'auto auto' }} />
-      <Mask
-        className={csses.game_list_mask}
-        container={() => document.body}
-        closeOnMask
-        open={game_list_open}
-        whenChange={() => set_game_list_open(false)}>
-        {game_list}
-      </Mask>
+      <Show yes={small}>
+        <Mask
+          className={csses.game_list_mask}
+          container={() => document.body}
+          closeOnMask
+          open={game_list_open && small}
+          whenChange={() => set_game_list_open(false)}>
+          {game_list}
+        </Mask>
+      </Show>
     </MainContext.Provider>
   </>
 }

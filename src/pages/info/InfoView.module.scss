@@ -83,6 +83,7 @@
     align-items    : center;
     justify-content: center;
     width          : calc(var(--size-w-icon-btn) * 2 + 8);
+    gap            : 5px;
   }
 
   .content_zone {

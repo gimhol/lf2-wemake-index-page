@@ -4,7 +4,7 @@
 import { interrupt_event } from "@/utils/interrupt_event";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
-import { cloneElement, isValidElement, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes, type PropsWithChildren, type ReactNode } from "react";
+import { cloneElement, isValidElement, useEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes, type PropsWithChildren, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import csses from "./index.module.scss";
 import { useToggleStatus } from "./useToggleStatus";
@@ -23,6 +23,35 @@ export function Tooltip(props: ITooltipProps) {
   const [viewing, set_viewing] = useState(false)
   const [pinned, set_pinned] = useState(false);
   const ref_tid = useRef(0)
+  const [alt, set_alt] = useState(false)
+
+  useEffect(() => {
+    const keydown = (e: KeyboardEvent) => {
+      const k = e.key?.toLowerCase()
+      console.log(k)
+      if (k != 'alt' && k != 'escape') return
+      e.preventDefault()
+      e.stopPropagation()
+      if (k == 'escape') set_viewing(false)
+      if (k == 'alt') set_alt(true)
+    }
+    const keyup = (e: KeyboardEvent) => {
+      const k = e.key?.toLowerCase()
+      if (k != 'alt' && k != 'escape') return
+
+      e.preventDefault()
+      e.stopPropagation()
+
+      if (k == 'escape') set_viewing(false)
+      if (k == 'alt') set_alt(false)
+    }
+    window.addEventListener('keydown', keydown)
+    window.addEventListener('keyup', keyup)
+    return () => {
+      window.removeEventListener('keydown', keydown)
+      window.removeEventListener('keyup', keyup)
+    }
+  }, [])
   const _children = useMemo(() => {
     if (title && isValidElement<any>(children)) {
       const {
@@ -78,13 +107,17 @@ export function Tooltip(props: ITooltipProps) {
           interrupt_event(e)
           clearTimeout(ref_tid.current)
           ref_tid.current = setTimeout(() => {
-            set_open(false); 
+            set_open(false);
             set_viewing(false)
           }, 300)
         }}>
-        <button className={pinned ? csses.pin_btn_active : csses.pin_btn} onClick={() => set_pinned(!pinned)}>
-          📌
-        </button>
+        {
+          alt || pinned ?
+            <button className={pinned ? csses.pin_btn_active : csses.pin_btn} onClick={() => set_pinned(!pinned)}>
+              📌
+            </button> : null
+        }
+
         {title}
       </div>, typeof container === 'function' ? container() : container)
     }

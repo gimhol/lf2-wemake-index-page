@@ -1,28 +1,23 @@
 import type { IRecord } from "@/api/listModRecords";
 import img_to_bottom from "@/assets/svg/arrow-to-bottom.svg";
 import img_to_top from "@/assets/svg/arrow-to-top.svg";
-import img_browser_mark_white from "@/assets/svg/browser.svg";
 import img_list_view from "@/assets/svg/database.svg";
 import img_cards_view from "@/assets/svg/gallery-view.svg";
-import windows_x64 from "@/assets/svg/windows_x64.svg";
 import { Info } from "@/base/Info";
 import { BackButton } from "@/components/button/BackButton";
 import { CollapseButton } from "@/components/button/CollapseButton";
 import { IconButton } from "@/components/button/IconButton";
-import { ShareButton } from "@/components/button/ShareButton";
 import { InfoCard } from "@/components/cards/InfoCard";
 import { Collapse } from "@/components/collapse/Collapse";
 import { Link } from "@/components/link";
 import { Viewer } from "@/components/markdown/Viewer";
 import Show from "@/gimd/Show";
 import Toast from "@/gimd/Toast";
-import GlobalStore from "@/GlobalStore";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
-import { useContext, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { MarkdownButton } from "../main/MarkdownModal";
-import { EditModButton } from "./EditModButton";
+import { InfoActions } from "./InfoActions";
 import csses from "./InfoView.module.scss";
 import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
@@ -71,16 +66,12 @@ export function InfoView(props: IInfoViewProps) {
 
   const { t } = useTranslation()
   const { children_title, date, url, desc, brief, full_desc_url, title } = info ?? {};
-  const win_x64_url = info?.get_url_by_name('win_x64')
-  const open_in_browser = t('open_in_browser')
-  const dl_win_x64 = t('dl_win_x64')
   const ref_el_children = useRef<HTMLDivElement>(null);
   const has_content = !!(desc || full_desc_url)
   const [children, , children_error] = useInfoChildren(info)
   Toast.useError(children_error)
   const __next_list_like = next_list_like(__listLike)
   const cls_root = classnames(csses.info_view_root, className)
-  const { value: { user_id } } = useContext(GlobalStore.context)
   if (!info) return <></>;
   return (
     <div className={cls_root} {..._p}>
@@ -94,7 +85,6 @@ export function InfoView(props: IInfoViewProps) {
           open={__open}
           whenChange={__set_open}
           className={!has_content ? csses.collapse_btn_hide : void 0} />
-
         <h3 className={csses.title}>
           <Link className={csses.title_link} href={url}>
             {title}
@@ -102,26 +92,20 @@ export function InfoView(props: IInfoViewProps) {
           <Tags info={info} />
         </h3>
         <div className={csses.head_right_zone}>
-          <IconButton title={open_in_browser} href={url} gone={!url} icon={img_browser_mark_white} />
-          <IconButton title={dl_win_x64} href={win_x64_url} gone={!win_x64_url} icon={windows_x64} />
           <IconButton
             gone={!(children?.length)}
             onClick={() => __set_listLike(__next_list_like)}
             title="Cards or List"
             icon={__next_list_like === 'cards' ? img_cards_view : img_list_view} />
-          <MarkdownButton info={info} />
-          <ShareButton info={info} />
-          <EditModButton
-            gone={record?.owner_id !== user_id}
-            me={{ id: Number(info.id) }} />
+          <InfoActions info={info} record={record} />
           <div className={csses.el_date}>
             <Link
               href={info.author_url}
               title={t('visit_author_link')}>
               {info.author}
             </Link>
+            <span>{date}</span>
           </div>
-          {date ? <div className={csses.el_date}> {date} </div> : null}
         </div>
       </div>
       <Viewer className={csses.content_zone} emptyAsGone content={brief} />
