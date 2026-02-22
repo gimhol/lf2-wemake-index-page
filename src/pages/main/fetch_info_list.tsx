@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { IRecord } from "@/api/listModRecords";
 import { Info } from "@/base/Info";
 import { ApiHttp } from "@/network/ApiHttp";
 import { fetch_info } from "./fetch_info";
@@ -24,47 +26,45 @@ export async function fetch_info_list(url: string, parent: Info | null, lang: st
   return cooked_list;
 }
 
-export async function fetch_infos(lang: string, init: RequestInit = {}): Promise<Info[] | undefined> {
+export interface IRecordInfo extends IRecord {
+  info: Info;
+}
+export async function fetch_infos(lang: string, init: RequestInit = {}): Promise<IRecordInfo[] | undefined> {
   const { signal } = init;
-  const r = await ApiHttp.post(`${API_BASE}lfwm/list`, null, {
+  const reply = await ApiHttp.post<any, any, IRecord[]>(`${API_BASE}lfwm/list`, null, {
     parent: 0, status: ['published'], type: ['product'],
   }, init)
+
   if (init.signal?.aborted) return;
-  const raw_list = r.data;
+  const raw_list = reply.data;
   if (!Array.isArray(raw_list))
     throw new Error(`[fetch_infos] failed, got ${raw_list}`);
-  const cooked_list: Info[] = [];
+  const cooked_list: IRecordInfo[] = [];
   for (const raw_item of raw_list) {
     if (!raw_item) continue;
-    if (typeof raw_item === 'object') {
-      cooked_list.push(new Info(raw_item, lang, null, null));
-      continue;
-    }
-    if (typeof raw_item === 'string') {
-      const item = await fetch_info(raw_item, null, lang, { signal })
-      cooked_list.push(item);
-    }
+    const { url } = raw_item;
+    if (typeof url !== 'string') continue;
+    const info = await fetch_info(url, null, lang, { signal })
+    const cooked_item: IRecordInfo = { ...raw_item, info }
+    cooked_list.push(cooked_item);
   }
   return cooked_list;
 }
-export async function fetch_children(parent: number | string, lang: string, init: RequestInit = {}): Promise<Info[] | undefined> {
+export async function fetch_children(parent: number | string, lang: string, init: RequestInit = {}): Promise<IRecordInfo[] | undefined> {
   const { signal } = init;
-  const r = await ApiHttp.get(`${API_BASE}lfwm/list`, { parent }, init)
+  const r = await ApiHttp.get<any, IRecord[]>(`${API_BASE}lfwm/list`, { parent }, init)
   if (init.signal?.aborted) return;
   const raw_list = r.data;
   if (!Array.isArray(raw_list))
     throw new Error(`[fetch_infos] failed, got ${raw_list}`);
-  const cooked_list: Info[] = [];
+  const cooked_list: IRecordInfo[] = [];
   for (const raw_item of raw_list) {
     if (!raw_item) continue;
-    if (typeof raw_item === 'object') {
-      cooked_list.push(new Info(raw_item, lang, null, null));
-      continue;
-    }
-    if (typeof raw_item === 'string') {
-      const item = await fetch_info(raw_item, null, lang, { signal })
-      cooked_list.push(item);
-    }
+    const { url } = raw_item;
+    if (typeof url !== 'string') continue;
+    const info = await fetch_info(url, null, lang, { signal })
+    const cooked_item: IRecordInfo = { ...raw_item, info }
+    cooked_list.push(cooked_item);
   }
   return cooked_list;
 }

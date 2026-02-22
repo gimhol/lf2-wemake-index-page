@@ -2,16 +2,17 @@
 import { Paths } from "@/Paths"
 import { Loading } from "@/components/loading"
 import Toast from "@/gimd/Toast"
+import { useCanGoBack } from "@/hooks/useCanGoBack"
 import { useContext, useEffect, useState } from "react"
-import { useLocation, useParams } from "react-router"
+import { useLocation, useNavigate, useParams } from "react-router"
 import { useImmer } from "use-immer"
-import { main_context } from "../main/main_context"
+import { MainContext } from "../main/main_context"
 import { get_mod, type IMod } from "../yours/get_mod"
 import { InfoView } from "./InfoView"
 import csses from "./index.module.scss"
 
 export default function InfoViewPage() {
-  const { info } = useContext(main_context)
+  const { info, record } = useContext(MainContext)
   const { game_id: mod_id } = useParams()
   const location = useLocation()
 
@@ -20,6 +21,8 @@ export default function InfoViewPage() {
 
   const [loading, set_loading] = useState(false)
   const [mod, set_mod] = useImmer<IMod | undefined>(void 0)
+  const canGoBack = useCanGoBack()
+
   useEffect(() => {
     if (!mod_id || !is_root) {
       set_mod(void 0);
@@ -39,10 +42,18 @@ export default function InfoViewPage() {
     })
     return () => ab.abort()
   }, [mod_id, set_mod, is_root])
+  const nav = useNavigate();
 
   return <>
     <InfoView
+      backable={is_root}
+      foldable={!is_root}
+      onClickBack={async () => {
+        if (canGoBack) nav(-1)
+        else nav(Paths.All.Main)
+      }}
       info={is_root ? mod?.info : info}
+      record={is_root ? mod?.record : record}
       className={is_root ? csses.main : csses.main_right}
       open={open} />
     <Loading fixed center loading={loading} big />

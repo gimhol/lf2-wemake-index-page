@@ -1,27 +1,27 @@
 import { IconButton } from "@/components/button/IconButton";
-import { ModFormView } from "./ModFormView";
-import { Mask, type _IMaskProps } from "@/components/mask";
+import { LangButton } from "@/components/LangButton";
+import { Mask, type IMaskProps } from "@/components/mask";
 import { interrupt_event } from "@/utils/interrupt_event";
 import csses from "./ModFormModal.module.scss";
-import { LangButton } from "@/components/LangButton";
+import { ModFormView } from "./ModFormView";
 
-export interface IModFormModalProps extends _IMaskProps {
+export interface IModFormModalProps extends IMaskProps {
   _?: never;
-  type?: RecordType;
   mod_id?: number;
 }
 export function ModFormModal(props: IModFormModalProps) {
-  const { container = document.body,type, onClose, mod_id, ..._p } = props;
+  const { container = document.body,  whenChange, mod_id, ..._p } = props;
   return (
-    <Mask container={container} whenChange={onClose} {..._p}>
-      <ModFormView type={type} mod_id={mod_id} />
+    <Mask container={container} whenChange={whenChange} {..._p}>
+      <ModFormView mod_id={mod_id} />
       <div className={csses.right_top}>
         <LangButton />
         <IconButton
           icon='✖︎'
-          onClick={e => { interrupt_event(e); onClose?.() }} />
+          onClick={e => { interrupt_event(e); whenChange?.(false) }} />
       </div>
-
     </Mask>
   );
 }
+
+

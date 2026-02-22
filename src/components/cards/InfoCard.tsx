@@ -1,3 +1,4 @@
+import type { IRecord } from "@/api/listModRecords";
 import windows_x64 from "@/assets/svg/windows_x64.svg";
 import { Info } from "@/base/Info";
 import { Tags } from "@/pages/info/Tags";
@@ -6,16 +7,17 @@ import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IconButton } from "../button/IconButton";
+import { ShareButton } from "../button/ShareButton";
 import { Link } from "../link";
 import { Viewer } from "../markdown/Viewer";
 import { Mask } from "../mask";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import { DetailCard } from "./DetailCard";
 import csses from "./InfoCard.module.scss";
-import { ShareButton } from "../button/ShareButton";
 
 export interface IInfoCardProps extends ICardBaseProps {
-  info?: Info
+  info?: Info;
+  record?: IRecord;
 }
 const classNames = { card: csses.info_card }
 const empty_info = Info.empty()

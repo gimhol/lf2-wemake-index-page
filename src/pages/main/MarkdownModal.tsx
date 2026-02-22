@@ -3,14 +3,15 @@ import img_markdown from "@/assets/svg/markdown.svg";
 import type { Info } from "@/base/Info";
 import { IconButton } from "@/components/button/IconButton";
 import { Loading } from "@/components/loading";
-import { type _IMaskProps, Mask } from "@/components/mask";
+import { type IMaskProps, Mask } from "@/components/mask";
+import { ctrl_a_bounding } from "@/components/mask/ctrl_a_bounding";
+import { interrupt_event } from "@/utils/interrupt_event";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import csses from "./styles.module.scss";
-import { ctrl_a_bounding } from "@/components/mask/ctrl_a_bounding";
 
-export function MarkdownModal(props: { info?: Info } & _IMaskProps) {
-  const { info, onClose, open, container = () => document.body, ..._p } = props;
+export function MarkdownModal(props: { info?: Info } & IMaskProps) {
+  const { info, whenChange, open, container = () => document.body, ..._p } = props;
   const [loading, set_loading] = useState(false);
   const [markdown, set_markdown] = useState('');
 
@@ -34,7 +35,7 @@ export function MarkdownModal(props: { info?: Info } & _IMaskProps) {
     <Mask
       open={open}
       style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-      whenChange={onClose}
+      whenChange={whenChange}
       container={container}
       onClick={(e) => e.stopPropagation()}
       {..._p}>
@@ -49,7 +50,10 @@ export function MarkdownModal(props: { info?: Info } & _IMaskProps) {
           </IconButton>
           <IconButton
             icon="✖︎"
-            onClick={onClose}
+            onClick={e => {
+              interrupt_event(e);
+              whenChange?.(false)
+            }}
             title="Close"
             stopPropagation />
         </div>
@@ -64,16 +68,20 @@ export function MarkdownModal(props: { info?: Info } & _IMaskProps) {
     </Mask>
   )
 }
+
 export function MarkdownButton(props: { info?: Info }) {
   const { info } = props;
-  const [md_open, set_md_open] = useState(false);
+  const [md_open, set_md_open] = useState<boolean>();
   return (
     <>
-      <IconButton onClick={() => set_md_open(true)} title="View Markdown" icon={img_markdown} />
+      <IconButton onClick={(e) => {
+        interrupt_event(e)
+        set_md_open(true)
+      }} title="View Markdown" icon={img_markdown} />
       <MarkdownModal
         info={info}
         open={md_open && !!info}
-        onClose={() => set_md_open(false)} />
+        whenChange={set_md_open} />
     </>
   )
 }

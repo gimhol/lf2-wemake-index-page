@@ -1,3 +1,4 @@
+import type { IRecord } from "@/api/listModRecords";
 import img_to_bottom from "@/assets/svg/arrow-to-bottom.svg";
 import img_to_top from "@/assets/svg/arrow-to-top.svg";
 import img_browser_mark_white from "@/assets/svg/browser.svg";
@@ -5,23 +6,26 @@ import img_list_view from "@/assets/svg/database.svg";
 import img_cards_view from "@/assets/svg/gallery-view.svg";
 import windows_x64 from "@/assets/svg/windows_x64.svg";
 import { Info } from "@/base/Info";
+import { BackButton } from "@/components/button/BackButton";
 import { CollapseButton } from "@/components/button/CollapseButton";
 import { IconButton } from "@/components/button/IconButton";
+import { ShareButton } from "@/components/button/ShareButton";
 import { InfoCard } from "@/components/cards/InfoCard";
 import { Collapse } from "@/components/collapse/Collapse";
 import { Link } from "@/components/link";
 import { Viewer } from "@/components/markdown/Viewer";
 import Show from "@/gimd/Show";
 import Toast from "@/gimd/Toast";
+import GlobalStore from "@/GlobalStore";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { MarkdownButton } from "../main/MarkdownModal";
+import { EditModButton } from "./EditModButton";
 import csses from "./InfoView.module.scss";
 import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
-import { ShareButton } from "@/components/button/ShareButton";
 type ListLike = 'cards' | 'list';
 function curr_list_like(v: string | undefined | null): ListLike {
   return v === 'cards' ? 'cards' : 'list'
@@ -30,9 +34,13 @@ function next_list_like(v: string | undefined | null): ListLike {
   return v === 'cards' ? 'list' : 'cards'
 }
 export interface IInfoViewProps extends React.HTMLAttributes<HTMLDivElement> {
+  record?: IRecord;
   info?: Info | null;
   open?: boolean;
   whenOpen?(open?: boolean): void;
+  foldable?: boolean;
+  backable?: boolean;
+  onClickBack?: React.MouseEventHandler<HTMLButtonElement>;
   listLike?: ListLike;
   whenListLike?(v?: ListLike): void;
 }
@@ -45,6 +53,10 @@ export function InfoView(props: IInfoViewProps) {
     whenOpen,
     listLike = curr_list_like(info?.children_look),
     whenListLike,
+    backable = false,
+    foldable = true,
+    onClickBack,
+    record,
     ..._p
   } = props;
   const [__open, __set_open] = usePropState(open, whenOpen)
@@ -68,14 +80,21 @@ export function InfoView(props: IInfoViewProps) {
   Toast.useError(children_error)
   const __next_list_like = next_list_like(__listLike)
   const cls_root = classnames(csses.info_view_root, className)
+  const { value: { user_id } } = useContext(GlobalStore.context)
   if (!info) return <></>;
   return (
     <div className={cls_root} {..._p}>
       <div className={csses.head}>
+        <BackButton
+          gone={!backable}
+          onClick={onClickBack}
+        />
         <CollapseButton
+          gone={!foldable}
           open={__open}
           whenChange={__set_open}
           className={!has_content ? csses.collapse_btn_hide : void 0} />
+
         <h3 className={csses.title}>
           <Link className={csses.title_link} href={url}>
             {title}
@@ -90,9 +109,11 @@ export function InfoView(props: IInfoViewProps) {
             onClick={() => __set_listLike(__next_list_like)}
             title="Cards or List"
             icon={__next_list_like === 'cards' ? img_cards_view : img_list_view} />
-
           <MarkdownButton info={info} />
           <ShareButton info={info} />
+          <EditModButton
+            gone={record?.owner_id !== user_id}
+            me={{ id: Number(info.id) }} />
           <div className={csses.el_date}>
             <Link
               href={info.author_url}
@@ -132,15 +153,15 @@ export function InfoView(props: IInfoViewProps) {
       {
         (__listLike !== 'cards' || !children?.length) ? null :
           <div className={classnames(csses.card_list, csses.scrollview)} ref={ref_el_children}>
-            {children?.map(version => <InfoCard info={version} key={version.id} />)}
+            {children?.map(child => <InfoCard info={child.info} record={child} key={child.id} />)}
           </div>
       }
       {
         (__listLike !== 'list' || !children?.length) ? null :
           <div className={classnames(csses.version_list, csses.scrollview)} ref={ref_el_children}>
             {
-              children.map((version, idx) => {
-                return <InfoView info={version} key={version.id} open={idx === 0} />
+              children.map((child, idx) => {
+                return <InfoView info={child.info} record={child} key={child.id} open={idx === 0} />
               })
             }
           </div>

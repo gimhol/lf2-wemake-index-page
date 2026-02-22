@@ -4,7 +4,6 @@ import { addModRecord } from "@/api/addModRecord"
 import { editModRecord } from "@/api/editModRecord"
 import { listModPath } from "@/api/listModPath"
 import { children_type, is_dir, is_publishable, listModRecords, type IRecord } from "@/api/listModRecords"
-import img_edit from "@/assets/svg/edit.svg"
 import img_preview from "@/assets/svg/preview.svg"
 import img_publish from "@/assets/svg/publish.svg"
 import img_reviewing from "@/assets/svg/reviewing.svg"
@@ -28,11 +27,10 @@ import dayjs from "dayjs"
 import { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router"
-import { useImmer } from "use-immer"
+import { EditModButton } from "../info/EditModButton"
+import { ModContext } from "../mod_form/ModContext"
 import { FileRow } from "./FileRow"
 import { get_icon, get_icon_title } from "./get_icon"
-import { ModFormModal } from "../mod_form/ModFormModal"
-import { ModPreviewModal } from "./ModPreviewModal"
 import { OwnerName } from "./OwnerName"
 import csses from "./styles.module.scss"
 import { VideoModal } from "./VideoModal"
@@ -49,13 +47,12 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   const [new_dir, set_new_dir] = useState(0);
   const ref_dragging = useRef<IRecord | undefined>(void 0);
   const [dragover, set_dragover] = useState<number | undefined>(void 0);
-  const [editing_mod, set_editing_mod] = useState<{ open?: boolean, data?: IRecord }>({})
   const ref_root = useRef<HTMLDivElement>(null);
   const [progress, set_progress] = useState<[string, number, number]>()
   const { value: { session_id, nickname, username, admin } } = useContext(GlobalStore.context);
   const nav = useNavigate();
   const { search } = LocationParams.useAll();
-  const [previewing, set_previewing] = useImmer({ open: false, mod_id: 0 })
+  const { edit: edit_mod, preview: preview_mod } = useContext(ModContext);
 
   const refresh_files = useCallback((parent: number = 0, init: RequestInit = {}) => {
     set_pending(true)
@@ -146,9 +143,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     ImagesViewer.open(imgs, idx)
   }
 
-  const edit_mod = (target: IRecord) => {
-    set_editing_mod({ open: true, data: target });
-  }
 
 
   const open_file = (target: IRecord) => {
@@ -297,7 +291,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       <VideoModal
         open={!!(viewing_video_open && viewing_video)}
         src={viewing_video}
-        onClose={() => set_viewing_video_open(void 0)}
+        whenChange={() => set_viewing_video_open(void 0)}
         afterClose={() => set_viewing_video(void 0)} />
       <div className={csses.file_list_head}>
         <IconButton
@@ -410,16 +404,12 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 owner={<OwnerName owner_id={me.owner_id} />}
                 download={me.type == 'file' ? me.url : void 0}
                 actions={(!is_publishable(me) || !mod_id) ? null : <>
-                  <IconButton
-                    icon={img_edit}
-                    title={t('edit_mod_info').replace('%1', t(`d_${me.type}`))}
-                    disabled={pending}
-                    onClick={() => edit_mod(me)} />
+                  <EditModButton me={me} disabled={pending} />
                   <IconButton
                     icon={img_preview}
                     title={t('preview')}
                     disabled={pending}
-                    onClick={() => set_previewing({ open: true, mod_id })} />
+                    onClick={() => preview_mod(mod_id)} />
                   <Show yes={!me.status || (me.status === 'reviewing' && admin & 1)}>
                     <IconButton
                       icon={img_publish}
@@ -506,12 +496,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                 onDel={() => del_file(me)} />
             )
           })}
-        <ModFormModal
-          type={editing_mod?.data?.type}
-          mod_id={editing_mod?.data?.id}
-          open={editing_mod?.open}
-          onClose={() => set_editing_mod(p => ({ ...p, open: false }))}
-          afterClose={() => set_editing_mod({})} />
       </div>
       {
         progress ?
@@ -521,11 +505,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
             <div>size: {file_size_txt(progress[2])}</div>
           </div> : null
       }
-      <ModPreviewModal
-        open={previewing.open}
-        onClose={() => set_previewing(d => { d.open = false; })}
-        afterClose={() => set_previewing(d => { d.mod_id = 0 })}
-        mod_id={previewing.mod_id} />
     </div>
   )
 }

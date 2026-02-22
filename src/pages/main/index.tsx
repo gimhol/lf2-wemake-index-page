@@ -4,7 +4,6 @@ import img_github from "@/assets/svg/github.svg";
 import img_login from "@/assets/svg/login.svg";
 import img_logout from "@/assets/svg/logout.svg";
 import img_menu from "@/assets/svg/menu.svg";
-import { Info } from "@/base/Info";
 import { IconButton } from "@/components/button/IconButton";
 import { LangButton } from "@/components/LangButton";
 import { Loading } from "@/components/loading";
@@ -23,15 +22,15 @@ import classnames from "classnames";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { fetch_infos } from "./fetch_info_list";
-import { main_context } from "./main_context";
+import { fetch_infos, type IRecordInfo } from "./fetch_info_list";
+import { MainContext } from "./main_context";
 import csses from "./styles.module.scss";
 
 export default function MainPage() {
   useEffect(() => { submit_visit_event(); })
   useMovingBg(document.documentElement)
   const { t, i18n } = useTranslation()
-  const [games, set_games] = useState<Info[]>()
+  const [games, set_games] = useState<IRecordInfo[]>()
   const [loading, set_loading] = useState(false);
   const nav = useNavigate();
   const { value: global_value, dispatch } = useContext(GlobalStore.context);
@@ -60,7 +59,7 @@ export default function MainPage() {
     if (session) return;
     if (pathname === Paths.All.Workspace) return;
     if (!game_id || (!session_id && game_id === 'yours')) {
-      set_location({ game: games?.find(v => v)?.id })
+      set_location({ game: games?.find(v => v)?.id?.toString() })
     }
   }, [session_id, search, game_id, set_location, games, pathname])
 
@@ -99,19 +98,13 @@ export default function MainPage() {
     return () => c.abort()
   }, [session_id, dispatch, set_location])
 
-  const actived = useMemo(() => games?.find(v => v.id === game_id), [game_id, games])
+  const actived: IRecordInfo | undefined = useMemo(() => games?.find(v => v.info.id == game_id), [game_id, games])
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     set_loading(true)
     const ab = new AbortController();
-    // ApiHttp.post(`${API_BASE}lfwm/list`, null, {
-    //   parent: 0,
-    //   status: ['published'],
-    //   type: ['product'],
-    //   signal: ab.signal
-    // })
     const lang = i18n.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    // fetch_info_list(`games.json?time=${time_str}`, null, lang, { signal: ab.signal })
     fetch_infos(lang, { signal: ab.signal })
       .then((list) => {
         if (ab.signal.aborted) return;
@@ -140,13 +133,13 @@ export default function MainPage() {
           </button>
         </Show>
         {games?.map((v) => {
-          const cls_name = game_id === v.id ? csses.game_item_actived : csses.game_item
+          const cls_name = game_id === v.info.id ? csses.game_item_actived : csses.game_item
           return (
             <button className={cls_name} key={v.id} onClick={() => {
-              set_location({ game: v.id });
+              set_location({ game: v.info.id });
               set_game_list_open(false)
             }}>
-              {v.short_title}
+              {v.info.short_title}
             </button>
           )
         })}
@@ -156,7 +149,7 @@ export default function MainPage() {
   }, [games, game_id, session_id, t, set_location, loading, pathname])
 
   return <>
-    <main_context.Provider value={{ info: actived }}>
+    <MainContext.Provider value={{ info: actived?.info, record: actived }}>
       <div className={csses.main_page}
         onDragOver={e => { e.stopPropagation(); e.preventDefault() }}
         onDrop={e => { e.stopPropagation(); e.preventDefault() }} >
@@ -170,7 +163,7 @@ export default function MainPage() {
             {t("main_title")}
           </h1>
           <div className={csses.right_zone}>
-            <LangButton whenClick={next => games?.map(v => v.with_lang(next))} />
+            <LangButton />
             <Show yes={!session_id}>
               <Dropdown
                 alignX={1}
@@ -230,7 +223,7 @@ export default function MainPage() {
         whenChange={() => set_game_list_open(false)}>
         {game_list}
       </Mask>
-    </main_context.Provider>
+    </MainContext.Provider>
   </>
 }
 

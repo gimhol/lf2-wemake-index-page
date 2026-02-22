@@ -27,7 +27,6 @@ import { replace_one } from "../yours/join_url";
 import { save_mod } from "../yours/save_mod";
 import csses from "./ModFormView.module.scss";
 export interface IModFormViewProps {
-  type?: RecordType;
   mod_id?: number;
 }
 const uploaded_map = new Map<File, IPickedFile>();
@@ -187,7 +186,7 @@ export function ModFormView(props: IModFormViewProps) {
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
       <div className={csses.head}>
         <h1 className={csses.title}>
-          {t('edit_mod_info').replace('%1', t(`d_${type}`))}
+          {t('edit_%1_info').replace('%1', t(`d_${type}`))}
           <Dropdown.Select options={langs}
             value={lang}
             onChange={v => {

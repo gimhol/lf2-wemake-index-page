@@ -2,6 +2,7 @@
 import React from "react"
 import type { RouteObject } from "react-router"
 import { Loading } from "./components/loading"
+import { ModProvider } from "./pages/mod_form/ModProvider"
 export namespace Paths {
   export enum All {
     _ = '',
@@ -43,7 +44,9 @@ export namespace Paths {
       path: str_path,
       element: (
         <React.Suspense fallback={<Loading loading={true} />}>
-          <Component />
+          <ModProvider>
+            <Component />
+          </ModProvider>
         </React.Suspense>
       )
     }
