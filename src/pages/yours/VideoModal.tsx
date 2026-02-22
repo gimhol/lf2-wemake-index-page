@@ -1,7 +1,7 @@
-import { Mask, type IMaskProps } from "@/components/mask";
+import { Mask, type _IMaskProps } from "@/components/mask";
 import type { CSSProperties, VideoHTMLAttributes } from "react";
 
-export interface IVideoModalProps extends IMaskProps, Pick<VideoHTMLAttributes<HTMLVideoElement>, 'src' | 'width'> {
+export interface IVideoModalProps extends _IMaskProps, Pick<VideoHTMLAttributes<HTMLVideoElement>, 'src' | 'width'> {
 
 }
 const base_style: CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }

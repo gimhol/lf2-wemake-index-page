@@ -227,7 +227,7 @@ export default function MainPage() {
         container={() => document.body}
         closeOnMask
         open={game_list_open}
-        onClose={() => set_game_list_open(false)}>
+        whenChange={() => set_game_list_open(false)}>
         {game_list}
       </Mask>
     </main_context.Provider>

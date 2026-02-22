@@ -1,11 +1,11 @@
 import { IconButton } from "@/components/button/IconButton";
 import { ModFormView } from "./ModFormView";
-import { Mask, type IMaskProps } from "@/components/mask";
+import { Mask, type _IMaskProps } from "@/components/mask";
 import { interrupt_event } from "@/utils/interrupt_event";
 import csses from "./ModFormModal.module.scss";
 import { LangButton } from "@/components/LangButton";
 
-export interface IModFormModalProps extends IMaskProps {
+export interface IModFormModalProps extends _IMaskProps {
   _?: never;
   type?: RecordType;
   mod_id?: number;
@@ -13,7 +13,7 @@ export interface IModFormModalProps extends IMaskProps {
 export function ModFormModal(props: IModFormModalProps) {
   const { container = document.body,type, onClose, mod_id, ..._p } = props;
   return (
-    <Mask container={container} onClose={onClose} {..._p}>
+    <Mask container={container} whenChange={onClose} {..._p}>
       <ModFormView type={type} mod_id={mod_id} />
       <div className={csses.right_top}>
         <LangButton />

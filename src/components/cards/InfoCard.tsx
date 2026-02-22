@@ -111,7 +111,7 @@ export function InfoCard(props: IInfoCardProps) {
       container={() => document.body}
       open={detail_open}
       closeOnMask
-      onClose={close_detail}>
+      whenChange={close_detail}>
       <DetailCard
         floating={false}
         info={info}

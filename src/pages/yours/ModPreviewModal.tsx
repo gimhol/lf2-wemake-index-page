@@ -3,7 +3,7 @@ import type { Info } from "@/base/Info";
 import { IconButton } from "@/components/button/IconButton";
 import { InfoCard } from "@/components/cards/InfoCard";
 import { Loading } from "@/components/loading";
-import { Mask, type IMaskProps } from "@/components/mask";
+import { Mask, type _IMaskProps } from "@/components/mask";
 import Toast from "@/gimd/Toast";
 import { interrupt_event } from "@/utils/interrupt_event";
 import cns from "classnames";
@@ -13,7 +13,7 @@ import { InfoView } from "../info/InfoView";
 import { get_mod, type IMod } from "./get_mod";
 import csses from "./ModPreviewModal.module.scss";
 
-export interface IInfoViewModalProps extends IMaskProps {
+export interface IInfoViewModalProps extends _IMaskProps {
   _?: never;
   mod_id?: number;
   info?: Info;
@@ -22,7 +22,7 @@ export function ModPreviewModal(props: IInfoViewModalProps) {
   const { container = document.body, mod_id, info, onClose, ..._p } = props;
 
   return (
-    <Mask container={container} onClose={onClose} className={csses.mod_preview_modal} {..._p} >
+    <Mask container={container} whenChange={onClose} className={csses.mod_preview_modal} {..._p} >
       <ModPreview mod_id={mod_id} info={info} head={
         <div className={cns(csses.head)}>
           <h1 className={csses.title}>previewing</h1>

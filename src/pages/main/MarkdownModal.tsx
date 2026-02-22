@@ -3,13 +3,13 @@ import img_markdown from "@/assets/svg/markdown.svg";
 import type { Info } from "@/base/Info";
 import { IconButton } from "@/components/button/IconButton";
 import { Loading } from "@/components/loading";
-import { type IMaskProps, Mask } from "@/components/mask";
+import { type _IMaskProps, Mask } from "@/components/mask";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import csses from "./styles.module.scss";
 import { ctrl_a_bounding } from "@/components/mask/ctrl_a_bounding";
 
-export function MarkdownModal(props: { info?: Info } & IMaskProps) {
+export function MarkdownModal(props: { info?: Info } & _IMaskProps) {
   const { info, onClose, open, container = () => document.body, ..._p } = props;
   const [loading, set_loading] = useState(false);
   const [markdown, set_markdown] = useState('');
@@ -34,7 +34,7 @@ export function MarkdownModal(props: { info?: Info } & IMaskProps) {
     <Mask
       open={open}
       style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-      onClose={onClose}
+      whenChange={onClose}
       container={container}
       onClick={(e) => e.stopPropagation()}
       {..._p}>
