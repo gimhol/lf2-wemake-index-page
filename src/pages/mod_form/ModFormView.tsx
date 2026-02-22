@@ -25,11 +25,12 @@ import { ModPreview } from "../yours/ModPreviewModal";
 import { get_mod, type IMod } from "../yours/get_mod";
 import { replace_one } from "../yours/join_url";
 import { save_mod } from "../yours/save_mod";
+import { FormLinkRow } from "./FormLinkRow";
 import csses from "./ModFormView.module.scss";
+import { uploaded_map } from "./uploaded_map";
 export interface IModFormViewProps {
   mod_id?: number;
 }
-const uploaded_map = new Map<File, IPickedFile>();
 const langs = [{ value: '' as const, label: 'EN' }, { value: 'zh' as const, label: '中' }]
 export function ModFormView(props: IModFormViewProps) {
   const { mod_id } = props;
@@ -62,6 +63,8 @@ export function ModFormView(props: IModFormViewProps) {
         set_mod(r)
         if (r.info.full_cover_url)
           set_covers([{ url: r.info.full_cover_url }])
+        if (r.info.url_type === InfoUrlType.Download && r.info.url)
+          set_attachments([{ url: r.info.url }])
         set_drafts({ '': r.info.raw, zh: r.info.raw.i18n?.['zh'] ?? {} })
       }).catch(e => {
         if (ab.signal.aborted) return;
@@ -193,7 +196,8 @@ export function ModFormView(props: IModFormViewProps) {
               preview(opens.preview, v ?? '')
               set_lang(v ?? '')
             }} />
-          <Dropdown.Select options={[{ value: 'cards' }, { value: 'list' }]}
+          <Dropdown.Select
+            options={[{ value: 'cards' }, { value: 'list' }]}
             value={drafts[''].children_look ?? 'list'}
             onChange={v => set_drafts(d => { d[''].children_look = v })} />
         </h1>
@@ -249,8 +253,22 @@ export function ModFormView(props: IModFormViewProps) {
           <div className={csses.form_row}>
             <span>{t('link')}:</span>
             <div className={csses.short_and_long}>
+              <IconButton
+                disabled={!!drafts[''].more_urls?.length && drafts[''].more_urls?.length > 5}
+                icon='+'
+                onClick={e => {
+                  interrupt_event(e);
+                  set_drafts(d => {
+                    const old = d[''].more_urls
+                    const n = {}
+                    if (old) d[''].more_urls = [...old, n]
+                    else d[''].more_urls = [n]
+                  })
+                }} />
+
               <Dropdown.Select
                 value={drafts[''].url_type}
+                placeholder={t('url_type')}
                 onChange={v => set_drafts(d => { d[''].url_type = v })}
                 options={all_info_url_type.map(v => ({ value: v, label: t(v) }))} />
               {drafts[''].url_type === InfoUrlType.Download ?
@@ -303,6 +321,18 @@ export function ModFormView(props: IModFormViewProps) {
               }
             </div>
           </div>
+          {drafts[''].more_urls?.map((me, idx) => {
+            return (
+              <FormLinkRow
+                key={idx}
+                mod_id={mod_id!}
+                me={me}
+                title={<>{t('link')}{idx + 1}:</>}
+                remove={() => set_drafts(d => { d[''].more_urls?.splice(idx, 1) })}
+                change={v => set_drafts(d => { d[''].more_urls![idx] = v })}
+              />
+            )
+          })}
           <div className={csses.form_row}>
             <span>{t('cover_img')}:</span>
             <PickFile
@@ -431,5 +461,7 @@ export function ModFormView(props: IModFormViewProps) {
     </div>
   </>
 }
+
+
 
 

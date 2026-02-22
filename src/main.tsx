@@ -6,12 +6,15 @@ import { Loading } from './components/loading';
 import Mask from './components/mask';
 import { GlobalStore } from './GlobalStore';
 import './init';
+import { OSSProvider } from './hooks/OSSProvider';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <GlobalStore.Provider fallback={<Loading loading big fixed />}>
-      <Mask.Provider>
+      <OSSProvider>
+        <Mask.Provider>
           <App />
-      </Mask.Provider>
+        </Mask.Provider>
+      </OSSProvider>
     </GlobalStore.Provider>
   </StrictMode>,
 )

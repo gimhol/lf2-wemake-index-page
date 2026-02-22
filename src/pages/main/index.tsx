@@ -34,8 +34,7 @@ export default function MainPage() {
   const [games, set_games] = useState<IRecordInfo[]>()
   const [loading, set_loading] = useState(false);
   const nav = useNavigate();
-  const { value: global_value, dispatch } = useContext(GlobalStore.context);
-  const { session_id } = global_value
+  const { value: { session_id, nickname, username }, dispatch } = useContext(GlobalStore.context);
   const {
     search, hash,
     params: { raw: { game_id } }
@@ -147,7 +146,6 @@ export default function MainPage() {
       </div>
     )
   }, [games, game_id, session_id, t, set_location, loading, pathname, game_list_open, small])
-
   return <>
     <MainContext.Provider value={{ info: actived?.info, record: actived }}>
       <div className={csses.main_page}
@@ -161,6 +159,11 @@ export default function MainPage() {
             {t("main_title")}
           </h1>
           <div className={csses.right_zone}>
+            <Show yes={!!session_id}>
+              <div className={csses.hello}>
+                Hi, {nickname || username || 'Somebody'}
+              </div>
+            </Show>
             <LangButton />
             <Show yes={!session_id}>
               <Dropdown

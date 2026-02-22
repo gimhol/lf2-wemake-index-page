@@ -58,6 +58,8 @@ export async function save_mod(opts: ISaveModFormOpts) {
     delete raw.i18n[l].desc;
     raw.i18n[l].desc_url = oss_name;
   }
+  raw.more_urls?.filter(v => !v.url)
+  if (!raw.more_urls?.length) delete raw.more_urls;
   const blob = new Blob([JSON.stringify(raw)], { type: 'application/json; charset=utf-8' })
   const oss_name = join_url('user', owner_id, mod_id, await read_blob_as_md5(blob))
   const file_name = ['desc', time, 'info.json'].filter(Boolean).join('.')

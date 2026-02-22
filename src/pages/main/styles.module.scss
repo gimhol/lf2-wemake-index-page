@@ -32,6 +32,11 @@
 
     .right_zone {
       @extend .actions_row;
+
+      .hello {
+        margin-right: 10px;
+        opacity     : 0.6;
+      }
     }
 
   }

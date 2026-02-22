@@ -13,6 +13,11 @@ export interface InfoProp {
   placeholder?: 'string'
 }
 export type TInfoChildrenLook = "cards" | "list"
+export interface IUrl {
+  url_type?: string,
+  url?: string,
+  url_name?: string
+}
 export interface IInfo {
   id?: string;
   title?: string;
@@ -24,7 +29,6 @@ export interface IInfo {
   url?: string;
   url_name?: string;
   url_type?: string;
-
   desc?: string;
   desc_url?: string;
   children_title?: string;
@@ -34,7 +38,7 @@ export interface IInfo {
   date?: string;
   cover_url?: string;
   unavailable?: string;
-  more_urls?: [{ url_type: string, url: string, url_name: string }];
+  more_urls?: IUrl[];
   i18n?: { [x in string]: IInfo };
 }
 
@@ -56,6 +60,9 @@ const { Cls, Str } = makeI18N();
   set type(v: RecordType | undefined) { this.raw.type = v }
   get type(): RecordType | undefined { return this.raw.type }
   set_type(v: RecordType | undefined) { this.type = v; return this; }
+  set more_urls(v: IUrl[] | undefined) { this.raw.more_urls = v }
+  get more_urls(): IUrl[] | undefined { return this.raw.more_urls }
+  set_more_urls(v: IUrl[] | undefined) { this.more_urls = v; return this; }
 
   get raw_desc(): string | undefined { return this.raw.desc; }
   get all_desc(): Map<string, string> {
@@ -183,7 +190,7 @@ const { Cls, Str } = makeI18N();
     if (this.full_cover_url) text += `[!cover](${this.full_cover_url})\n\n`
 
     if (this.brief) text += `${this.brief}\n\n`
-    
+
     text += await this.fetch_desc().then(r => r ? `${r}\n\n` : '')
     // text += await this.fetch_changelog().then(r => r ? `${r}\n\n` : '')
 

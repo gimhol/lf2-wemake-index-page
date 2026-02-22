@@ -43,6 +43,7 @@ export function Files(props: IFilePickerFilesProps) {
         return (
           <div
             key={record.name + '_' + idx}
+            title={record.name ?? record.url}
             className={cns(csses.cell, onFileClick && csses.cell_clickable, classNames?.cell,)}
             onClick={e => {
               if (!onFileClick) return
