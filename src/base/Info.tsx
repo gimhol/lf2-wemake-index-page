@@ -175,24 +175,26 @@ const { Cls, Str } = makeI18N();
   async markdown() {
     const md = this._md
     if (md) return md;
+    const { url } = this;
 
-    let text = `# ${this.title}`
-    text += '\n\n'
+    let text = ``
+    if (this.url) text += `# [${this.title}](${url})\n\n`
+    else text += `# ${this.title}\n\n`
+
+
     if (this.author && this.author_url) {
-      text += `visit [**${this.author}**](${this.author_url})\n\n`
+      text += `by [**${this.author}**](${this.author_url})  `
     } else if (this.author) {
-      text += `by **${this.author}**\n\n`
+      text += `by **${this.author}**   `
     } else if (this.author_url) {
-      text += `visit [author](${this.author_url})\n\n`
+      text += `by [author](${this.author_url})   `
     }
-    // text += `[中文](CHANGELOG.MD) | [English](CHANGELOG.EN.MD)\n\n`
 
+    if (this.date) text += `${this.date}\n\n`
     if (this.full_cover_url) text += `[!cover](${this.full_cover_url})\n\n`
-
     if (this.brief) text += `${this.brief}\n\n`
 
     text += await this.fetch_desc().then(r => r ? `${r}\n\n` : '')
-    // text += await this.fetch_changelog().then(r => r ? `${r}\n\n` : '')
 
     if (this.subs?.length) {
       text += `## ${this.children_title}\n\n`
@@ -200,7 +202,6 @@ const { Cls, Str } = makeI18N();
         text += `### ${version.title}\n\n`
         if (version.date) text += `${version.date}\n\n`
         text += await version.fetch_desc().then(r => r ? `${r}\n\n` : '')
-        // text += await version.fetch_changelog().then(r => r ? `${r}\n\n` : '')
       }
     }
     return text;
