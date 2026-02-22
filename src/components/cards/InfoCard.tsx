@@ -1,6 +1,6 @@
 import type { IRecord } from "@/api/listModRecords";
 import { Info } from "@/base/Info";
-import { InfoActions } from "@/pages/info/InfoActions";
+import { IdLink, InfoActions } from "@/pages/info/InfoActions";
 import { Tags } from "@/pages/info/Tags";
 import { submit_click_event } from "@/utils/events";
 import classnames from "classnames";
@@ -12,6 +12,7 @@ import { Mask } from "../mask";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import { DetailCard } from "./DetailCard";
 import csses from "./InfoCard.module.scss";
+import Show from "@/gimd/Show";
 
 export interface IInfoCardProps extends ICardBaseProps {
   info?: Info;
@@ -54,7 +55,6 @@ export function InfoCard(props: IInfoCardProps) {
         <div className={csses.info_card_head}>
           <Link className={csses.title} href={url}>
             {info.title}
-            {info.url_type === Info.OPEN_IN_BROWSER && url ? ' ▸' : null}
           </Link>
           <Tags info={info} />
           <div className={csses.mid}>
@@ -91,11 +91,17 @@ export function InfoCard(props: IInfoCardProps) {
           <div className={csses.mid}>
           </div>
           <div className={csses.right}>
-            <span className={csses.prefix}>
-              {t('date')}
-            </span>
-            {info.date}
+            <IdLink info={info} />
           </div>
+          <Show yes={!!info.date}>
+            <div className={csses.right} title={info.date}>
+              <span className={csses.prefix}>
+                {t('date')}
+              </span>
+              {info.date?.substring(0, 10)}
+            </div>
+          </Show>
+
         </div>
       </div>
     </CardBase>

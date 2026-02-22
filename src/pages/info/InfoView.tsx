@@ -17,7 +17,7 @@ import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { InfoActions } from "./InfoActions";
+import { IdLink, InfoActions } from "./InfoActions";
 import csses from "./InfoView.module.scss";
 import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
@@ -98,14 +98,23 @@ export function InfoView(props: IInfoViewProps) {
             title="Cards or List"
             icon={__next_list_like === 'cards' ? img_cards_view : img_list_view} />
           <InfoActions info={info} record={record} />
-          <div className={csses.el_date}>
-            <Link
-              href={info.author_url}
-              title={t('visit_author_link')}>
-              {info.author}
-            </Link>
-            <span>{date}</span>
+          <div className={csses.item} >
+            <IdLink info={info} />
           </div>
+          <Show yes={info.author || info.author_url}>
+            <div className={csses.item}>
+              <Link
+                href={info.author_url}
+                title={t('visit_author_link')}>
+                {info.author || 'Author'}
+              </Link>
+            </div>
+          </Show>
+          <Show yes={date}>
+            <div className={csses.item}>
+              <span title={date}>{date?.substring(0, 10)}</span>
+            </div>
+          </Show>
         </div>
       </div>
       <Viewer className={csses.content_zone} emptyAsGone content={brief} />

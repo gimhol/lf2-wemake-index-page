@@ -1,9 +1,8 @@
 import type { IRecord } from "@/api/listModRecords";
 import { Info } from "@/base/Info";
 import Show from "@/gimd/Show";
-import { InfoActions } from "@/pages/info/InfoActions";
+import { IdLink, InfoActions } from "@/pages/info/InfoActions";
 import { Tags } from "@/pages/info/Tags";
-import { Paths } from "@/Paths";
 import classnames from "classnames";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -84,20 +83,14 @@ export function DetailCard(props: IDetailCardProps) {
           </div>
           <Show yes={!!info?.id}>
             <div className={csses.right}>
-              <span className={csses.prefix}>
-                {t('id')}
-              </span>
-              <a href={`${location.protocol}//${location.host}/#${Paths.All.Info.replace(':game_id', '' + info?.id)}`}
-                target='_blank'>
-                {info?.id}
-              </a>
+              <IdLink info={info} />
             </div>
           </Show>
-          <div className={csses.right}>
+          <div className={csses.right} title={info?.date}>
             <span className={csses.prefix}>
               {t('date')}
             </span>
-            {info?.date}
+            {info?.date?.substring(0, 10)}
           </div>
         </div>
       </div>

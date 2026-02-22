@@ -72,19 +72,25 @@
 
   .head_right_zone {
     @extend .actions_row;
+
+
+    .item {
+      opacity        : 0.75;
+      font-size      : var(--font-size-small);
+      font-weight    : normal;
+      overflow       : visible;
+      display        : flex;
+      align-items    : center;
+      justify-content: center;
+      width          : calc(var(--size-w-icon-btn) * 2 + 8);
+      margin-right   : 5px;
+    }
+
+    .item:last-child {
+      margin-right: 0px;
+    }
   }
 
-  .el_date {
-    opacity        : 0.75;
-    font-size      : var(--font-size-small);
-    font-weight    : normal;
-    overflow       : visible;
-    display        : flex;
-    align-items    : center;
-    justify-content: center;
-    width          : calc(var(--size-w-icon-btn) * 2 + 8);
-    gap            : 5px;
-  }
 
   .content_zone {
     box-sizing  : border-box;

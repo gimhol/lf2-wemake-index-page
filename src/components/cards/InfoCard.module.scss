@@ -128,9 +128,14 @@
   }
 
   .right {
-    display    : flex;
-    align-items: center;
-    color      : white;
+    display     : flex;
+    align-items : center;
+    color       : white;
+    margin-right: 5px;
+  }
+
+  .right:last-child {
+    margin-right: 0px;
   }
 }
 
