@@ -295,9 +295,8 @@ export function ModFormView(props: IModFormViewProps) {
                       }
                     }).then(r => {
                       if (!r.length) throw 'upload nothings'
-                      const name = r[0].url.split('/').pop();
                       set_drafts(d => {
-                        d[lang].url = name;
+                        d[lang].url = r[0].url;
                         d[lang].url_type = 'download'
                       })
                     }).catch((err) => {

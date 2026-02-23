@@ -22,7 +22,7 @@ export function InfoActions(props: IInfoActionsProps) {
       title={t('' + url_type)}
       href={url}
       gone={!url}
-      icon={img_browser} />
+      icon={icons[url_type as InfoUrlType]} />
     {
       more_urls?.map((u, idx) => {
         return (
