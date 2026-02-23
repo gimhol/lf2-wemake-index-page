@@ -1,5 +1,4 @@
 import type { IRecord } from "@/api/listModRecords";
-import img_browser from "@/assets/svg/browser.svg";
 import type { Info } from "@/base/Info";
 import { IconButton } from "@/components/button/IconButton";
 import { ShareButton } from "@/components/button/ShareButton";
