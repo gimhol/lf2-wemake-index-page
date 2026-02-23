@@ -70,8 +70,8 @@ export function FormLinkRow(props: {
               set_uploading(true);
               ossUploadModRecords({
                 mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
-                  'application/x-zip-compressed': { max_size: 100 * 1024 * 1024 },
-                  'application/zip': { max_size: 100 * 1024 * 1024 },
+                  'application/x-zip-compressed': { max_size: 150 * 1024 * 1024 },
+                  'application/zip': { max_size: 150 * 1024 * 1024 },
                 },
                 progress: (progress, { file }) => {
                   const record = uploaded_map.get(file);

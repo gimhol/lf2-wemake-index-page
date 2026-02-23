@@ -47,9 +47,9 @@ export async function ossUploadFiles(opts: IOssUploadFilesOpts) {
   if (!files?.length) throw new Error(`files.length got ${files?.length}`);
   if (!getObjectName) throw new Error(`getObjectName got ${getObjectName}`);
 
-  if (opts.limits) test_limit(files, opts.limits)
-  test_limit(files, limits)
-
+  const l = Object.assign({}, limits, opts.limits)
+  test_limit(files, l)
+  
   const ret: IOSSUploadImagesResult = { sts, list: [] };
   for (const file of files) {
     const ossName = await getObjectName(file, sts);
