@@ -1,3 +1,4 @@
+import { file_size_txt } from "@/utils/file_size_txt";
 import type OSS from "ali-oss";
 export interface IOSSUploadImagesResult {
   sts: IOSSStsInfo;
@@ -31,12 +32,13 @@ const limits: { [x in string]?: { max_size: number } } = {
 function test_limit(files: File[], limits: { [x in string]?: { max_size: number } }) {
   const not_allow = files.find(v => !limits[v.type]);
   if (not_allow) throw new Error(`file not allow, type: ${not_allow.type} name: ${not_allow.name}`);
+
   const too_large = files.find(v => {
     const { max_size } = limits[v.type]!
     if (!max_size) return false
     return v.size > max_size;
   });
-  if (too_large) throw new Error(`file size must be <= 5MB, name: ${too_large.name}`);
+  if (too_large) throw new Error(`file size must be <= ${file_size_txt(limits[too_large.type]!.max_size)}, name: ${too_large.name}`);
 }
 export async function ossUploadFiles(opts: IOssUploadFilesOpts) {
   const { sts, oss, files, getObjectName, progress } = opts;
