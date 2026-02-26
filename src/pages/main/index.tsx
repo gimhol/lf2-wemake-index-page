@@ -34,7 +34,7 @@ export default function MainPage() {
   const [games, set_games] = useState<IRecordInfo[]>()
   const [loading, set_loading] = useState(false);
   const nav = useNavigate();
-  const { value: { session_id, nickname, username }, dispatch } = useContext(GlobalStore.context);
+  const { value: { session_id, nickname, username, admin }, dispatch } = useContext(GlobalStore.context);
   const {
     search, hash,
     params: { raw: { game_id } }
@@ -57,10 +57,10 @@ export default function MainPage() {
   useEffect(() => {
     const session = search.get_string('session')
     if (session) return;
-    if (pathname === Paths.All.Workspace) return;
-    if (!game_id || (!session_id && game_id === 'yours')) {
-      set_location({ game: games?.find(v => v)?.id?.toString() })
-    }
+    if (session_id && pathname === Paths.All.Workspace) return;
+    if (session_id && pathname === Paths.All.Dashboard) return;
+    const game = games?.find(v => v.id == game_id);
+    if (!game) set_location({ game: games?.find(v => v)?.id?.toString() })
   }, [session_id, search, game_id, set_location, games, pathname])
 
   useEffect(() => {
@@ -131,6 +131,14 @@ export default function MainPage() {
             {t('workspace')}
           </button>
         </Show>
+        <Show yes={admin == 255}>
+          <button className={pathname === Paths.All.Dashboard ? csses.game_item_actived : csses.game_item} onClick={() => {
+            set_location({ game: 'dashboard' });
+            if (small) set_game_list_open(false)
+          }}>
+            {t('Dashboard')}
+          </button>
+        </Show>
         {games?.map((v) => {
           const cls_name = game_id === v.info.id ? csses.game_item_actived : csses.game_item
           return (
@@ -145,7 +153,7 @@ export default function MainPage() {
         <Loading loading={loading} center absolute />
       </div>
     )
-  }, [games, game_id, session_id, t, set_location, loading, pathname, game_list_open, small])
+  }, [game_list_open, session_id, pathname, t, admin, games, loading, set_location, small, game_id])
   return <>
     <MainContext.Provider value={{ info: actived?.info, record: actived }}>
       <div className={csses.main_page}

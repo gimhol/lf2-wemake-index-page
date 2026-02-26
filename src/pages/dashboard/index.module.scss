@@ -1,0 +1,62 @@
+@use "../../theme/common.module.scss"as *;
+
+.dashboard {
+  display       : flex;
+  flex-direction: column;
+  flex          : 1;
+  justify-items : stretch;
+  font-size     : 1rem;
+
+  .head {
+    display      : flex;
+    border-bottom: 1px dashed var(--color-divider);
+
+    .input {
+      background-color: transparent;
+      border          : transparent;
+      outline         : transparent;
+      color           : var(--color-txt);
+      font-size       : 1rem;
+      width           : 200px;
+      text-align      : center;
+      padding         : 5px 10px;
+      box-sizing      : border-box;
+    }
+  }
+
+  .record_list {
+    @extend .scrollview;
+    overflow      : auto;
+    display       : flex;
+    flex-direction: column;
+    flex          : 1;
+    align-items   : stretch;
+
+    table {
+      border-collapse: collapse;
+
+      tr {
+        border-bottom   : 1px dashed var(--color-divider);
+        background-color: var(--color-table-row-bg-1);
+
+        &:nth-child(2n+1) {
+          background-color: var(--color-table-row-bg-2);
+        }
+
+        &:hover {
+          background-color: var(--color-table-row-bg-hover);
+        }
+
+        td {
+          padding: 5px 10px;
+        }
+
+        td>span.picked {
+          color: red;
+        }
+      }
+    }
+
+
+  }
+}

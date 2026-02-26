@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 export function useMovingBg(el: HTMLElement | null | undefined) {
   useEffect(() => {
     if (!el) return;
+    if (window.location.host.startsWith('localhost')) return
     let x = 0;
     let y = 0;
     let a = Math.random() * Math.PI;
