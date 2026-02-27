@@ -37,6 +37,12 @@ export function InfoCard(props: IInfoCardProps) {
     set_detail_style({ width, height, left, top })
   }
   const open_detail = (e: React.MouseEvent) => {
+    const el = ref_el.current;
+    if (!el) return;
+    const paths: HTMLElement[] = [e.target as HTMLElement]
+    while (paths[paths.length - 1].parentElement) paths.push(paths[paths.length - 1].parentElement!);
+    if (!paths.includes(el)) return 
+
     set_detail_open(true)
     const { width, height, left, top } = ref_el.current!.firstElementChild!.getBoundingClientRect()
     set_detail_style({ width, height, left, top })

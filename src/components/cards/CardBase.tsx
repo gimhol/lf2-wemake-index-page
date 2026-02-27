@@ -29,10 +29,16 @@ export function CardBase(props: ICardBaseProps) {
   const [dynamic_card_style, set_dynamic_card_style] = useState<React.CSSProperties>({})
   const [is_pointer_down, set_is_pointer_down] = useState(false);
 
+
   const on_pointer_move = (e: React.PointerEvent) => {
     if (is_pointer_down) return;
     const el = el_card;
     if (!el) return;
+
+    const paths: HTMLElement[] = [e.target as HTMLElement]
+    while (paths[paths.length - 1].parentElement) paths.push(paths[paths.length - 1].parentElement!);
+    if (!paths.includes(el)) return on_pointer_leave();
+
     const r = el.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
@@ -54,7 +60,15 @@ export function CardBase(props: ICardBaseProps) {
     ) ? prev : { filter, transform })
   }
   const on_pointer_down = (e: React.PointerEvent) => {
+
     if (e.button != 0) return;
+    
+    const el = el_card;
+    if (!el) return;
+    const paths: HTMLElement[] = [e.target as HTMLElement]
+    while (paths[paths.length - 1].parentElement) paths.push(paths[paths.length - 1].parentElement!);
+    if (!paths.includes(el)) return on_pointer_leave();
+
     set_is_pointer_down(true);
     const filter = 'contrast(1)'
     const transform = 'rotateX(0deg) rotateY(0deg)'
