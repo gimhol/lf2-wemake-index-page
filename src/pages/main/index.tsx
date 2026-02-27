@@ -168,7 +168,6 @@ export default function MainPage() {
           }} />
         )}
         <NavButton
-          show={!!session_id}
           children={t('Dat Editor')}
           onClick={(e) => {
             if (small) set_game_list_open(false)
