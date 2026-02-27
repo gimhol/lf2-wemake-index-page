@@ -157,16 +157,6 @@ export default function MainPage() {
             set_location({ game: 'dashboard' });
           }}
         />
-        <NavButton
-          show={!!session_id}
-          actived={pathname === Paths.All.Editor}
-          children={t('data_editor')}
-          onClick={(e) => {
-            if (small) set_game_list_open(false)
-            interrupt_event(e);
-            set_location({ game: 'editor' });
-          }}
-        />
         {games?.map((v) => <NavButton
           key={v.id}
           actived={real_game_id === v.info.id}
@@ -177,6 +167,15 @@ export default function MainPage() {
             if (small) set_game_list_open(false)
           }} />
         )}
+        <NavButton
+          show={!!session_id}
+          children={t('Dat Editor')}
+          onClick={(e) => {
+            if (small) set_game_list_open(false)
+            interrupt_event(e);
+            set_location({ game: 'editor' });
+          }}
+        />
         <Loading loading={loading} center absolute />
       </div>
     )
