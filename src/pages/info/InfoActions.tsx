@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { MarkdownButton } from "../main/MarkdownModal";
 import { icons, InfoUrlType } from "../yours/InfoUrlType";
 import { EditModButton } from "./EditModButton";
+import { Tooltip } from "@/gimd/Tooltip";
 
 export interface IInfoActionsProps {
   record?: IRecord | null;
@@ -43,9 +44,11 @@ export function IdLink(props: IInfoActionsProps) {
   const { info } = props;
   if (!info) return <></>
   const href = `${location.protocol}//${location.host}/#${Paths.All.Info.replace(':game_id', '' + info?.id)}`
-  return <>
-    <a href={href} target='_blank' style={{ display: 'inline' }} onClick={e => e.stopPropagation()}>
-      <span style={{ fontSize: `0.8em`, opacity: 0.5 }}>id:</span>{info?.id}
-    </a>
-  </>
+  return (
+    <Tooltip title='Open In New Page'>
+      <a href={href} target='_blank' style={{ display: 'inline' }} onClick={e => e.stopPropagation()}>
+        <span style={{ fontSize: `0.8em`, opacity: 0.5 }}>id:</span>{info?.id}
+      </a>
+    </Tooltip>
+  )
 }

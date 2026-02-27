@@ -69,13 +69,13 @@ export default function MainPage() {
   useEffect(() => {
     const session = search.get_string('session')
     if (session) return;
-    if (session_id && Paths.Relations[Paths.All.Main]?.includes(pathname as any)) return;
+    if (pathname !== Paths.All.Main && Paths.has_permission(pathname)) return;
     const curr = games?.find(v => v.id == real_game_id);
     if (curr) return;
     const next_game_id = games?.find(v => v)?.id?.toString();
     const game = b_mappings['' + next_game_id] ?? next_game_id
     set_location({ game: game })
-  }, [session_id, search, real_game_id, set_location, games, pathname])
+  }, [search, real_game_id, set_location, games, pathname])
 
   useEffect(() => {
     const session = search.get_string('session')

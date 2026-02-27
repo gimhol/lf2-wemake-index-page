@@ -11,6 +11,7 @@ import { Link } from "../link";
 import { Viewer } from "../markdown/Viewer";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import csses from "./DetailCard.module.scss";
+import { InfoDate } from "./InfoDate";
 
 export interface IDetailCardProps extends ICardBaseProps {
   info?: Info | null;
@@ -86,15 +87,16 @@ export function DetailCard(props: IDetailCardProps) {
               <IdLink info={info} />
             </div>
           </Show>
-          <div className={csses.right} title={info?.date}>
+          <div className={csses.right}>
             <span className={csses.prefix}>
               {t('date')}
             </span>
-            {info?.date?.substring(0, 10)}
+            <InfoDate record={record} />
           </div>
         </div>
       </div>
     </CardBase>
   </>
 }
+
 

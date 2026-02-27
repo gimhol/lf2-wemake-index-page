@@ -21,6 +21,7 @@ import { IdLink, InfoActions } from "./InfoActions";
 import csses from "./InfoView.module.scss";
 import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
+import { InfoDate } from "@/components/cards/InfoDate";
 type ListLike = 'cards' | 'list';
 function curr_list_like(v: string | undefined | null): ListLike {
   return v === 'cards' ? 'cards' : 'list'
@@ -65,7 +66,7 @@ export function InfoView(props: IInfoViewProps) {
   }, [info])
 
   const { t } = useTranslation()
-  const { children_title, date, url, desc, brief, full_desc_url, title } = info ?? {};
+  const { children_title, url, desc, brief, full_desc_url, title } = info ?? {};
   const ref_el_children = useRef<HTMLDivElement>(null);
   const has_content = !!(desc || full_desc_url)
   const [children, , children_error] = useInfoChildren(info)
@@ -110,11 +111,9 @@ export function InfoView(props: IInfoViewProps) {
               </Link>
             </div>
           </Show>
-          <Show yes={date}>
-            <div className={csses.item}>
-              <span title={date}>{date?.substring(0, 10)}</span>
-            </div>
-          </Show>
+          <div className={csses.item}>
+            <InfoDate record={record} />
+          </div>
         </div>
       </div>
       <Viewer className={csses.content_zone} emptyAsGone content={brief} />

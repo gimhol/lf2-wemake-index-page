@@ -12,7 +12,7 @@ import { Mask } from "../mask";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import { DetailCard } from "./DetailCard";
 import csses from "./InfoCard.module.scss";
-import Show from "@/gimd/Show";
+import { InfoDate } from "./InfoDate";
 
 export interface IInfoCardProps extends ICardBaseProps {
   info?: Info;
@@ -93,15 +93,12 @@ export function InfoCard(props: IInfoCardProps) {
           <div className={csses.right}>
             <IdLink info={info} />
           </div>
-          <Show yes={!!info.date}>
-            <div className={csses.right} title={info.date}>
-              <span className={csses.prefix}>
-                {t('date')}
-              </span>
-              {info.date?.substring(0, 10)}
-            </div>
-          </Show>
-
+          <div className={csses.right}>
+            <span className={csses.prefix}>
+              {t('date')}
+            </span>
+            <InfoDate record={record} />
+          </div>
         </div>
       </div>
     </CardBase>

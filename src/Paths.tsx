@@ -3,6 +3,7 @@ import React from "react"
 import type { RouteObject } from "react-router"
 import { Loading } from "./components/loading"
 import { ModProvider } from "./pages/mod_form/ModProvider"
+import GlobalStore from "./GlobalStore"
 export namespace Paths {
   export enum All {
     _ = '',
@@ -37,6 +38,23 @@ export namespace Paths {
       All.Editor,
     ]
   }
+  export const Permissions: Record<All, string | undefined | null> = {
+    [All._]: null,
+    [All.Main]: null,
+    [All.Info]: null,
+    [All.Workspace]: '',
+    [All.Dashboard]: '',
+    [All.Editor]: null,
+    [All.InnerInfo]: null,
+    [All.ModForm]: ''
+  }
+  export function has_permission(pathname: string) {
+    if (!(pathname in Paths.Permissions)) return false;
+    const p = Paths.Permissions[pathname as Paths.All];
+    if (p === void 0 || p === null) return true
+    return !!GlobalStore.store.value.session_id
+  }
+
   export const gen_route_obj = (path: All, parent?: All): RouteObject => {
     let str_path: string = path
     if (parent !== void 0) {

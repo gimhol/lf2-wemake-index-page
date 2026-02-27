@@ -7,6 +7,9 @@ export function submit_visit_event() {
   const curr_location = location.toString();
   if (_prev_location == curr_location) return;
   _prev_location = curr_location
+  console.log(curr_location)
+  if (curr_location.endsWith(`/#/`)) return;
+  if (curr_location.indexOf('#') < 0) return
   submit_event('visit', { uri: curr_location });
 }
 
