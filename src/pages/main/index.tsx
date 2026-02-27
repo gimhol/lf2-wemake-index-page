@@ -50,9 +50,7 @@ export default function MainPage() {
     search, hash,
     params: { raw: { game_id } }
   } = LocationParams.useAll()
-
   const real_game_id = useMemo(() => a_mappings['' + game_id] ?? game_id, [game_id]);
-
   const { pathname } = useLocation()
   const set_location = useCallback((opts: { game?: string }) => {
     const { game } = opts
@@ -160,7 +158,7 @@ export default function MainPage() {
           }}
         />
         <NavButton
-          show={!!session_id && admin == 255}
+          show={!!session_id}
           actived={pathname === Paths.All.Editor}
           children={t('data_editor')}
           onClick={(e) => {

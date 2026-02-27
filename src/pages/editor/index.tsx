@@ -65,10 +65,8 @@ export default function Editor() {
     if (!txt) return;
     const model = editor.getModel();
     if (!model) return;
-
     const [, a] = txt.match(/next:\s*(\d+)/) || []
     const [, b] = txt.match(/hit_[a-zA-Z]*:\s*(\d+)/) || []
-
     const next = Number(a ?? b);
     if (!Number.isInteger(next) || !next) return;
     const [result] = model.findMatches(`<frame>\\s*${next}[\n\\s][\\s\\S\n]*?<frame_end>`, true, true, true, null, true)
@@ -81,8 +79,7 @@ export default function Editor() {
 
   useEffect(() => {
     ref_editor.current?.onMouseDown(on_mouse_down)
-  }, [on_mouse_down])
-
+  })
   useEffect(() => {
     const editor = ref_editor.current = monaco.editor.create(ref_container.current!, {
       value: '',
