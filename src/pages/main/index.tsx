@@ -27,6 +27,15 @@ import { fetch_infos, type IRecordInfo } from "./fetch_info_list";
 import { MainContext } from "./main_context";
 import csses from "./styles.module.scss";
 
+const a_mappings: { [x in string]?: string } = {
+  'origin': `1`,
+  'wmods': `2`,
+  'mods': `3`,
+  'tools': `4`,
+}
+const b_mappings: { [x in string]?: string } = {};
+for (const k in a_mappings) b_mappings[a_mappings[k]!] = k
+
 export default function MainPage() {
   useEffect(() => { submit_visit_event(); })
   useMovingBg(document.documentElement)
@@ -39,6 +48,9 @@ export default function MainPage() {
     search, hash,
     params: { raw: { game_id } }
   } = LocationParams.useAll()
+
+  const real_game_id = useMemo(() => a_mappings['' + game_id] ?? game_id, [game_id]);
+
   const { pathname } = useLocation()
   const set_location = useCallback((opts: { game?: string }) => {
     const { game } = opts
@@ -59,9 +71,12 @@ export default function MainPage() {
     if (session) return;
     if (session_id && pathname === Paths.All.Workspace) return;
     if (session_id && pathname === Paths.All.Dashboard) return;
-    const game = games?.find(v => v.id == game_id);
-    if (!game) set_location({ game: games?.find(v => v)?.id?.toString() })
-  }, [session_id, search, game_id, set_location, games, pathname])
+    const curr = games?.find(v => v.id == real_game_id);
+    if (curr) return;
+    const next_game_id = games?.find(v => v)?.id?.toString();
+    const game = b_mappings['' + next_game_id] ?? next_game_id
+    set_location({ game: game })
+  }, [session_id, search, real_game_id, set_location, games, pathname])
 
   useEffect(() => {
     const session = search.get_string('session')
@@ -98,7 +113,7 @@ export default function MainPage() {
     return () => c.abort()
   }, [session_id, dispatch, set_location])
 
-  const actived: IRecordInfo | undefined = useMemo(() => games?.find(v => v.info.id == game_id), [game_id, games])
+  const actived: IRecordInfo | undefined = useMemo(() => games?.find(v => v.info.id == real_game_id), [real_game_id, games])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -140,10 +155,10 @@ export default function MainPage() {
           </button>
         </Show>
         {games?.map((v) => {
-          const cls_name = game_id === v.info.id ? csses.game_item_actived : csses.game_item
+          const cls_name = real_game_id === v.info.id ? csses.game_item_actived : csses.game_item
           return (
             <button className={cls_name} key={v.id} onClick={() => {
-              set_location({ game: v.info.id });
+              set_location({ game: b_mappings['' + v.info.id] ?? v.info.id });
               if (small) set_game_list_open(false)
             }}>
               {v.info.short_title}
@@ -153,7 +168,7 @@ export default function MainPage() {
         <Loading loading={loading} center absolute />
       </div>
     )
-  }, [game_list_open, session_id, pathname, t, admin, games, loading, set_location, small, game_id])
+  }, [game_list_open, session_id, pathname, t, admin, games, loading, set_location, small, real_game_id])
   return <>
     <MainContext.Provider value={{ info: actived?.info, record: actived }}>
       <div className={csses.main_page}
