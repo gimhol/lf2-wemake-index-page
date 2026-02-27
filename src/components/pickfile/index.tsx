@@ -2,9 +2,10 @@ import { usePropState } from "@/utils/usePropState";
 import cns from "classnames";
 import { useEffect, useMemo, type HTMLAttributes, type InputHTMLAttributes } from "react";
 import { FilePickerCtx, type FilePickerContextValue, type IPickedFile } from "./_Common";
-import { Images } from "./_Images";
 import { Files } from "./_Files";
+import { Images } from "./_Images";
 import csses from "./index.module.scss";
+import { open_file } from "./open_file";
 
 export interface IPickFileProps extends
   HTMLAttributes<HTMLDivElement>,
@@ -70,12 +71,7 @@ export function PickFile(props: IPickFileProps) {
       disabled,
       open: () => {
         if (files && files.length > max) return
-        const el = document.createElement('input')
-        el.type = 'file'
-        if (typeof multiple === 'boolean') el.multiple = multiple
-        if (typeof accept === 'string') el.accept = accept
-        el.onchange = () => add(el.files?.length ? Array.from(el.files).map(file => ({ file })) : [])
-        el.click();
+        open_file(multiple, accept, add);
       },
       remove,
       add,
@@ -96,3 +92,5 @@ export function PickFile(props: IPickFileProps) {
 }
 PickFile.Images = Images
 PickFile.Files = Files
+
+

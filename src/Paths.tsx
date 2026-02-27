@@ -10,6 +10,7 @@ export namespace Paths {
     Info = '/info/:game_id',
     Workspace = '/yours',
     Dashboard = '/dashboard',
+    Editor = '/editor',
     InnerInfo = '/:game_id',
     ModForm = '/mod_form/:id',
   }
@@ -20,7 +21,8 @@ export namespace Paths {
     [All.InnerInfo]: React.lazy(() => import("./pages/info")),
     [All.Info]: React.lazy(() => import("./pages/info")),
     [All.ModForm]: React.lazy(() => import("./pages/mod_form")),
-    [All.Dashboard]: React.lazy(() => import("./pages/dashboard"))
+    [All.Dashboard]: React.lazy(() => import("./pages/dashboard")),
+    [All.Editor]: React.lazy(() => import("./pages/editor")),
   }
   export const Relations: { [x in All]?: All[] } = {
     [All._]: [
@@ -31,7 +33,8 @@ export namespace Paths {
     [All.Main]: [
       All.Workspace,
       All.Dashboard,
-      All.InnerInfo
+      All.InnerInfo,
+      All.Editor,
     ]
   }
   export const gen_route_obj = (path: All, parent?: All): RouteObject => {

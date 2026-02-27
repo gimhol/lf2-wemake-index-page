@@ -18,13 +18,15 @@ import * as KnownError from "@/network/KnownError";
 import { Paths } from "@/Paths";
 import { useSmallScreen } from "@/useSmallScreen";
 import { submit_visit_event } from "@/utils/events";
+import { interrupt_event } from "@/utils/interrupt_event";
 import { LocationParams } from "@/utils/LocationParams";
-import classnames from "classnames";
+import cns from "classnames";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { fetch_infos, type IRecordInfo } from "./fetch_info_list";
 import { MainContext } from "./main_context";
+import { NavButton } from "./NavButton";
 import csses from "./styles.module.scss";
 
 const a_mappings: { [x in string]?: string } = {
@@ -69,8 +71,7 @@ export default function MainPage() {
   useEffect(() => {
     const session = search.get_string('session')
     if (session) return;
-    if (session_id && pathname === Paths.All.Workspace) return;
-    if (session_id && pathname === Paths.All.Dashboard) return;
+    if (session_id && Paths.Relations[Paths.All.Main]?.includes(pathname as any)) return;
     const curr = games?.find(v => v.id == real_game_id);
     if (curr) return;
     const next_game_id = games?.find(v => v)?.id?.toString();
@@ -137,34 +138,47 @@ export default function MainPage() {
   const [game_list_open, set_game_list_open] = useState(!small);
   const game_list = useMemo(() => {
     return (
-      <div className={classnames(csses.game_list, game_list_open ? void 0 : csses.close, csses.scrollview)}>
-        <Show yes={!!session_id}>
-          <button className={pathname === Paths.All.Workspace ? csses.game_item_actived : csses.game_item} onClick={() => {
+      <div className={cns(csses.game_list, game_list_open ? void 0 : csses.close, csses.scrollview)}>
+        <NavButton
+          show={!!session_id}
+          actived={pathname === Paths.All.Workspace}
+          children={t('workspace')}
+          onClick={(e) => {
+            if (small) set_game_list_open(false)
+            interrupt_event(e);
             set_location({ game: 'yours' });
+          }}
+        />
+        <NavButton
+          show={!!session_id && admin == 255}
+          actived={pathname === Paths.All.Dashboard}
+          children={t('dashboard')}
+          onClick={(e) => {
             if (small) set_game_list_open(false)
-          }}>
-            {t('workspace')}
-          </button>
-        </Show>
-        <Show yes={admin == 255}>
-          <button className={pathname === Paths.All.Dashboard ? csses.game_item_actived : csses.game_item} onClick={() => {
+            interrupt_event(e);
             set_location({ game: 'dashboard' });
+          }}
+        />
+        <NavButton
+          show={!!session_id && admin == 255}
+          actived={pathname === Paths.All.Editor}
+          children={t('data_editor')}
+          onClick={(e) => {
             if (small) set_game_list_open(false)
-          }}>
-            {t('Dashboard')}
-          </button>
-        </Show>
-        {games?.map((v) => {
-          const cls_name = real_game_id === v.info.id ? csses.game_item_actived : csses.game_item
-          return (
-            <button className={cls_name} key={v.id} onClick={() => {
-              set_location({ game: b_mappings['' + v.info.id] ?? v.info.id });
-              if (small) set_game_list_open(false)
-            }}>
-              {v.info.short_title}
-            </button>
-          )
-        })}
+            interrupt_event(e);
+            set_location({ game: 'editor' });
+          }}
+        />
+        {games?.map((v) => <NavButton
+          key={v.id}
+          actived={real_game_id === v.info.id}
+          children={v.info.short_title}
+          onClick={e => {
+            interrupt_event(e);
+            set_location({ game: b_mappings['' + v.info.id] ?? v.info.id });
+            if (small) set_game_list_open(false)
+          }} />
+        )}
         <Loading loading={loading} center absolute />
       </div>
     )
@@ -254,4 +268,3 @@ export default function MainPage() {
     </MainContext.Provider>
   </>
 }
-
