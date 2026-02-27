@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/immutability */
 import { open_file } from "@/components/pickfile/open_file";
 import { interrupt_event } from "@/utils/interrupt_event";
 import * as monaco from 'monaco-editor';

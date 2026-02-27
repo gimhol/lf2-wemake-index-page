@@ -7,6 +7,7 @@ function encode(buf: { [i in number]: number }, len: number) {
   for (let i = 0; i < len; ++i) buf[i] += pwd.charCodeAt(i % pwd.length);
 }
 
+const chunk = 8 * 1024
 export async function decode_lf2_dat(
   array_buffer: ArrayBuffer,
 ): Promise<string> {
@@ -14,7 +15,14 @@ export async function decode_lf2_dat(
   decode(buf, buf.byteLength);
   const char_code_arr = Array.from(buf);
   char_code_arr.splice(0, head_placeholder_length);
-  return String.fromCharCode(...char_code_arr);
+
+  let str = '';
+  let i;
+  for (i = 0; i < char_code_arr.length / chunk; i++) {
+    str += String.fromCharCode.apply(null, char_code_arr.slice(i * chunk, (i + 1) * chunk));
+  }
+  str += String.fromCharCode.apply(null, char_code_arr.slice(i * chunk));
+  return str;
 }
 
 export async function encode_lf2_dat(text: string): Promise<ArrayBuffer> {
