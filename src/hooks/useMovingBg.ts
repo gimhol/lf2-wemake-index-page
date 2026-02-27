@@ -12,6 +12,7 @@ export function useMovingBg(el: HTMLElement | null | undefined) {
     const interval = 100;
     const d = Math.random() > 0.5 ? -1 : 1;
     const tid = setInterval(() => {
+      if ('stop_moving' in window) return;
       a += ang_step * d;
       const xd = dis_step * Math.sin(a)
       const yd = dis_step * Math.cos(a)

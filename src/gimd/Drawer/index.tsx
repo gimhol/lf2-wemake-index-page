@@ -68,7 +68,6 @@ export function Drawer(props: IDrawerProps) {
   }, [pos]);
 
   const on_pointerup = useCallback(() => {
-    console.log('on_pointerup')
     const ele = ref_ele.current;
     if (!ele) return;
     ele.classList.remove(styles.drawer_dragging)

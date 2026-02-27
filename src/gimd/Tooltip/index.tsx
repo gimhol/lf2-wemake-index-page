@@ -28,7 +28,6 @@ export function Tooltip(props: ITooltipProps) {
   useEffect(() => {
     const keydown = (e: KeyboardEvent) => {
       const k = e.key?.toLowerCase()
-      console.log(k)
       if (k != 'alt' && k != 'escape') return
       e.preventDefault()
       e.stopPropagation()

@@ -484,7 +484,6 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
                     return true
                   }).catch(e => {
                     set_new_dir(0)
-                    console.log(e)
                     Toast.error(e)
                     return false
                   }).finally(() => {

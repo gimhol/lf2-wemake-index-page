@@ -30,7 +30,6 @@ export function FormLinkRow(props: {
   const [oss, sts] = useOSS();
 
   useEffect(() => {
-    console.log(me)
     if (me.url_type === InfoUrlType.Download && me.url)
       set_attachments([{ url: me.url, name: me.url }])
   }, [me])

@@ -63,7 +63,6 @@ export function Viewer(props: IViewerProps) {
     const link = (e.target as Element).closest("a");
     const href = link?.getAttribute('data-href')
     if (href?.startsWith('/')) {
-      console.log(href)
       nav({ pathname: href })
       e.preventDefault();
       e.stopPropagation();

@@ -20,7 +20,7 @@ export class PIO<K, V> {
       if (!pendings) this.pendings.set(key, pendings = []);
       pendings.push([a, b]);
       if (pendings.length > 1) {
-        if (this.debug) console.log(`[${this.name}] pending, waiting first job.`)
+        if (this.debug) console.debug(`[${this.name}] pending, waiting first job.`)
         return;
       }
       job().then(r => {
