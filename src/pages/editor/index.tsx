@@ -16,9 +16,13 @@ export default function Editor() {
   const [file_name, set_file_name] = useState('')
   const [state, set_state] = useImmer<IEditorsState>(init_editor_state)
   const [ready, set_ready] = useState(false);
-  const load_editor_state = async (tab: IEditorTab) => {
+  const load_editor_state = async (tab?: IEditorTab | null) => {
     const editor = ref_editor.current;
     if (!editor) return;
+    if (!tab) {
+      editor.setValue('');
+      return
+    }
     const state = await forage.getItem<IEditorState>('editor_state_' + tab.id)
     const text = state?.content ?? "";
     editor.setValue(text);
@@ -167,7 +171,7 @@ export default function Editor() {
       draft.clicks = clicks
       draft.actived = next?.id ?? ''
     })
-    if (next) await load_editor_state(next)
+    await load_editor_state(next)
   }
   return (
     <div className={cns(csses.editor_view, 'monaco-editor')}>
