@@ -79,7 +79,7 @@ export default function Editor() {
   }, [set_state, ready, load_editor_state])
 
   useEffect(() => {
-    if (ready) return;
+    if (!ready) return;
     forage.setItem<IEditorsState>(`editors_state`, state)
   }, [state, ready])
 
