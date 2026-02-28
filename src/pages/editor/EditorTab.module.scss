@@ -1,0 +1,58 @@
+@use "../../theme/common.module.scss"as *;
+
+.editor_tab {
+  height         : var(--editor-tab-height);
+  transition     : background-color 120ms, border-color 120ms;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  gap            : 5px;
+  padding        : 0px 5px 0px 15px;
+  cursor         : pointer;
+  user-select    : none;
+  border-right   : 1px solid var(--editor-border-color);
+  border-bottom  : 1px solid var(--editor-border-color);
+  border-top     : 1px solid var(--editor-border-color);
+  overflow       : hidden;
+  word-break     : keep-all;
+  white-space    : nowrap;
+  flex-shrink    : 0;
+  position       : relative;
+  box-sizing     : border-box;
+}
+
+.editor_tab:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+.editor_tab.actived {
+  border-top-color   : var(--vscode-focusBorder);
+  position           : relative;
+  z-index            : 1;
+  background-color   : var(--vscode-tab-activeBackground);
+  border-bottom-color: var(--vscode-tab-activeBackground);
+}
+
+.btn_close_tab {
+  transition     : opacity 120ms, background-color 120ms;
+  opacity        : 0;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 20px;
+  height         : 20px;
+  border-radius  : 3px;
+}
+
+.btn_close_tab:hover {
+  opacity         : 1;
+  background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+.editor_tab:hover>.btn_close_tab {
+  opacity: 1;
+}
+
+.editor_tab.actived>.btn_close_tab {
+  opacity: 1;
+}

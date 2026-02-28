@@ -2,21 +2,24 @@ import { open_file } from "@/components/pickfile/open_file";
 import { interrupt_event } from "@/utils/interrupt_event";
 import cns from "classnames";
 import * as monaco from 'monaco-editor';
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useImmer } from "use-immer";
-import { encode_lf2_dat, save_to_file } from "./decode_lf2_dat";
+import { EditorsContext, init_editor_state, type IEditorsContextValue, type IEditorsState, type IEditorState, type IEditorTab, type IEditorTreeNode } from "./base";
+import { encode_lf2_dat } from "./decode_lf2_dat";
+import { EditorTab } from "./EditorTab";
 import csses from "./index.module.scss";
 import { forage } from "./init";
 import { read_dat_or_txt } from "./read_dat_or_txt";
-import { init_editor_state, type IEditorsState, type IEditorState, type IEditorTab } from "./type";
+import { TreeItem } from "./TreeItem";
 
 export default function Editor() {
   const ref_editor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const ref_container = useRef<HTMLDivElement>(null);
-  const [file_name, set_file_name] = useState('')
   const [state, set_state] = useImmer<IEditorsState>(init_editor_state)
+
+  const { tabs, clicks, trees, actived } = state;
   const [ready, set_ready] = useState(false);
-  const load_editor_state = async (tab?: IEditorTab | null) => {
+  const load_editor_state = useCallback(async (tab?: IEditorTab | null) => {
     const editor = ref_editor.current;
     if (!editor) return;
     if (!tab) {
@@ -40,8 +43,11 @@ export default function Editor() {
       editor.setScrollTop(state.scrollTop ?? 0)
     }
     editor.focus()
-  }
-  const save_editor_state = async () => {
+  }, [])
+  const del_editor_state = useCallback(async (tab: IEditorTab) => {
+    await forage.removeItem('editor_state_' + tab.id)
+  }, [])
+  const save_editor_state = useCallback(async (tab: IEditorTab) => {
     const editor = ref_editor.current;
     if (!editor) return;
     const prev_state: IEditorState = {
@@ -59,11 +65,9 @@ export default function Editor() {
       scrollTop: editor.getScrollTop(),
       content: editor.getValue(),
     }
-    forage.setItem<IEditorState>('editor_state_' + state.actived, prev_state)
-  }
-  const del_editor_state = async (tab: IEditorTab) => {
-    await forage.removeItem('editor_state_' + tab.id)
-  }
+    forage.setItem<IEditorState>('editor_state_' + tab.id, prev_state)
+  }, [])
+
   useEffect(() => {
     if (ready) return;
     forage.getItem<IEditorsState>(`editors_state`).then(r => {
@@ -72,10 +76,10 @@ export default function Editor() {
       set_state(r ?? init_editor_state)
       set_ready(true)
     })
-  }, [set_state, ready])
+  }, [set_state, ready, load_editor_state])
 
   useEffect(() => {
-    if (!ready) return;
+    if (ready) return;
     forage.setItem<IEditorsState>(`editors_state`, state)
   }, [state, ready])
 
@@ -113,108 +117,122 @@ export default function Editor() {
     }
   }, [])
 
-  const import_file = async () => {
+  const import_file = useCallback(async () => {
     const editor = ref_editor.current;
     if (!editor) return;
     const files = await open_file(true, '.dat,.txt')
     if (!files.length) return;
+    const valids: IEditorTab[] = [];
+    let text = ''
     for (const file of files) {
       const uuid = crypto.randomUUID();
-      const text = await read_dat_or_txt(file);
+      text = await read_dat_or_txt(file);
       const prev_state: IEditorState = { content: text }
       forage.setItem<IEditorState>('editor_state_' + uuid, prev_state)
-      set_state(d => {
-        const idx = d.tabs.findIndex(v => v.id === uuid);
-        if (idx >= 0) {
-          d.actived = d.tabs[idx].id;
-          return;
-        }
-        d.tabs.push({
-          id: uuid,
-          name: file.name,
-          type: file.type,
-        })
-        d.actived = uuid;
+      valids.push({
+        id: uuid,
+        type: file.type,
+        name: file.name
       })
-      set_file_name(file.name)
-      editor.setValue(text);
     }
+    if (!valids.length) return;
+    const last = valids[valids.length - 1];
+    const next_tabs: IEditorTab[] = [...tabs, ...valids]
+    const next_clicks: string[] = [...clicks, ...valids.map(v => v.id)]
+    const next_trees: IEditorTreeNode[] = [...trees, ...valids.map(v => {
+      const ret: IEditorTreeNode = {
+        ...v,
+        children: []
+      }
+      return ret;
+    })]
+    set_state(draft => {
+      draft.tabs = next_tabs;
+      draft.actived = last.id;
+      draft.clicks = next_clicks;
+      draft.trees = next_trees
+    })
+    editor.setValue(text);
+  }, [set_state, trees, clicks, tabs])
 
-  }
-  const save_file = async () => {
+  const export_file = async () => {
     const editor = ref_editor.current;
     if (!editor) return;
     const value = editor.getValue()
     const buf = await encode_lf2_dat(value)
-    save_to_file(buf, file_name)
+    // save_to_file(buf, file_name)
+    console.log(buf)
   }
-  const use_tab = async (tab: IEditorTab) => {
-    if (tab.id === state.actived) return;
+
+  const open = useCallback(async (tab: IEditorTab) => {
+    if (tab.id === actived) return;
     const editor = ref_editor.current;
     if (!editor) return;
-    await save_editor_state()
-    const clicks = [...state.clicks, tab.id]
+    const prev = tabs.find(v => v.id == actived);
+    if (prev) await save_editor_state(prev)
+    let next_tabs: IEditorTab[] | null = null;
+    const exist = tabs.find(v => v.id === tab.id)
+    if (!exist) next_tabs = [...tabs, tab]
+    const next_clicks = [...clicks, tab.id]
     set_state(draft => {
       draft.actived = tab.id;
-      draft.clicks = clicks
+      draft.clicks = next_clicks;
+      if (next_tabs) draft.tabs = next_tabs
     })
     await load_editor_state(tab)
-  }
-  const close_tab = async (tab: IEditorTab) => {
-    await del_editor_state(tab)
-    const idx = state.tabs.findIndex(v => v.id == tab.id);
-    const clicks = state.clicks.filter(v => v != tab.id)
-    const tabs = state.tabs.filter(v => v.id != tab.id)
-    const next = tabs.find(v => v.id == clicks[clicks.length - 1]) ?? tabs[idx] ?? tabs[idx - 1]
+  }, [tabs, actived, clicks, set_state, save_editor_state, load_editor_state])
+
+  const close = useCallback(async (tab: IEditorTab) => {
+    const idx = tabs.findIndex(v => v.id == tab.id);
+    const next_clicks = clicks.filter(v => v != tab.id)
+    const next_tabs = tabs.filter(v => v.id != tab.id)
+    const last = next_clicks[next_clicks.length - 1]
+    const next_actived = next_tabs.find(v => v.id == last) ?? next_tabs[idx] ?? next_tabs[idx - 1];
     set_state(draft => {
-      draft.tabs = tabs
-      draft.clicks = clicks
-      draft.actived = next?.id ?? ''
+      draft.tabs = next_tabs
+      draft.clicks = next_clicks
+      draft.actived = next_actived?.id ?? ''
     })
-    await load_editor_state(next)
-  }
+    await load_editor_state(next_actived)
+  }, [tabs, clicks, set_state, load_editor_state])
+
+  const del = useCallback(async (tab: IEditorTab) => {
+    await del_editor_state(tab)
+    await close(tab)
+  }, [del_editor_state, close])
+
+  const ctx_value = useMemo<IEditorsContextValue>(() => {
+    const ret: IEditorsContextValue = { state, open, del, close }
+    return ret
+  }, [state, open, del, close])
+
   return (
-    <div className={cns(csses.editor_view, 'monaco-editor')}>
-      <div className={csses.editor_head}>
-        <button onClick={(e) => { interrupt_event(e); import_file() }}>
-          import
-        </button>
-        <button onClick={(e) => { interrupt_event(e); save_file() }}>
-          save
-        </button>
+    <EditorsContext.Provider value={ctx_value}>
+      <div className={cns(csses.editor_root, 'monaco-editor')}>
+        <div className={cns(csses.files)}>
+          {state.trees?.map((v) => <TreeItem key={v.id} v={v} />)}
+        </div>
+        <div className={cns(csses.editor_view)}>
+          <div className={csses.editor_head}>
+            <button onClick={(e) => { interrupt_event(e); import_file() }}>
+              import
+            </button>
+            <button onClick={(e) => { interrupt_event(e); export_file() }}>
+              export
+            </button>
+          </div>
+          <div className={csses.editor_tabs_row}>
+            {state.tabs?.map((v) => <EditorTab key={v.id} info={v} />)}
+            <div className={csses.empty_space} />
+          </div>
+          <div
+            ref={ref_container}
+            className={csses.editor_text_area_container}
+            contentEditable />
+        </div>
       </div>
-      <div className={csses.editor_tabs_row}>
-        {state.tabs?.map((v) => {
-          const is_actived = v.id == state.actived
-          const cls = cns(csses.editor_tab, is_actived ? csses.actived : void 0)
-          return (
-            <div
-              key={v.id}
-              className={cls}
-              title={`name: ${v.name} type: ${v.type}`}
-              onClick={e => {
-                interrupt_event(e);
-                use_tab(v);
-              }}>
-              {v.name}
-              <div
-                className={csses.btn_close_tab}
-                onClick={e => {
-                  interrupt_event(e);
-                  close_tab(v);
-                }}
-              >
-                ✖︎
-              </div>
-            </div>
-          )
-        })}
-        <div className={csses.empty_space} />
-      </div>
-      <div
-        ref={ref_container}
-        className={csses.editor_text_area_container}
-        contentEditable />
-    </div>
+    </EditorsContext.Provider>
   )
 }
+
+
