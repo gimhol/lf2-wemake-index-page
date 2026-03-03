@@ -1,6 +1,8 @@
 
 import type * as monaco from 'monaco-editor';
 import { createContext } from 'react';
+import { WEditorsContext } from './WEditorsContext';
+
 export interface IEditorTab {
   id: string;
   name: string;
@@ -36,13 +38,17 @@ export const init_editor_state: IEditorsState = {
 }
 export interface IEditorsContextValue {
   state: IEditorsState;
+  context: WEditorsContext;
   open(tab: IEditorTab): Promise<void>;
   close(tab: IEditorTab): Promise<void>;
   del(tab: IEditorTab): Promise<void>;
 }
-export const EditorsContext = createContext<IEditorsContextValue>({
+export const init_editors_context_value: IEditorsContextValue = {
   state: init_editor_state,
+  context: new WEditorsContext(),
   open: () => Promise.reject('not ready'),
   del: () => Promise.reject('not ready'),
   close: () => Promise.reject('not ready')
-})
+}
+export const EditorsContext = createContext<IEditorsContextValue>(init_editors_context_value)
+

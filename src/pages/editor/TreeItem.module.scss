@@ -7,6 +7,12 @@ html {
   --editor-list-item-selection-bg-active: #0e395e;
 }
 
+_flex_h_center {
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+}
+
 .tree_item {
   cursor       : pointer;
   height       : 22px;
@@ -17,12 +23,32 @@ html {
   text-overflow: ellipsis;
   font-size    : 13px;
   flex-shrink  : 0;
+  border-width : 1px;
+  box-sizing   : border-box;
+  user-select  : none;
 
-  img {
-    height: 13px;
+  .left {
+    padding-right: 6px;
+    @extend _flex_h_center;
+
+    .icon_wrapper {
+      @extend _flex_h_center;
+
+      .icon {
+        height     : 13px;
+        width      : 13px;
+        display    : inline;
+        user-select: none;
+      }
+    }
   }
 }
 
+
 .tree_item:hover {
   background-color: var(--editor-list-item-bg-hover);
+}
+
+.tree_item:focus {
+  background-color: var(--editor-list-item-selection-bg-active);
 }

@@ -8,6 +8,7 @@
 
   background-color: var(--editor-background-color);
   display         : flex;
+  flex-direction  : column;
   flex            : 1;
   overflow        : hidden;
 }
@@ -59,4 +60,10 @@
 .empty_space {
   flex         : 1;
   border-bottom: 1px solid var(--editor-border-color);
+}
+
+.editor_main {
+  display : flex;
+  flex    : 1;
+  overflow: hidden;
 }
