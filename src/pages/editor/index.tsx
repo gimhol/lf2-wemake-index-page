@@ -142,6 +142,7 @@ export default function Editor() {
     const next_trees: IEditorTreeNode[] = [...trees, ...valids.map(v => {
       const ret: IEditorTreeNode = {
         ...v,
+        depth: 0,
         children: []
       }
       return ret;

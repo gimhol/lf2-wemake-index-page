@@ -17,6 +17,7 @@ export interface IEditorTreeNode {
   id: string;
   name: string;
   type: string;
+  depth: number;
   children: IEditorTreeNode[]
 }
 
@@ -27,11 +28,11 @@ export interface IEditorsState {
   clicks: string[];
 }
 
-export const init_editor_state: IEditorsState = { 
-  trees: [], 
-  tabs: [], 
-  actived: '', 
-  clicks: [] 
+export const init_editor_state: IEditorsState = {
+  trees: [],
+  tabs: [],
+  actived: '',
+  clicks: []
 }
 export interface IEditorsContextValue {
   state: IEditorsState;
