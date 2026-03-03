@@ -5,67 +5,28 @@ import cns from "classnames";
 import * as monaco from 'monaco-editor';
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useImmer } from "use-immer";
-import { EditorsContext, init_editor_state, init_editors_context_value, type IEditorsContextValue, type IEditorsState, type IEditorState, type IEditorTab, type IEditorTreeNode, type IProjectInfo } from "./base";
+import { EditorsContext, init_editor_state, init_editors_context_value, type IEditorsContextValue, type IEditorsState, type IEditorState, type IEditorTab, type IEditorTreeNode } from "./base";
 import { EditorTab } from "./EditorTab";
 import csses from "./index.module.scss";
 import { forage } from "./init";
-import { project_tree_item } from "./project_tree_item";
+import { ProjectFiles } from "./ProjectFiles";
 import { read_dat_or_txt } from "./read_dat_or_txt";
-import { TreeItem } from "./TreeItem";
+import type { IProjectInfo } from "./WEditorsContext";
+
 
 export function EditorGroupView() {
-  const ref_editor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const ref_container = useRef<HTMLDivElement>(null);
-  // const load_editor_state = useCallback(async (tab?: IEditorTab | null) => {
-  //   const editor = ref_editor.current;
-  //   if (!editor) return;
-  //   if (!tab) {
-  //     editor.setValue('');
-  //     return
-  //   }
-  //   const state = await forage.getItem<IEditorState>('editor_state_' + tab.id)
-  //   const text = state?.content ?? "";
-  //   editor.setValue(text);
-  //   if (state) {
-  //     const next_selection = state.selections?.map(s => new monaco.Selection(
-  //       s.startLineNumber,
-  //       s.startColumn,
-  //       s.endLineNumber,
-  //       s.endColumn,
-  //     )) ?? [];
-  //     if (!next_selection.length) next_selection.push(new monaco.Selection(0, 0, 0, 0))
-  //     editor.setPosition(state.position || new monaco.Position(0, 0))
-  //     editor.setSelections(next_selection)
-  //     editor.setScrollLeft(state.scrollLeft ?? 0)
-  //     editor.setScrollTop(state.scrollTop ?? 0)
-  //   }
-  //   editor.focus()
-  // }, [])
-
-  // const save_editor_state = useCallback(async (tab: IEditorTab) => {
-  //   const editor = ref_editor.current;
-  //   if (!editor) return;
-  //   const prev_state: IEditorState = {
-  //     selections: editor.getSelections()?.map(s => {
-  //       const d = s.getDirection()
-  //       return {
-  //         startLineNumber: d ? s.endLineNumber : s.startLineNumber,
-  //         startColumn: d ? s.endColumn : s.startColumn,
-  //         endLineNumber: d ? s.startLineNumber : s.endLineNumber,
-  //         endColumn: d ? s.startColumn : s.endColumn,
-  //       }
-  //     }),
-  //     position: editor.getPosition()?.clone(),
-  //     scrollLeft: editor.getScrollLeft(),
-  //     scrollTop: editor.getScrollTop(),
-  //     content: editor.getValue(),
-  //   }
-  //   forage.setItem<IEditorState>('editor_state_' + tab.id, prev_state)
-  // }, [])
+  const { state: { tabs, actived } } = useContext(EditorsContext)
+  const [editor, set_editor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null)
 
   useEffect(() => {
-    ref_editor.current?.onMouseDown((e: monaco.editor.IEditorMouseEvent) => {
-      const editor = ref_editor.current;
+    const editor = monaco.editor.create(ref_container.current!, {
+      value: '',
+      language: 'lf2-dat',
+      theme: 'lf2-dat',
+      automaticLayout: true,
+    });
+    editor.onMouseDown((e: monaco.editor.IEditorMouseEvent) => {
       if (!editor) return;
       if (e.event.buttons != 1 || !e.event.ctrlKey) return;
       const txt = e.target.element?.innerText;
@@ -83,26 +44,71 @@ export function EditorGroupView() {
       editor.revealLines(lnum0, lnum1, 0)
       editor.setSelection(result.range)
     })
-  })
-  useEffect(() => {
-    const editor = ref_editor.current = monaco.editor.create(ref_container.current!, {
-      value: '',
-      language: 'lf2-dat',
-      theme: 'lf2-dat',
-      automaticLayout: true,
-    });
+    set_editor(editor)
     return () => {
       editor.dispose()
-      ref_editor.current = null
+      set_editor(null)
     }
   }, [])
 
-  const { state } = useContext(EditorsContext)
+  useEffect(() => {
+    const tab = tabs.find(v => v.id === actived);
+    if (!tab || !editor) return;
+
+    let destructed = false
+    forage.getItem<IEditorState>('editor_state_' + tab.id).then(state => {
+      console.log('ii', destructed, editor)
+      if (destructed) return;
+      if (!editor) return;
+      editor.focus();
+      if (!state) {
+        editor.setSelections([]);
+        editor.setValue('');
+        return;
+      }
+      editor.setValue(state.content || '');
+      const next_selection = state.selections?.map(s => new monaco.Selection(
+        s.startLineNumber,
+        s.startColumn,
+        s.endLineNumber,
+        s.endColumn
+      )) ?? [];
+      if (!next_selection.length) next_selection.push(new monaco.Selection(0, 0, 0, 0));
+      editor.setPosition(state.position || new monaco.Position(0, 0));
+      editor.setSelections(next_selection);
+      editor.setScrollLeft(state.scrollLeft ?? 0);
+      editor.setScrollTop(state.scrollTop ?? 0);
+    }).catch(e => {
+      console.warn(e)
+    })
+
+    return () => {
+      destructed = true;
+      const prev_state: IEditorState = {
+        selections: editor.getSelections()?.map(s => {
+          const d = s.getDirection();
+          return {
+            startLineNumber: d ? s.endLineNumber : s.startLineNumber,
+            startColumn: d ? s.endColumn : s.startColumn,
+            endLineNumber: d ? s.startLineNumber : s.endLineNumber,
+            endColumn: d ? s.startColumn : s.endColumn,
+          };
+        }),
+        position: editor.getPosition()?.clone(),
+        scrollLeft: editor.getScrollLeft(),
+        scrollTop: editor.getScrollTop(),
+        content: editor.getValue(),
+      };
+      forage.setItem<IEditorState>('editor_state_' + tab.id, prev_state);
+    }
+  }, [editor, actived, tabs])
+
+
 
   return (
     <div className={cns(csses.editor_view)}>
       <div className={csses.editor_tabs_row}>
-        {state.tabs?.map((v) => <EditorTab key={v.id} info={v} />)}
+        {tabs.map((v) => <EditorTab key={v.id} info={v} />)}
         <div className={csses.empty_space} />
       </div>
       <div
@@ -125,12 +131,10 @@ export default function Editor() {
   useEffect(() => {
     if (ready) return;
     forage.getItem<IEditorsState>(`editors_state`).then(r => {
-      const tab = r?.tabs.find(v => v.id == r.actived)
-      if (tab) load_editor_state(tab)
       set_state(r ?? init_editor_state)
       set_ready(true)
     })
-  }, [set_state, ready, load_editor_state])
+  }, [set_state, ready])
 
   useEffect(() => {
     if (!ready) return;
@@ -140,8 +144,6 @@ export default function Editor() {
 
 
   const import_file = useCallback(async () => {
-    const editor = ref_editor.current;
-    if (!editor) return;
     const files = await open_file(true, '.dat,.txt')
     if (!files.length) return;
     const valids: IEditorTab[] = [];
@@ -150,7 +152,7 @@ export default function Editor() {
       const uuid = crypto.randomUUID();
       text = await read_dat_or_txt(file);
       const prev_state: IEditorState = { content: text }
-      forage.setItem<IEditorState>('editor_state_' + uuid, prev_state)
+      await forage.setItem<IEditorState>('editor_state_' + uuid, prev_state)
       valids.push({
         id: uuid,
         type: file.type,
@@ -175,23 +177,21 @@ export default function Editor() {
       draft.clicks = next_clicks;
       draft.trees = next_trees
     })
-    editor.setValue(text);
   }, [set_state, trees, clicks, tabs])
 
 
   const new_project = async () => {
     await context.new_project()
     await context.projects()
-      .then(r => set_projects(r))
+      .then(r => {
+        set_projects(r)
+        set_project(r.at(0)?.id)
+      })
       .catch(e => Toast.error(e))
   }
 
   const open = useCallback(async (tab: IEditorTab) => {
     if (tab.id === actived) return;
-    const editor = ref_editor.current;
-    if (!editor) return;
-    const prev = tabs.find(v => v.id == actived);
-    if (prev) await save_editor_state(prev)
     let next_tabs: IEditorTab[] | null = null;
     const exist = tabs.find(v => v.id === tab.id)
     if (!exist) next_tabs = [...tabs, tab]
@@ -201,8 +201,7 @@ export default function Editor() {
       draft.clicks = next_clicks;
       if (next_tabs) draft.tabs = next_tabs
     })
-    await load_editor_state(tab)
-  }, [tabs, actived, clicks, set_state, save_editor_state, load_editor_state])
+  }, [tabs, actived, clicks, set_state])
 
   const close = useCallback(async (tab: IEditorTab) => {
     const idx = tabs.findIndex(v => v.id == tab.id);
@@ -215,8 +214,7 @@ export default function Editor() {
       draft.clicks = next_clicks
       draft.actived = next_actived?.id ?? ''
     })
-    await load_editor_state(next_actived)
-  }, [tabs, clicks, set_state, load_editor_state])
+  }, [tabs, clicks, set_state])
 
   const del = useCallback(async (tab: IEditorTab) => {
     await del_editor_state(tab)
@@ -247,18 +245,19 @@ export default function Editor() {
       <div className={cns(csses.editor_root, 'monaco-editor')}>
         <div className={csses.editor_head}>
           <button onClick={(e) => { interrupt_event(e); new_project() }}>
-            new
+            new project
           </button>
+          {project ?
+            <button onClick={(e) => { interrupt_event(e); import_file() }}>
+              import
+            </button> : null}
         </div>
         <div className={csses.editor_main}>
-          <div className={cns(csses.files)}>
-            {projects?.map((v) => <TreeItem key={v.id} info={project_tree_item(v)} />)}
+          <div className={cns(csses.second_view)}>
+            {projects?.map((v) => <ProjectFiles key={v.id} info={v} />)}
           </div>
-          {/* <div className={cns(csses.files)}>
-            {state.trees?.map((v) => <TreeItem key={v.id} info={v} />)}
-          </div> */}
           {
-            project ?
+            (project && tabs.length) ?
               <EditorGroupView />
               : null
           }
@@ -267,5 +266,6 @@ export default function Editor() {
     </EditorsContext.Provider>
   )
 }
+
 
 

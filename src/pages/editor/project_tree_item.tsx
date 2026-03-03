@@ -1,4 +1,5 @@
-import type { IProjectInfo, IEditorTreeNode } from "./base";
+import type { IEditorTreeNode } from "./base";
+import type { IProjectInfo } from "./WEditorsContext";
 
 export function project_tree_item(i: IProjectInfo): IEditorTreeNode {
   return {

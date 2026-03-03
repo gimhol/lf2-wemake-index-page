@@ -6,7 +6,7 @@ import csses from "./TreeItem.module.scss";
 export function TreeItem(props: { info: IEditorTreeNode; }) {
   const { info } = props;
   const { open } = useContext(EditorsContext);
-  const ref_root = useRef<HTMLDivElement>(null)
+  const ref_root = useRef<HTMLDivElement>(null);
   return (
     <div
       ref={ref_root}
@@ -27,3 +27,4 @@ export function TreeItem(props: { info: IEditorTreeNode; }) {
     </div>
   );
 }
+
