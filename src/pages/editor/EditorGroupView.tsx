@@ -1,7 +1,7 @@
 import cns from "classnames";
 import * as monaco from 'monaco-editor';
 import { useContext, useEffect, useRef, useState } from "react";
-import { context, EditorsContext, type IEditorState } from "./base";
+import { context, EditorsContext } from "./base";
 import csses from "./EditorGroupView.module.scss";
 import { EditorTab } from "./EditorTab";
 import { create_editor, type IEditor } from "./monaco";
@@ -10,7 +10,7 @@ export function EditorGroupView() {
   const ref_container = useRef<HTMLDivElement>(null);
   const { state: { tabs, tab: actived, project } } = useContext(EditorsContext)
   const [editor, set_editor] = useState<IEditor | null>(null)
-
+  const tab = tabs.find(v => v.id === actived)
   useEffect(() => {
     const editor = create_editor(ref_container.current!, {
       value: '',
@@ -38,66 +38,19 @@ export function EditorGroupView() {
     })
     set_editor(editor)
     return () => {
-      editor.dispose()
+      // stupid
+      setTimeout(() => editor.dispose(), 1000)
       set_editor(null)
     }
   }, [])
 
   useEffect(() => {
-    if (!project) return;
-    const tab = tabs.find(v => v.id === actived);
-    if (!tab || !editor) return;
-    const forage = context.forage(project);
-    let destructed = false;
-    forage
-      .getItem<IEditorState>('editor_state_' + tab.id)
-      .then(state => {
-        if (destructed) return;
-        if (!editor) return;
-        editor.focus();
-        if (!state) {
-          editor.setSelections([]);
-          editor.setValue('');
-          return;
-        }
-        editor.setValue(state.content || '');
-        const next_selection = state.selections?.map(s => new monaco.Selection(
-          s.startLineNumber,
-          s.startColumn,
-          s.endLineNumber,
-          s.endColumn
-        )) ?? [];
-        if (!next_selection.length) next_selection.push(new monaco.Selection(0, 0, 0, 0));
-        editor.setPosition(state.position || new monaco.Position(0, 0));
-        editor.setSelections(next_selection);
-        editor.setScrollLeft(state.scrollLeft ?? 0);
-        editor.setScrollTop(state.scrollTop ?? 0);
-      }).catch(e => {
-        console.warn(e)
-      })
-
+    if (!project || !tab || !editor) return;
+    context.load_editor_state(project, tab, editor);
     return () => {
-      destructed = true;
-      const prev_state: IEditorState = {
-        selections: editor.getSelections()?.map(s => {
-          const d = s.getDirection();
-          return {
-            startLineNumber: d ? s.endLineNumber : s.startLineNumber,
-            startColumn: d ? s.endColumn : s.startColumn,
-            endLineNumber: d ? s.startLineNumber : s.endLineNumber,
-            endColumn: d ? s.startColumn : s.endColumn,
-          };
-        }),
-        position: editor.getPosition()?.clone(),
-        scrollLeft: editor.getScrollLeft(),
-        scrollTop: editor.getScrollTop(),
-        content: editor.getValue(),
-      };
-      forage.setItem<IEditorState>('editor_state_' + tab.id, prev_state);
+      context.save_editor_state(project, tab, editor);
     }
-  }, [editor, actived, tabs, project])
-
-
+  }, [editor, tab, project])
 
   return (
     <div className={cns(csses.editor_view)}>

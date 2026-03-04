@@ -45,10 +45,14 @@ export const init_editor_state: IEditorsState = {
 export interface IEditorsContextValue {
   state: IEditorsState;
   set_state: Updater<IEditorsState>;
+  pending: boolean;
+  set_pending(v: boolean): void;
 }
 export const init_editors_context_value: IEditorsContextValue = {
   state: init_editor_state,
   set_state: () => console.warn('not ready'),
+  pending: true,
+  set_pending: () => console.warn('not ready'),
 }
 export const context = new WEditorsContext();
 export const EditorsContext = createContext<IEditorsContextValue>(init_editors_context_value)

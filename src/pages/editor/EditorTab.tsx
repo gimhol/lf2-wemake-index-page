@@ -9,31 +9,31 @@ export interface IEditorTabProps {
 }
 export function EditorTab(props: IEditorTabProps) {
   const { info } = props;
-  const { state: { project, tab }, set_state } = useContext(EditorsContext);
+  const { state: { project, tab }, set_state, set_pending } = useContext(EditorsContext);
   const is_actived = info.id == tab
   const cls = cns(csses.editor_tab, is_actived ? csses.actived : void 0)
+  if (!project) return <></>
   return (
     <div
       className={cls}
       title={`name: ${info.name} type: ${info.type}`}
       onClick={e => {
         interrupt_event(e);
-        if (project) context.open_file(project, info).then(s => {
-          set_state(s)
-        }).catch(e => {
-          Toast.error(e)
-        })
+        context.open_file(project, info)
+          .then(set_state)
+          .catch(Toast.error)
+          .finally(() => set_pending(false))
       }}>
       {info.name}
       <div
         className={csses.btn_close_tab}
         onClick={e => {
           interrupt_event(e);
-          if (project) context.close_file(project, info).then(s => {
-            set_state(s)
-          }).catch(e => {
-            Toast.error(e)
-          })
+          context
+            .close_file(project, info)
+            .then(set_state)
+            .catch(Toast.error)
+            .finally(() => set_pending(false))
         }}
       >
         ✖︎

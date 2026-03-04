@@ -1,7 +1,7 @@
-import * as monaco from 'monaco-editor';
+import * as _ from 'monaco-editor';
 
-monaco.languages.register({ id: 'lf2-dat' })
-monaco.editor.defineTheme('lf2-dat', {
+_.languages.register({ id: 'lf2-dat' })
+_.editor.defineTheme('lf2-dat', {
   base: 'vs-dark',
   inherit: true,
   colors: {},
@@ -11,7 +11,7 @@ monaco.editor.defineTheme('lf2-dat', {
     fontStyle: 'text-decoration: underline',
   }]
 })
-monaco.languages.setMonarchTokensProvider('lf2-dat', {
+_.languages.setMonarchTokensProvider('lf2-dat', {
   tokenizer: {
     root: [
       [/#[\s\S]*/, { token: 'comment' }],
@@ -53,5 +53,6 @@ monaco.languages.setMonarchTokensProvider('lf2-dat', {
     ],
   }
 })
-export const create_editor = monaco.editor.create;
-export type IEditor = monaco.editor.IStandaloneCodeEditor;
+export const create_editor = _.editor.create;
+export type IEditor = _.editor.IStandaloneCodeEditor;
+export const monaco = _;

@@ -20,7 +20,7 @@ export interface ISaveModFormOpts {
 const TAG = '[save_mod]'
 export async function save_mod(opts: ISaveModFormOpts) {
   console.debug(`${TAG} opts:`, opts)
-  const time = dayjs().format(`YYYY-MM-DD-HH-mm-ss-SSS`);
+  const time = dayjs().format(`YYYY-MM-DD HH:mm:ss.SSS`);
   const { mod_id, oss, info, owner_id } = opts;
   info.id = '' + mod_id;
   const m = new Map<string, string>();

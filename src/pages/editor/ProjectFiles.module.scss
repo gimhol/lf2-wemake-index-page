@@ -14,4 +14,11 @@
   }
 
   .content_zone.open {}
+
+  .tree_item.open {
+    .icon {
+      transform: rotateZ(90deg);
+    }
+  }
+
 }
