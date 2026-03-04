@@ -12,6 +12,7 @@ export namespace Paths {
     Workspace = '/yours',
     Dashboard = '/dashboard',
     Editor = '/editor',
+    _Editor = '/_editor',
     InnerInfo = '/:game_id',
     ModForm = '/mod_form/:id',
   }
@@ -24,11 +25,13 @@ export namespace Paths {
     [All.ModForm]: React.lazy(() => import("./pages/mod_form")),
     [All.Dashboard]: React.lazy(() => import("./pages/dashboard")),
     [All.Editor]: React.lazy(() => import("./pages/editor")),
+    [All._Editor]: React.lazy(() => import("./pages/editor")),
   }
   export const Relations: { [x in All]?: All[] } = {
     [All._]: [
       All.Info,
       All.ModForm,
+      All._Editor,
       All.Main
     ],
     [All.Main]: [
@@ -38,15 +41,19 @@ export namespace Paths {
       All.Editor,
     ]
   }
+  export enum Permission {
+    Login = ''
+  }
   export const Permissions: Record<All, string | undefined | null> = {
     [All._]: null,
     [All.Main]: null,
     [All.Info]: null,
-    [All.Workspace]: '',
-    [All.Dashboard]: '',
+    [All.Workspace]: Permission.Login,
+    [All.Dashboard]: Permission.Login,
     [All.Editor]: null,
     [All.InnerInfo]: null,
-    [All.ModForm]: ''
+    [All.ModForm]: Permission.Login,
+    [All._Editor]: null
   }
   export function has_permission(pathname: string) {
     if (!(pathname in Paths.Permissions)) return false;

@@ -12,7 +12,7 @@
   user-select    : none;
   border-right   : 1px solid var(--editor-border-color);
   border-bottom  : 1px solid var(--editor-border-color);
-  border-top     : 1px solid var(--editor-border-color);
+  border-top     : 1px solid transparent;
   overflow       : hidden;
   word-break     : keep-all;
   white-space    : nowrap;

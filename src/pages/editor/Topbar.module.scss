@@ -1,0 +1,7 @@
+.editor_head {
+  display      : flex;
+  border-bottom: 1px solid var(--editor-border-color);
+  position     : relative;
+  z-index      : 0;
+  box-sizing   : border-box;
+}

@@ -5,15 +5,13 @@
   flex-direction: column;
   overflow      : hidden;
   flex-shrink   : 0;
+  color         : var(--editor-list-item-color);
 
   .content_zone {
     @extend .scrollview;
     overflow-y: auto;
     overflow-x: hidden;
-    flex-basis: 1;
   }
 
-  .content_zone.open {
-    flex-basis: 0;
-  }
+  .content_zone.open {}
 }

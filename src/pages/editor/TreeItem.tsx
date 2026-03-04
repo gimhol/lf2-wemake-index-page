@@ -1,11 +1,12 @@
 import img_angle_right from "@/assets/svg/angle-right.svg";
+import Toast from "@/gimd/Toast";
 import { interrupt_event } from "@/utils/interrupt_event";
 import { useContext, useRef } from "react";
-import { type IEditorTreeNode, EditorsContext } from "./base";
+import { type IEditorTreeNode, context, EditorsContext } from "./base";
 import csses from "./TreeItem.module.scss";
 export function TreeItem(props: { info: IEditorTreeNode; }) {
   const { info } = props;
-  const { open } = useContext(EditorsContext);
+  const { state: { project }, set_state } = useContext(EditorsContext);
   const ref_root = useRef<HTMLDivElement>(null);
   return (
     <div
@@ -15,7 +16,14 @@ export function TreeItem(props: { info: IEditorTreeNode; }) {
       onClick={e => {
         interrupt_event(e);
         if (info.children.length) return;
-        open(info);
+
+        if (project) {
+          context.open_file(project, info).then(r => {
+            set_state(r)
+          }).catch(e => {
+            Toast.error(e)
+          })
+        }
         ref_root.current?.focus();
       }}>
       <div className={csses.left} style={{ paddingLeft: (info.depth + 1) * 8 }}>

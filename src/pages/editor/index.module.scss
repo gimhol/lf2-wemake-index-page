@@ -1,5 +1,13 @@
 @use "../../theme/common.module.scss"as *;
 
+html {
+  --editor-list-item-bg                 : #00000000;
+  --editor-list-item-bg-hover           : #2A2D2E;
+  --editor-list-item-selection-bg       : #37373d;
+  --editor-list-item-selection-bg-active: #0e395e;
+  --editor-list-item-color              : #cccccc;
+}
+
 .editor_root {
   --editor-border-color        : rgb(43, 43, 43);
   --editor-background-color    : rgb(24, 24, 24);
@@ -13,53 +21,17 @@
   overflow        : hidden;
 }
 
+:global(#root) {
+  .editor_root {
+    width : 100%;
+    height: 100%;
+  }
+}
+
 .files {
   display       : flex;
   flex-direction: column;
   border-right  : 1px solid var(--editor-border-color);
-}
-
-.editor_view {
-  display       : flex;
-  flex-direction: column;
-  flex          : 1;
-  overflow      : hidden;
-}
-
-.editor_text_area_container {
-  @extend .scrollview;
-  flex      : 1;
-  align-self: stretch;
-  overflow  : auto;
-  outline   : none;
-  border    : none;
-  position  : relative;
-  z-index   : 0;
-}
-
-.editor_head {
-  display      : flex;
-  border-bottom: 1px solid var(--editor-border-color);
-  position     : relative;
-  z-index      : 0;
-  box-sizing   : border-box;
-}
-
-.editor_tabs_row {
-  @extend .scrollview;
-  @extend .noscrollbar;
-  margin-top: -1px;
-  display   : flex;
-  overflow-x: scroll;
-  overflow-y: visible;
-  box-sizing: border-box;
-  position  : relative;
-  z-index   : 10;
-}
-
-.empty_space {
-  flex         : 1;
-  border-bottom: 1px solid var(--editor-border-color);
 }
 
 .editor_main {

@@ -1,12 +1,5 @@
 @use "../../theme/common.module.scss"as *;
 
-html {
-  --editor-list-item-bg                 : #00000000;
-  --editor-list-item-bg-hover           : #2A2D2E;
-  --editor-list-item-selection-bg       : #37373d;
-  --editor-list-item-selection-bg-active: #0e395e;
-}
-
 _flex_h_center {
   display        : flex;
   align-items    : center;
@@ -44,6 +37,9 @@ _flex_h_center {
   }
 }
 
+.tree_item.selection {
+  background-color: var(--editor-list-item-selection-bg);
+}
 
 .tree_item:hover {
   background-color: var(--editor-list-item-bg-hover);

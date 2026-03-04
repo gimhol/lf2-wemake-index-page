@@ -1,7 +1,8 @@
 
 import type * as monaco from 'monaco-editor';
 import { createContext } from 'react';
-import { WEditorsContext } from './WEditorsContext';
+import type { Updater } from 'use-immer';
+import { WEditorsContext, type IProjectInfo } from './WEditorsContext';
 
 export interface IEditorTab {
   id: string;
@@ -26,29 +27,29 @@ export interface IEditorTreeNode {
 export interface IEditorsState {
   trees: IEditorTreeNode[];
   tabs: IEditorTab[];
-  actived: string;
+  tab: string;
   clicks: string[];
+  project: string | undefined;
+  projects: IProjectInfo[];
 }
 
 export const init_editor_state: IEditorsState = {
   trees: [],
   tabs: [],
-  actived: '',
-  clicks: []
+  tab: '',
+  clicks: [],
+  project: void 0,
+  projects: []
 }
+
 export interface IEditorsContextValue {
   state: IEditorsState;
-  context: WEditorsContext;
-  open(tab: IEditorTab): Promise<void>;
-  close(tab: IEditorTab): Promise<void>;
-  del(tab: IEditorTab): Promise<void>;
+  set_state: Updater<IEditorsState>;
 }
 export const init_editors_context_value: IEditorsContextValue = {
   state: init_editor_state,
-  context: new WEditorsContext(),
-  open: () => Promise.reject('not ready'),
-  del: () => Promise.reject('not ready'),
-  close: () => Promise.reject('not ready')
+  set_state: () => console.warn('not ready'),
 }
+export const context = new WEditorsContext();
 export const EditorsContext = createContext<IEditorsContextValue>(init_editors_context_value)
 

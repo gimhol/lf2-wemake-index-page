@@ -1,7 +1,5 @@
-import localforage from "localforage";
 import * as monaco from 'monaco-editor';
 
-export const forage = localforage.createInstance({ name: 'lfwm-editors' })
 monaco.languages.register({ id: 'lf2-dat' })
 monaco.editor.defineTheme('lf2-dat', {
   base: 'vs-dark',
@@ -55,3 +53,5 @@ monaco.languages.setMonarchTokensProvider('lf2-dat', {
     ],
   }
 })
+export const create_editor = monaco.editor.create;
+export type IEditor = monaco.editor.IStandaloneCodeEditor;
