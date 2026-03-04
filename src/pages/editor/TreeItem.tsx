@@ -1,13 +1,14 @@
 import img_angle_right from "@/assets/svg/angle-right.svg";
 import Toast from "@/gimd/Toast";
 import { interrupt_event } from "@/utils/interrupt_event";
-import { useContext, useRef } from "react";
+import { useContext, useRef, useState } from "react";
 import { type IEditorTreeNode, context, EditorsContext } from "./base";
 import csses from "./TreeItem.module.scss";
 export function TreeItem(props: { info: IEditorTreeNode; }) {
   const { info } = props;
   const { state: { project }, set_state, set_pending } = useContext(EditorsContext);
   const ref_root = useRef<HTMLDivElement>(null);
+  const [renaming, set_renaming] = useState(false)
   if (!project) return <></>
   return (
     <div
@@ -30,7 +31,30 @@ export function TreeItem(props: { info: IEditorTreeNode; }) {
           <img className={csses.icon} src={img_angle_right} alt="" />
         </div>
       </div>
-      {info.name}
+      {renaming ?
+        <input
+          className={csses.name_input}
+          defaultValue={info.name}
+          onClick={e => e.stopPropagation()}
+          autoFocus
+          onFocus={e => {
+            const el = e.target as HTMLInputElement;
+            const idx = el.value.lastIndexOf('.')
+            if (idx <= 0) el.setSelectionRange(0, el.value.length)
+            else el.setSelectionRange(0, idx)
+          }}
+          onBlur={e => {
+            console.log(`blur`, e)
+            set_renaming(false)
+          }} /> :
+        <div
+          className={csses.name}
+          children={info.name}
+          onClick={(e) => {
+            e.stopPropagation()
+            set_renaming(true)
+          }} />
+      }
     </div >
   );
 }

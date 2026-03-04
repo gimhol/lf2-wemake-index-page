@@ -32,7 +32,16 @@ export function ProjectFiles(props: { info: IProjectInfo; }) {
             <img className={cns(csses.icon, open ? csses.open : void 0)} src={img_angle_right} alt="" />
           </div>
         </div>
-        {info.name}
+        {
+          info.name ?
+            <div
+              className={csses.name}
+              children={info.name} /> :
+            <input
+              className={csses.name_input}
+              defaultValue={info.name}
+              onClick={e => e.stopPropagation()} />
+        }
       </div>
       {open ?
         <div className={cns(csses.files, csses.content_zone, csses.open)}>
