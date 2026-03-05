@@ -43,8 +43,11 @@ html {
 
 
 .second_view {
+  @extend .scrollview;
   display       : flex;
-  overflow      : hidden;
+  overflow      : scroll;
   flex-direction: column;
   flex-shrink   : 1;
+  width         : 100%;
+  height        : 100%;
 }
