@@ -1,4 +1,5 @@
 @use "../../theme/common.module.scss"as *;
+@use "./SplitView.module.scss"as *;
 
 html {
   --editor-list-item-bg                 : #00000000;
@@ -35,9 +36,10 @@ html {
 }
 
 .editor_main {
-  display : flex;
-  flex    : 1;
   overflow: hidden;
+  position: relative;
+  flex    : 1;
+
 }
 
 .second_view {

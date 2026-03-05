@@ -11,7 +11,10 @@ export function EditorGroupView() {
   const { state: { tabs, tab: actived, project } } = useContext(EditorsContext)
   const [editor, set_editor] = useState<IEditor | null>(null)
   const tab = tabs.find(v => v.id === actived)
+
+  const empty = !project || !tabs.length;
   useEffect(() => {
+    if (empty) return;
     const editor = create_editor(ref_container.current!, {
       value: '',
       language: 'lf2-dat',
@@ -42,7 +45,7 @@ export function EditorGroupView() {
       setTimeout(() => editor.dispose(), 1000)
       set_editor(null)
     }
-  }, [])
+  }, [empty])
 
   useEffect(() => {
     if (!project || !tab || !editor) return;
@@ -52,7 +55,7 @@ export function EditorGroupView() {
     }
   }, [editor, tab, project])
 
-  return (
+  return project && tabs.length ? (
     <div className={cns(csses.editor_view)}>
       <div className={csses.editor_tabs_row}>
         {tabs.map((v) => <EditorTab key={v.id} info={v} />)}
@@ -63,5 +66,5 @@ export function EditorGroupView() {
         className={csses.editor_text_area_container}
         contentEditable />
     </div>
-  )
+  ) : <div className={cns(csses.editor_view)} />
 }
