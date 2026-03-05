@@ -1,112 +1,83 @@
 import csses from './SplitView.module.scss';
 export class SplitView {
-  private view_container: HTMLElement | null;
-  private sash_container: HTMLElement | null;
+  readonly view_container: HTMLElement;
+  readonly sash_container: HTMLElement;
+  readonly node: HTMLElement;
+  private _id: string;
+  private _parent: SplitView | null;
+  private _root: SplitView;
   private direction: 'h' | 'v' = 'h';
-  private resize_ob = new ResizeObserver(() => {
-    this.on_resize();
-    this.update();
-  });
-  private mutation_ob = new MutationObserver((records) => {
 
-    for (const record of records) {
-      console.log('removedNodes', record.removedNodes)
-      console.log('addedNodes', record.addedNodes)
-    }
-
-
-    this.on_children();
-    this.on_resize()
-    this.update();
-  });
-  private sizes: number[] = [];
-  private children: HTMLElement[] = [];
+  private _children: SplitView[] = [];
   private sashs: HTMLElement[] = [];
+  private _min_size = { w: 220, h: 72 }
 
-  constructor(view_container: HTMLElement | null, sash_container: HTMLElement | null, direction: 'h' | 'v') {
+  data: unknown;
+  mode: 'fixed' | 'keep' | '' = '';
+  size: number = 0;
+
+  get id() { return this._id }
+  get parent() { return this._parent }
+  get root() { return this._root }
+  get is_root() { return this._root === this }
+  get children(): ReadonlyArray<SplitView> { return this._children }
+  get min_w(): number {
+    if (!this.children.length)
+      return this._min_size.w;
+    if (this.direction === 'h')
+      return this.children.reduce((r, c) => r + c.min_w, 0)
+    return Math.max(...this.children.map(v => v.min_w))
+  }
+  get min_h(): number {
+    if (!this.children.length)
+      return this._min_size.h;
+    if (this.direction === 'v')
+      return this.children.reduce((r, c) => r + c.min_h, 0)
+    return Math.max(...this.children.map(v => v.min_h))
+  }
+  get min_size() {
+    return {
+      w: this.min_w,
+      h: this.min_h,
+    }
+  }
+  constructor(direction: 'h' | 'v', parent: SplitView | null = null) {
+    this._parent = parent;
+    this._root = parent?._root ?? this;
+    this._id = crypto.randomUUID();
     this.direction = direction;
-    this.view_container = this.set_view_container(view_container);
-    this.sash_container = this.set_sash_container(sash_container);
-    this.on_children();
-    this.on_resize();
-    this.update();
+    this.node = document.createElement('div')
+    this.node.id = this._id;
+    this.node.classList.add(csses.split_view, csses[direction])
+    this.sash_container = document.createElement('div');
+    this.sash_container.classList.add(csses.sash_container)
+    this.view_container = document.createElement('div');
+    this.view_container.classList.add(csses.view_container)
+    this.node.append(this.sash_container, this.view_container)
   }
-  set_sash_container(node: HTMLElement | null): HTMLElement | null {
-    if (this.sash_container == node) return node;
-    this.sash_container = node
-    return node;
+  insert(index: number = this._children.length): SplitView {
+    const child = new SplitView(this.direction == 'h' ? 'v' : 'h', this);
+    this._children.splice(index, 0, child);
+    this.view_container.appendChild(child.node);
+    return child;
   }
-  set_view_container(node: HTMLElement | null): HTMLElement | null {
-    if (this.view_container == node) return node;
-    if (this.view_container) this.resize_ob.disconnect()
-    if (this.view_container) this.mutation_ob.disconnect()
-    this.view_container = node;
-    if (node) this.resize_ob.observe(node)
-    if (node) this.mutation_ob.observe(node, { childList: true })
-    return node;
+  remove(c: SplitView) {
+    this._children = this._children.filter(v => v !== c);
   }
   release() {
-    this.sashs.forEach(s => s.remove())
-  }
-  on_resize() {
-    const { view_container: node } = this;
-    if (!node) return;
-    const rect = node.getBoundingClientRect();
-    const { width, height } = rect;
-    const full_size = this.direction == 'h' ? width : height
-
-    let remain = full_size;
-    const len = this.children.length;
-    if (len > 0) {
-      let factors: number[] = []
-      if (this.sizes.length >= len) {
-        this.sizes.length = len;
-        const total = this.sizes.reduce((r, o) => r + o, 0);
-        factors = this.sizes.map(v => v / total);
-      }
-      for (let i = 0; i < len; i++) {
-        const factor = factors[i] ?? (1 / len);
-        const size = i == len - 1 ? remain : Math.round(factor * full_size)
-        this.sizes[i] = size;
-        remain -= size;
-      }
-    }
-    this.sizes.length = len
-  }
-  on_children() {
-    const { view_container: node } = this;
-    if (!node) return;
-    this.children.length = 0;
-    for (const c of node.children) {
-      if (!c.tagName) continue;
-      if (c.classList.contains(csses.sash)) continue;
-      this.children.push(c as HTMLElement)
-    }
+    this._parent?.remove(this)
+    this.node.remove();
   }
   create_sash() {
     const ret = document.createElement('div');
-    ret.classList.add(csses.sash);
-    ret.classList.add(csses[this.direction]);
+    ret.classList.add(csses.sash, csses[this.direction]);
     this.sash_container?.appendChild(ret);
-
-
-    const pointermove = (e: PointerEvent) => {
+    const pointermove = () => {
       const { sash_container } = this;
       if (!sash_container) return console.debug('broken!');
-
       const idx = this.sashs.indexOf(ret);
-      if (idx < 0 || idx > this.sizes.length - 2) return console.debug('broken!');
+      if (idx < 0 || idx > this.children.length - 2) return console.debug('broken!');
       this.view_container?.getBoundingClientRect();
-
-      const { x } = sash_container.getBoundingClientRect();
-
-
-
-      console.log(
-        'size l:', this.sizes[idx],
-        'size r:', this.sizes[idx + 1],
-        'x:', e.x
-      )
     }
     const pointerup = () => {
       ret.classList.remove(csses.hover)
@@ -125,29 +96,74 @@ export class SplitView {
   update() {
     const { view_container } = this;
     if (!view_container) return;
+
     const rect = view_container.getBoundingClientRect();
-    let offset = 0;
+    const { width, height } = rect;
+    const full_size = this.direction == 'h' ? width : height
 
-    for (let i = 0; i < this.children.length; i++) {
-      const c = this.children[i];
-      c.style.position = 'absolute';
-      c.style.height = `${rect.height}px`;
-      c.style.top = `0px`;
-      c.style.left = `${offset}px`;
-      c.style.width = `${this.sizes[i]}px`;
+    let start = full_size;
+    const len = this._children.length;
 
-      offset += c.getBoundingClientRect().width;
-      if (i == this.children.length - 1) break;
-      const sash = this.sashs[i] ?? this.create_sash();
-      this.sashs[i] = sash
-      sash.style.left = `${offset - 3}px`
+    const total = this._children.reduce((r, c) => r + c.size, 0);
+    const factors = this._children.map(c => c.size / total);
+
+    for (let i = 0; i < len; i++) {
+      const child = this._children[i];
+      if (child.mode === 'fixed') {
+        start -= child.size;
+        continue;
+      } else if (child.mode === 'keep') {
+        start -= child.size;
+        continue;
+      }
+
+      const factor = factors[i] ?? (1 / len);
+      const size = i == len - 1 ? start : Math.round(factor * full_size)
+      child.size = size;
+      start -= size;
     }
 
-    // if (this.sashs.length >= this.children.length)
-    //   this.sashs.splice(this.children.length, this.sashs.length - this.children.length).forEach(v => v.remove())
-    // console.log(
-    //   'children:', this.children.length,
-    //   'sashs:', this.sashs.length
-    // )
+
+    let offset = 0;
+    for (let i = 0; i < this._children.length; i++) {
+      const c = this._children[i];
+      const n = c.node;
+      if (this.direction === 'h') {
+        n.style.height = `${rect.height}px`;
+        n.style.top = `0px`;
+        n.style.left = `${offset}px`;
+        n.style.width = `${c.size}px`;
+        offset += n.getBoundingClientRect().width;
+      } else {
+        n.style.width = `${rect.width}px`;
+        n.style.left = `0px`;
+        n.style.top = `${offset}px`;
+        n.style.height = `${c.size}px`;
+        offset += n.getBoundingClientRect().height;
+      }
+      if (i == this._children.length - 1) break;
+      const sash = this.sashs[i] ?? this.create_sash();
+      this.sashs[i] = sash
+      if (this.direction === 'h') {
+        sash.style.left = `${offset - 3}px`
+      } else {
+        sash.style.top = `${offset - 3}px`
+      }
+      c.update()
+    }
+
+    this.handle_leaves(this.leaves())
+  }
+
+  leaves(ret: SplitView[] = []): SplitView[] {
+    for (const node of this._children) {
+      if (!node._children.length) ret.push(node);
+      else node.leaves(ret)
+    }
+    return ret;
+  }
+
+  handle_leaves = (leaves: SplitView[]) => {
+    console.log(leaves)
   }
 }

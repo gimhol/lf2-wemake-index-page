@@ -37,11 +37,22 @@
 }
 
 .view_container>* {
-  border-right  : 1px solid var(--editor-border-color);
   box-sizing    : border-box;
   pointer-events: all;
 }
 
 .sash_container {
   z-index: 1;
+}
+
+.split_view {
+  position: absolute;
+}
+
+.split_view.h>.view_container>*:not(:last-child) {
+  border-right: 1px solid var(--editor-border-color);
+}
+
+.split_view.v>.view_container>*:not(:last-child) {
+  border-bottom: 1px solid var(--editor-border-color);
 }

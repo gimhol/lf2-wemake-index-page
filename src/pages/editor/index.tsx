@@ -1,12 +1,12 @@
 import Toast from "@/gimd/Toast";
 import cns from "classnames";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useImmer } from "use-immer";
 import { context, EditorsContext, init_editors_context_value, type IEditorsContextValue, type IEditorsState } from "./base";
 import { EditorGroupView } from "./EditorGroupView";
 import csses from "./index.module.scss";
 import { ProjectFiles } from "./ProjectFiles";
-import { SplitView } from "./SplitView";
+import { ReactSplitView } from "./ReactSplitView";
 import { Topbar } from "./Topbar";
 
 
@@ -43,37 +43,27 @@ export default function Editor() {
     forage.setItem<IEditorsState>(`editors_state`, state)
   }, [state, ready, forage])
 
-  const ref_view_container = useRef<HTMLDivElement>(null)
-  const ref_sash_container = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const view_container = ref_view_container.current
-    const sash_container = ref_sash_container.current
-    const sv = new SplitView(view_container, sash_container, 'h');
-    return () => {
-      sv.set_view_container(view_container)
-      sv.set_sash_container(sash_container)
-      sv.release();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [SplitView])
-
   return (
     <EditorsContext.Provider value={context_value}>
-      <div className={cns(csses.editor_root, 'monaco-editor')} >
-        <Topbar />
-        <div className={csses.editor_main}>
-          <div className={csses.sash_container} ref={ref_sash_container} />
-          <div className={csses.view_container} ref={ref_view_container}>
-            <div className={cns(csses.second_view)}>
-              {state.projects?.map((v) => <ProjectFiles key={v.id} info={v} />)}
-            </div>
-            <EditorGroupView />
-            {/* <div /> */}
-            {/* <div /> */}
-          </div>
-        </div>
-      </div>
+      <ReactSplitView
+        className={cns(csses.editor_root, 'monaco-editor')}
+        direction="v">
+        {(leaf) => {
+          switch (leaf.data) {
+            case 'root_top': return <Topbar />;
+            case 'root_bottom': return <Topbar />;
+            case 'second_view': {
+              return (
+                <div className={cns(csses.second_view)}>
+                  {state.projects?.map((v) => <ProjectFiles key={v.id} info={v} />)}
+                </div>)
+            }
+            case 'main_view': {
+              return <EditorGroupView />;
+            }
+          }
+        }}
+      </ReactSplitView>
     </EditorsContext.Provider>
   )
 }
-
