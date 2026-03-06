@@ -183,7 +183,7 @@ export class WEditorsContext {
       .getItem<IEditorState>('editor_state_' + tab.id)
       .then(state => {
         if (!editor) return;
-        editor.focus();
+        // editor.focus();
         if (!state) {
           editor.setSelections([]);
           editor.setValue('');
