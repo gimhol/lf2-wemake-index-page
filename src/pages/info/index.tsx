@@ -47,9 +47,11 @@ export default function InfoViewPage() {
   // eslint-disable-next-line react-hooks/purity
   const id = useMemo(() => `root_info_view_${Date.now()}`, [])
   useEffect(() => {
+    if (!mod?.info) return;
     const el = document.getElementById(id)
     const head = el?.firstElementChild;
     if (!el || !head) {
+      console.log(id, el, head)
       set_margin_top(0)
       return;
     }
@@ -59,8 +61,8 @@ export default function InfoViewPage() {
     const r = new ResizeObserver(resize);
     r.observe(head)
     resize()
-    return () => r.disconnect()
-  }, [id])
+    return () => { r.disconnect() }
+  }, [id, mod])
 
   return <>
     <InfoView

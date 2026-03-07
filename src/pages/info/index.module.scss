@@ -19,10 +19,11 @@
 
   &>*:first-child {
     @extend .bg;
-    position: fixed;
-    top     : 0px;
-    left    : 0px;
-    right   : 0px;
-    z-index : 1;
+    position  : fixed;
+    top       : 0px;
+    left      : 0px;
+    right     : 0px;
+    z-index   : 1;
+    box-sizing: border-box;
   }
 }
