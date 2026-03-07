@@ -36,11 +36,9 @@
   ul {
     padding: 0px;
     margin : 0px;
-
-    li {
-      display: flex;
-      margin : 0px;
-    }
+  }
+  li>ul {
+    margin: 0px 15px;
   }
 
   :global {

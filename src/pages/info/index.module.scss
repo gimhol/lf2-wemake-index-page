@@ -15,6 +15,7 @@
   overflow      : auto;
   flex-shrink   : 0;
   height        : 100%;
+  margin-top    : 60px;
 
   &>*:first-child {
     @extend .bg;
@@ -23,9 +24,5 @@
     left    : 0px;
     right   : 0px;
     z-index : 1;
-  }
-
-  &>*:nth-child(2) {
-    margin-top: 40px;
   }
 }
