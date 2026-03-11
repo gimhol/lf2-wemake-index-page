@@ -1,12 +1,20 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LF-WeMakit</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LF-Wemakit</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+  <script id="redirect_to_https">
+    if (location.href.startsWith('http://lf.gim.ink'))
+      location.href = location.href.replace('http://', 'https://')
+    document.getElementById('redirect_to_https').remove();
+  </script>
+</body>
+
 </html>
