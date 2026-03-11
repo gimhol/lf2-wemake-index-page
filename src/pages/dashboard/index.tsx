@@ -10,7 +10,7 @@ import csses from "./index.module.scss";
 export default function DashBoard() {
   const [data, set_data] = useState<any>([])
   const [fingerprint, set_fingerprint] = useState('')
-  const [size,] = useState(100);
+  const [size,] = useState(50);
   const [last, set_last] = useState<string>()
 
   const [ranges, setRanges] = useState<[Dayjs, Dayjs][] | undefined>(() => [[
@@ -76,7 +76,9 @@ export default function DashBoard() {
               return (
                 <tr key={v.id + v.time}>
                   <td onClick={() => set_fingerprint(v.fingerprint)}>
-                    <span className={v.fingerprint == fingerprint ? csses.picked : ''}>{v.fingerprint}</span>
+                    <Tooltip title={v.ua}>
+                      <span className={v.fingerprint == fingerprint ? csses.picked : ''}>{v.fingerprint}</span>
+                    </Tooltip>
                   </td>
                   <td> {v.ip} </td>
                   <td> {v.long_place} </td>
