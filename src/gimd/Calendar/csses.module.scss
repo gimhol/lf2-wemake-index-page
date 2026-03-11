@@ -1,0 +1,122 @@
+.calendar {
+  --gimd_calendar_bg_color                        : var(--gimd_main_bg_color);
+  --gimd_calendar_cell_width                      : 26px;
+  --gimd_calendar_cell_height                     : 26px;
+  --gimd_calendar_color                           : var(--gimd_main_color);
+  --gimd_calendar_cell_border_color               : transparent;
+  --gimd_calendar_cell_border_color_hover         : rgba(255, 255, 255, 0.5);
+  --gimd_calendar_cell_border_color_selected      : rgba(255, 255, 255, 0.5);
+  --gimd_calendar_cell_border_color_selected_hover: rgba(255, 255, 255, 0.8);
+  --gimd_calendar_cell_bg_color_hover             : rgba(255, 255, 255, 0.3);
+  --gimd_calendar_cell_bg_color_today             : rgba(255, 255, 255, 0.3);
+  --gimd_calendar_cell_bg_color_selected          : rgba(255, 255, 255, 0.3);
+  --gimd_calendar_range_picker_bg_color           : rgba(255, 255, 255, 0.2);
+
+  background-color: var(--gimd_calendar_bg_color);
+  display         : flex;
+  flex-direction  : column;
+  align-items     : stretch;
+  overflow        : hidden;
+  gap             : 5px;
+}
+
+.calendar_row {
+  position       : relative;
+  display        : flex;
+  flex-shrink    : 0;
+  justify-content: space-between;
+  min-width      : fit-content;
+}
+
+
+.calendar_cell {
+  flex           : 1;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  flex-shrink    : 0;
+}
+
+.calendar_cell.tomonth {
+  color: var(--gimd_calendar_cell_color, rgba(255, 255, 255));
+}
+
+.calendar_cell.outmonth {
+  color: var(--gimd_calendar_cell_outmonth_color, rgba(255, 255, 255, 0.5));
+}
+
+.calendar_cell_inner {
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  width          : var(--gimd_calendar_cell_width);
+  height         : var(--gimd_calendar_cell_height);
+  min-width      : var(--gimd_calendar_cell_width);
+  min-height     : var(--gimd_calendar_cell_height);
+  border-radius  : 50%;
+  transition     : all 255ms;
+  user-select    : none;
+  border-width   : 2px;
+  border-style   : dashed;
+  border-color   : var(--gimd_calendar_cell_border_color);
+  box-sizing     : border-box;
+}
+
+.calendar_cell.today>.calendar_cell_inner {
+  background-color: var(--gimd_calendar_cell_bg_color_today);
+}
+
+.calendar.selectable {
+  .calendar_cell:hover>.calendar_cell_inner {
+    border-color    : var(--gimd_calendar_cell_border_color_hover);
+    background-color: var(--gimd_calendar_cell_bg_color_hover);
+  }
+
+  .calendar_cell.selected>.calendar_cell_inner {
+    border-style    : solid;
+    border-color    : var(--gimd_calendar_cell_border_color_selected);
+    background-color: var(--gimd_calendar_cell_bg_color_selected);
+  }
+
+  .calendar_cell.selected:hover>.calendar_cell_inner {
+    border-color    : var(--gimd_calendar_cell_border_color_selected_hover);
+    background-color: var(--gimd_calendar_cell_bg_color_selected);
+  }
+}
+
+
+
+
+.weekday {
+  pointer-events: none;
+  font-weight   : bold;
+}
+
+.calendar_range {
+  pointer-events  : none;
+  position        : absolute;
+  height          : 100%;
+  box-sizing      : border-box;
+  border-width    : 2px;
+  border-style    : solid;
+  border-color    : transparent;
+  border-radius   : calc(var(--gimd_calendar_cell_width) / 2);
+  background-color: var(--gimd_calendar_cell_bg_color_selected);
+  transition      : all 255ms;
+
+  &.l_open {
+    border-top-left-radius   : 0px;
+    border-bottom-left-radius: 0px;
+    border-left-color        : transparent;
+  }
+
+  &.r_open {
+    border-top-right-radius   : 0px;
+    border-bottom-right-radius: 0px;
+    border-right-color        : transparent;
+  }
+
+  &.picker {
+    background-color: var(--gimd_calendar_range_picker_bg_color);
+  }
+}

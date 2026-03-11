@@ -14,10 +14,11 @@ export interface ITooltipProps extends PropsWithChildren {
   title?: ReactNode;
   open?: boolean;
   onOpen?(v?: boolean): void;
-  container?: Element | DocumentFragment | (() => Element | DocumentFragment)
+  container?: Element | DocumentFragment | (() => Element | DocumentFragment);
+  style?: CSSProperties
 }
 export function Tooltip(props: ITooltipProps) {
-  const { children, title, open: _open, container = document.body, onOpen } = props;
+  const { children, title, open: _open, container = document.body, style: _style, onOpen } = props;
   const [open, set_open] = usePropState(_open, onOpen);
   const [style, set_style] = useState<CSSProperties>({});
   const [viewing, set_viewing] = useState(false)
@@ -65,7 +66,7 @@ export function Tooltip(props: ITooltipProps) {
           const rect = (e.target as HTMLElement).getBoundingClientRect();
           const ih = window.innerHeight
           const iw = window.innerWidth
-          const s: CSSProperties = {}
+          const s: CSSProperties = { ..._style }
           if (rect.right <= iw / 2) s.left = rect.left
           else s.right = `calc(100vW - ${rect.right}px)`
           if (rect.bottom <= ih / 2) s.top = rect.bottom

@@ -1,26 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ApiHttp } from "@/network/ApiHttp"
-import { useEffect, useState } from "react"
-import csses from "./index.module.scss";
-import dayjs, { Dayjs } from "dayjs";
-import { Input } from "@/gimd/Input";
 import { IconButton } from "@/components/button/IconButton";
+import { Calendar } from "@/gimd/Calendar/Calendar";
+import { Tooltip } from "@/gimd/Tooltip";
+import { ApiHttp } from "@/network/ApiHttp";
+import dayjs, { Dayjs } from "dayjs";
+import { useEffect, useState } from "react";
+import csses from "./index.module.scss";
 
 export default function DashBoard() {
   const [data, set_data] = useState<any>([])
   const [fingerprint, set_fingerprint] = useState('')
   const [size,] = useState(100);
   const [last, set_last] = useState<string>()
-  const [[from, to], set_daterange] = useState<[Dayjs, Dayjs]>(() => [
+
+  const [ranges, setRanges] = useState<[Dayjs, Dayjs][] | undefined>(() => [[
     dayjs().startOf('month'),
     dayjs().endOf('month')
-  ])
-  const [a, set_a] = useState(() => from.format('YYYY-MM-DD HH:mm:ss'))
-  const [b, set_b] = useState(() => to.format('YYYY-MM-DD HH:mm:ss'))
+  ]]);
+
   useEffect(() => {
+    if (!ranges?.length) return;
+    const [from, to] = ranges[0]
     ApiHttp.get(`${API_BASE}events/ips`, {
-      from: from.format('YYYY-MM-DD HH:mm:ss'),
-      to: to.format('YYYY-MM-DD HH:mm:ss'),
+      from: from.format('YYYY-MM-DD 00:00:00'),
+      to: to.format('YYYY-MM-DD 23:59:59'),
       size,
       last
     }).then(r => {
@@ -30,29 +33,39 @@ export default function DashBoard() {
       }
       set_data(r.data)
     })
-  }, [from, to, size, last])
+  }, [ranges, size, last])
+  const [open, set_open] = useState<boolean | undefined>()
+  const daterange = !ranges?.length ? '未选择日期范围' :
+    ranges[0][0].diff(ranges[0][1], 'day') == 0 ?
+      `${ranges[0][0].format('YYYY-MM-DD')}` :
+      `${ranges[0][0].format('YYYY-MM-DD')} ~ ${ranges[0][1].format('YYYY-MM-DD')}`
 
   return (
-    <div className={csses.dashboard}>
+    <div className={csses.dashboard} >
       <div className={csses.head}>
-        <Input className={csses.input} value={a} onChange={e => set_a(e.target.value)} onBlur={() => {
-          const d = dayjs(a.trim());
-          if (d.isValid()) {
-            set_a(d.format('YYYY-MM-DD HH:mm:ss'))
-            set_daterange(v => [d, v[1]])
-          } else {
-            set_a(to.format('YYYY-MM-DD HH:mm:ss'))
-          }
-        }} />~
-        <Input className={csses.input} value={b} onChange={e => set_b(e.target.value)} onBlur={() => {
-          const d = dayjs(b.trim());
-          if (d.isValid()) {
-            set_b(d.format('YYYY-MM-DD HH:mm:ss'))
-            set_daterange(v => [v[0], d])
-          } else {
-            set_b(to.format('YYYY-MM-DD HH:mm:ss'))
-          }
-        }} />
+        <Tooltip
+          style={{ padding: 0, borderWidth: 0, overflow: 'hidden', background: 'none' }}
+          open={open}
+          onOpen={v => {
+            set_open(v);
+            if (v) return;
+            const r: [Dayjs, Dayjs][] = ranges ? ranges : [[
+              dayjs().startOf('month'),
+              dayjs().endOf('month')
+            ]]
+            setRanges(r)
+          }}
+          title={
+            <Calendar
+              style={{ padding: `5px` }}
+              ranges={ranges}
+              whenRanges={setRanges}
+            />
+          }>
+          <IconButton>
+            {daterange}
+          </IconButton>
+        </Tooltip>
         <IconButton onClick={() => set_last(void 0)}>first</IconButton>
         <IconButton onClick={() => set_last(data[data.length - 1]._id)}>next</IconButton>
       </div>

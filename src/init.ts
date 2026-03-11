@@ -7,6 +7,10 @@ import * as KnownError from './network/KnownError';
 import './style.scss';
 import './utils/events';
 import './utils/fingerprint';
+import weekday from "dayjs/plugin/weekday";
+import dayjs from 'dayjs';
+dayjs.extend(weekday);
+dayjs.locale('zh-cn');
 ApiHttp.addRequestInterceptor((url, opts) => {
   if (!API_BASE) return [url, opts];
   if (!url.startsWith('http')) {

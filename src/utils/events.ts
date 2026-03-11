@@ -22,7 +22,7 @@ export function submit_event(type: string, event: any) {
     fetch(`https://gim.ink/api/events/add?type=${type}`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ ...event, seq: ++_seq, time: new Date() }),
+      body: JSON.stringify({ ...event, ua: navigator.userAgent, seq: ++_seq, time: new Date() }),
       mode: 'cors',
     })
   })
