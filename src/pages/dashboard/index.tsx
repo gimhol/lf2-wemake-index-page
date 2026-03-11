@@ -6,6 +6,7 @@ import { ApiHttp } from "@/network/ApiHttp";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import csses from "./index.module.scss";
+import { useSmallScreen } from "@/useSmallScreen";
 
 export default function DashBoard() {
   const [data, set_data] = useState<any>([])
@@ -39,7 +40,7 @@ export default function DashBoard() {
     ranges[0][0].diff(ranges[0][1], 'day') == 0 ?
       `${ranges[0][0].format('YYYY-MM-DD')}` :
       `${ranges[0][0].format('YYYY-MM-DD')} ~ ${ranges[0][1].format('YYYY-MM-DD')}`
-
+  const small = useSmallScreen()
   return (
     <div className={csses.dashboard} >
       <div className={csses.head}>
@@ -73,7 +74,20 @@ export default function DashBoard() {
         <table>
           <tbody>
             {data.map((v: any) => {
-              return (
+              return small ?
+                <tr key={v.id + v.time}>
+                  <td onClick={() => set_fingerprint(v.fingerprint)}>
+                    <div>
+                      <Tooltip title={v.ua}>
+                        <span className={v.fingerprint == fingerprint ? csses.picked : ''}>{v.fingerprint}</span>
+                      </Tooltip>
+                      <div> {v.ip} </div>
+                      <div> {v.long_place} </div>
+                      <div> {v.uri} </div>
+                      <div> {v.time.substring(0, 20)} </div>
+                    </div>
+                  </td>
+                </tr> :
                 <tr key={v.id + v.time}>
                   <td onClick={() => set_fingerprint(v.fingerprint)}>
                     <Tooltip title={v.ua}>
@@ -85,7 +99,6 @@ export default function DashBoard() {
                   <td> {v.uri} </td>
                   <td> {v.time.substring(0, 20)} </td>
                 </tr>
-              )
             })}
           </tbody>
         </table>
