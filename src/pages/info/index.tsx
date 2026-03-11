@@ -3,7 +3,7 @@ import { Paths } from "@/Paths"
 import { Loading } from "@/components/loading"
 import Toast from "@/gimd/Toast"
 import { useCanGoBack } from "@/hooks/useCanGoBack"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router"
 import { useImmer } from "use-immer"
 import { MainContext } from "../main/main_context"
@@ -43,11 +43,32 @@ export default function InfoViewPage() {
     return () => ab.abort()
   }, [mod_id, set_mod, is_root])
   const nav = useNavigate();
+  const [margin_top, set_margin_top] = useState(0)
+  // eslint-disable-next-line react-hooks/purity
+  const id = useMemo(() => `root_info_view_${Date.now()}`, [])
+  useEffect(() => {
+    if (!mod?.info) return;
+    const el = document.getElementById(id)
+    const head = el?.firstElementChild;
+    if (!el || !head) {
+      console.log(id, el, head)
+      set_margin_top(0)
+      return;
+    }
+    const resize = () => {
+      set_margin_top(head.getBoundingClientRect().height)
+    }
+    const r = new ResizeObserver(resize);
+    r.observe(head)
+    resize()
+    return () => { r.disconnect() }
+  }, [id, mod])
 
   return <>
     <InfoView
+      id={is_root ? id : void 0}
       backable={is_root}
-      foldable={!is_root}
+      foldable
       onClickBack={async () => {
         if (canGoBack) nav(-1)
         else nav(Paths.All.Main)
@@ -55,7 +76,8 @@ export default function InfoViewPage() {
       info={is_root ? mod?.info : info}
       record={is_root ? mod?.record : record}
       className={is_root ? csses.main : csses.main_right}
-      open={open} />
+      open={open}
+      style={{ marginTop: margin_top }} />
     <Loading fixed center loading={loading} big />
   </>
 }
