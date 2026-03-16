@@ -8,23 +8,23 @@ import { BackButton } from "@/components/button/BackButton";
 import { CollapseButton } from "@/components/button/CollapseButton";
 import { IconButton } from "@/components/button/IconButton";
 import { InfoCard } from "@/components/cards/InfoCard";
+import { InfoDate } from "@/components/cards/InfoDate";
 import { Collapse } from "@/components/collapse/Collapse";
 import { Link } from "@/components/link";
 import { Viewer as MDViewer } from "@/components/markdown/Viewer";
 import Show from "@/gimd/Show";
 import Toast from "@/gimd/Toast";
+import { useSmallScreen } from "@/useSmallScreen";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import Viewer from 'viewerjs';
+import 'viewerjs/dist/viewer.min.css';
 import { IdLink, InfoActions } from "./InfoActions";
 import csses from "./InfoView.module.scss";
 import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
-import { InfoDate } from "@/components/cards/InfoDate";
-import Viewer from 'viewerjs';
-import 'viewerjs/dist/viewer.min.css';
-import { useSmallScreen } from "@/useSmallScreen";
 
 type ListLike = 'cards' | 'list';
 function curr_list_like(v: string | undefined | null): ListLike {
@@ -92,8 +92,7 @@ export function InfoView(props: IInfoViewProps) {
     const gallery = new Viewer(ele, {
       filter: (img: HTMLImageElement) => {
         const ok = img.parentElement?.tagName !== 'BUTTON' && img.parentElement?.tagName !== 'A'
-        console.log(ok, img)
-        return img.parentElement?.tagName !== 'BUTTON' && img.parentElement?.tagName !== 'A'
+        return ok
       }
     })
     return () => { gallery.destroy(); }
