@@ -124,6 +124,7 @@ export function InfoCard(props: IInfoCardProps) {
         style={detail_style}
         onClick={e => e.stopPropagation()}
         onClose={close_detail}
+        record={record}
       />
     </Mask>
   </>
