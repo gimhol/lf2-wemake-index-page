@@ -38,6 +38,7 @@
   white-space  : nowrap;
   display      : flex;
   align-items  : center;
+  flex-wrap    : wrap;
 
   a {
     user-select: none;
