@@ -10,18 +10,22 @@ import { IconButton } from "@/components/button/IconButton";
 import { InfoCard } from "@/components/cards/InfoCard";
 import { Collapse } from "@/components/collapse/Collapse";
 import { Link } from "@/components/link";
-import { Viewer } from "@/components/markdown/Viewer";
+import { Viewer as MDViewer } from "@/components/markdown/Viewer";
 import Show from "@/gimd/Show";
 import Toast from "@/gimd/Toast";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IdLink, InfoActions } from "./InfoActions";
 import csses from "./InfoView.module.scss";
 import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
 import { InfoDate } from "@/components/cards/InfoDate";
+import Viewer from 'viewerjs';
+import 'viewerjs/dist/viewer.min.css';
+import { useSmallScreen } from "@/useSmallScreen";
+
 type ListLike = 'cards' | 'list';
 function curr_list_like(v: string | undefined | null): ListLike {
   return v === 'cards' ? 'cards' : 'list'
@@ -57,13 +61,20 @@ export function InfoView(props: IInfoViewProps) {
   } = props;
   const [__open, __set_open] = usePropState(open, whenOpen)
   const [__listLike, __set_listLike] = usePropState(listLike, whenListLike)
-
+  const small = useSmallScreen();
   useEffect(() => {
     if (whenListLike) return;
+    if (small) { return __set_listLike('list') }
     const listlike = curr_list_like(info?.children_look)
     __set_listLike(listlike)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [info])
+  }, [info, small])
+
+
+  useEffect(() => {
+    if (!small) return;
+    __set_open(false);
+  }, [__set_open, small])
 
   const { t } = useTranslation()
   const { children_title, url, desc, brief, full_desc_url, title } = info ?? {};
@@ -73,9 +84,25 @@ export function InfoView(props: IInfoViewProps) {
   Toast.useError(children_error)
   const __next_list_like = next_list_like(__listLike)
   const cls_root = classnames(csses.info_view_root, className)
+  const ref_article = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ele = ref_article.current;
+    if (!ele) return;
+    const gallery = new Viewer(ele, {
+      filter: (img: HTMLImageElement) => {
+        const ok = img.parentElement?.tagName !== 'BUTTON' && img.parentElement?.tagName !== 'A'
+        console.log(ok, img)
+        return img.parentElement?.tagName !== 'BUTTON' && img.parentElement?.tagName !== 'A'
+      }
+    })
+    return () => { gallery.destroy(); }
+  }, [children, info, open])
+
   if (!info) return <></>;
+
   return (
-    <div className={cls_root} {..._p}>
+    <div className={cls_root} {..._p} ref={ref_article}>
       <div className={csses.head}>
         <BackButton
           gone={!backable}
@@ -116,14 +143,14 @@ export function InfoView(props: IInfoViewProps) {
           </div>
         </div>
       </div>
-      <Viewer className={csses.content_zone} emptyAsGone content={brief} />
+      <MDViewer className={csses.content_zone} emptyAsGone content={brief} />
       <Collapse open={__open && has_content} >
         <Show yes={!!info.full_cover_url}>
-          <Viewer className={csses.content_zone}>
+          <MDViewer className={csses.content_zone}>
             <img src={info.full_cover_url} style={{ maxWidth: '100%' }} />
-          </Viewer>
+          </MDViewer>
         </Show>
-        <Viewer
+        <MDViewer
           emptyAsGone
           className={csses.content_zone}
           content={desc}

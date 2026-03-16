@@ -13,6 +13,9 @@ import { CardBase, type ICardBaseProps } from "./CardBase";
 import { DetailCard } from "./DetailCard";
 import csses from "./InfoCard.module.scss";
 import { InfoDate } from "./InfoDate";
+import { useNavigate } from "react-router";
+import { useSmallScreen } from "@/useSmallScreen";
+import { Paths } from "@/Paths";
 
 export interface IInfoCardProps extends ICardBaseProps {
   info?: Info;
@@ -36,12 +39,17 @@ export function InfoCard(props: IInfoCardProps) {
     const { width, height, left, top } = ref_el.current!.firstElementChild!.getBoundingClientRect()
     set_detail_style({ width, height, left, top })
   }
+  const nav = useNavigate();
+  const small = useSmallScreen();
   const open_detail = (e: React.MouseEvent) => {
+    if (small) {
+      nav(Paths.All.Info.replace(':game_id', '' + record?.id))
+    }
     const el = ref_el.current;
     if (!el) return;
     const paths: HTMLElement[] = [e.target as HTMLElement]
     while (paths[paths.length - 1].parentElement) paths.push(paths[paths.length - 1].parentElement!);
-    if (!paths.includes(el)) return 
+    if (!paths.includes(el)) return
 
     set_detail_open(true)
     const { width, height, left, top } = ref_el.current!.firstElementChild!.getBoundingClientRect()
