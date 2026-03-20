@@ -44,6 +44,7 @@ export interface IInfo {
 
 const { Cls, Str } = makeI18N();
 @Cls export class Info implements IInfo {
+
   static readonly OPEN_IN_BROWSER = 'open_in_browser';
   static readonly PLAY_IN_BROWSER = 'play_in_browser';
   static readonly DOWNLOAD = 'download';
@@ -238,5 +239,16 @@ const { Cls, Str } = makeI18N();
   }
   private async fetch(url: string): Promise<Response> {
     return fetch(this.full_url(url), { mode: 'cors' })
+  }
+
+  clearup(): this {
+    if (!this.url?.trim()) {
+      this.set_url(void 0)
+      this.set_url_type(void 0)
+    }
+    if (!this.author_url) {
+      this.set_author_url(void 0)
+    }
+    return this
   }
 }

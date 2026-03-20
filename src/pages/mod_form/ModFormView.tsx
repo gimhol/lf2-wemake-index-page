@@ -111,7 +111,8 @@ export function ModFormView(props: IModFormViewProps) {
       ...drafts[''],
       i18n: { zh: { ...drafts.zh } }
     }
-    const next = mod.info.clone().load(raw).set_id('' + mod_id)
+    const next = mod.info.clone().load(raw).set_id('' + mod_id).clearup()
+
     if (JSON.stringify(mod.info.raw) === JSON.stringify(next.raw)) {
       Toast.show('Nothings Changed.')
       return false;
