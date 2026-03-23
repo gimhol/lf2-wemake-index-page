@@ -27,7 +27,7 @@ export const is_publishable = (f: IRecord | undefined | null) => {
   if (!f?.type) return false;
   return info_types.includes(f.type)
 }
-export const children_type = (f: IRecord | undefined | null): RecordType[] | undefined => {
+export const children_types = (f: IRecord | undefined | null): RecordType[] | undefined => {
   if (!f?.type) return undefined;
   switch (f.type) {
     case "product": return ['version', 'file']

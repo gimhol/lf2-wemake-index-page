@@ -189,3 +189,8 @@
     flex-shrink: 0 !important;
   }
 }
+
+.divider_h {
+  height       : 1px;
+  border-bottom: 1px var(--color-divider) dashed;
+}

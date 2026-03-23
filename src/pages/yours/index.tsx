@@ -3,7 +3,7 @@
 import { addModRecord } from "@/api/addModRecord"
 import { editModRecord } from "@/api/editModRecord"
 import { listModPath } from "@/api/listModPath"
-import { children_type, is_dir, is_publishable, listModRecords, type IRecord } from "@/api/listModRecords"
+import { children_types, is_dir, is_publishable, listModRecords, type IRecord } from "@/api/listModRecords"
 import img_preview from "@/assets/svg/preview.svg"
 import img_publish from "@/assets/svg/publish.svg"
 import img_reviewing from "@/assets/svg/reviewing.svg"
@@ -263,8 +263,9 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
   }
 
   const actions = useMemo(() => {
-    return children_type(dir)?.map(type => {
-      if (type == "product" && (admin & 0b10000000)) return null
+    const types = children_types(dir);
+    return types?.map(type => {
+      if (type == "product" && !(admin & 0b10000000)) return null
       switch (type) {
         case "file": return null;
         case "dir":

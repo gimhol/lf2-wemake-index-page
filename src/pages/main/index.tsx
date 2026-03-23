@@ -4,6 +4,7 @@ import img_github from "@/assets/svg/github.svg";
 import img_login from "@/assets/svg/login.svg";
 import img_logout from "@/assets/svg/logout.svg";
 import img_menu from "@/assets/svg/menu.svg";
+import { Info } from "@/base/Info";
 import { IconButton } from "@/components/button/IconButton";
 import { LangButton } from "@/components/LangButton";
 import { Loading } from "@/components/loading";
@@ -42,16 +43,23 @@ export default function MainPage() {
   useEffect(() => { submit_visit_event(); })
   useMovingBg(document.documentElement)
   const { t, i18n } = useTranslation()
+  const lang = i18n.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
   const [games, set_games] = useState<IRecordInfo[]>()
   const [loading, set_loading] = useState(false);
+  const { pathname } = useLocation()
   const nav = useNavigate();
   const { value: { session_id, nickname, username, admin }, dispatch } = useContext(GlobalStore.context);
   const {
     search, hash,
     params: { raw: { game_id } }
   } = LocationParams.useAll()
-  const real_game_id = useMemo(() => a_mappings['' + game_id] ?? game_id, [game_id]);
-  const { pathname } = useLocation()
+
+  const real_game_id = useMemo(() => {
+    if (typeof game_id === 'string')
+      return a_mappings[game_id] ?? game_id
+    return pathname;
+  }, [game_id, pathname]);
+
   const set_location = useCallback((opts: { game?: string }) => {
     const { game } = opts
     const pathname = typeof game === 'string' ?
@@ -70,7 +78,7 @@ export default function MainPage() {
     const session = search.get_string('session')
     if (session) return;
     if (pathname !== Paths.All.Main && Paths.has_permission(pathname)) return;
-    const curr = games?.find(v => v.id == real_game_id);
+    const curr = games?.find(v => ('' + v.id) == real_game_id);
     if (curr) return;
     const next_game_id = games?.find(v => v)?.id?.toString();
     const game = b_mappings['' + next_game_id] ?? next_game_id
@@ -113,12 +121,12 @@ export default function MainPage() {
   }, [session_id, dispatch, set_location])
 
   const actived: IRecordInfo | undefined = useMemo(() => games?.find(v => v.info.id == real_game_id), [real_game_id, games])
-
+  const small = useSmallScreen()
+  const [game_list_open, set_game_list_open] = useState(!small);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     set_loading(true)
     const ab = new AbortController();
-    const lang = i18n.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
     fetch_infos(lang, { signal: ab.signal })
       .then((list) => {
         if (ab.signal.aborted) return;
@@ -131,54 +139,57 @@ export default function MainPage() {
         set_loading(false)
       })
     return () => ab.abort()
-  }, [i18n])
-  const small = useSmallScreen()
-  const [game_list_open, set_game_list_open] = useState(!small);
+  }, [lang])
+
+  const _games = useMemo<('divider' | IRecordInfo)[] | undefined>(() => {
+    if (!games) return games
+    if (!session_id) return games;
+    const ret: ('divider' | IRecordInfo)[] = [...games]
+    const head: ('divider' | IRecordInfo | null)[] = [admin == 255 ? {
+      info: new Info({
+        id: Paths.All.Dashboard,
+        short_title: t('Dashboard')
+      }, lang, null, null)
+    } : null, {
+      info: new Info({
+        id: Paths.All.Workspace,
+        short_title: t('workspace')
+      }, lang, null, null)
+    }, {
+      info: new Info({
+        id: Paths.All.Editor,
+        short_title: t('Editor')
+      }, lang, null, null)
+    }, 'divider']
+    head.forEach((v, i) => v && ret.splice(i, 0, v))
+    return ret
+  }, [games, session_id, admin, t, lang])
+
   const game_list = useMemo(() => {
     return (
       <div className={cns(csses.game_list, game_list_open ? void 0 : csses.close, csses.scrollview)}>
-        <NavButton
-          show={!!session_id}
-          actived={pathname === Paths.All.Workspace}
-          children={t('workspace')}
-          onClick={(e) => {
-            if (small) set_game_list_open(false)
-            interrupt_event(e);
-            set_location({ game: 'yours' });
-          }}
-        />
-        <NavButton
-          show={!!session_id && admin == 255}
-          actived={pathname === Paths.All.Dashboard}
-          children={t('dashboard')}
-          onClick={(e) => {
-            if (small) set_game_list_open(false)
-            interrupt_event(e);
-            set_location({ game: 'dashboard' });
-          }}
-        />
-        {games?.map((v) => <NavButton
-          key={v.id}
-          actived={real_game_id === v.info.id}
-          children={v.info.short_title}
-          onClick={e => {
-            interrupt_event(e);
-            set_location({ game: b_mappings['' + v.info.id] ?? v.info.id });
-            if (small) set_game_list_open(false)
-          }} />
+        {_games?.map((v) => {
+          if (!v) return <></>
+          if (v === 'divider') return <div className={csses.divider_h} />
+          return (
+            <NavButton
+              key={v.id}
+              actived={real_game_id === v.info.id || pathname === v.info.id}
+              children={v.info.short_title}
+              onClick={e => {
+                const game = b_mappings['' + v.info.id] ?? v.info.id
+                console.log({ game })
+                interrupt_event(e);
+                set_location({ game });
+                if (small) set_game_list_open(false)
+              }} />
+          )
+        }
         )}
-        <NavButton
-          children={t('Dat Editor')}
-          onClick={(e) => {
-            if (small) set_game_list_open(false)
-            interrupt_event(e);
-            set_location({ game: 'editor' });
-          }}
-        />
         <Loading loading={loading} center absolute />
       </div>
     )
-  }, [game_list_open, session_id, pathname, t, admin, games, loading, set_location, small, real_game_id])
+  }, [game_list_open, pathname, _games, loading, set_location, small, real_game_id])
   return <>
     <MainContext.Provider value={{ info: actived?.info, record: actived }}>
       <div className={csses.main_page}
