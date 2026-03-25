@@ -7,6 +7,12 @@
 
       display: flex !important;
     }
+
+    .bytemd-preview {
+      a {
+        color: inherit;
+      }
+    }
   }
 
   .bytemd-fullscreen {

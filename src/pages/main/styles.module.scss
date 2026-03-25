@@ -57,9 +57,9 @@
       padding       : 5px;
       box-sizing    : border-box;
       flex-shrink   : 1;
-      flex-basis    : 100px;
+      // flex-basis    : 100px;
       flex-grow     : 0;
-      width         : 100%;
+      // width         : 100%;
       transition    : flex-basis 255ms, padding 255ms;
     }
 

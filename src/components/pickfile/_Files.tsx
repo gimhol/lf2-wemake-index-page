@@ -1,10 +1,12 @@
+import img_download from "@/assets/svg/download.svg";
+import { file_size_txt } from "@/utils/file_size_txt";
 import { interrupt_event } from "@/utils/interrupt_event";
+import { open_link } from "@/utils/open_link";
 import cns from "classnames";
 import { useContext, type HTMLAttributes, type MouseEvent } from "react";
 import { IconButton } from "../button/IconButton";
 import { FilePickerCtx, type FilePickerContextValue, type IPickedFile } from "./_Common";
 import csses from "./index.module.scss";
-import { file_size_txt } from "@/utils/file_size_txt";
 
 export interface IFilePickerFilesProps extends HTMLAttributes<HTMLDivElement> {
   _?: never;
@@ -34,7 +36,7 @@ export function Files(props: IFilePickerFilesProps) {
         const files = Array.from(e.dataTransfer.files).filter(file => {
           const suffixes = accept?.split(';').filter(Boolean)
           if (!suffixes) return true
-          return suffixes.some(v => file.type.endsWith(v))
+          return suffixes.some(v => file.name.endsWith(v))
         });
         if (!files.length) return
         add(files.map(file => ({ file })))
@@ -43,7 +45,6 @@ export function Files(props: IFilePickerFilesProps) {
         return (
           <div
             key={record.name + '_' + idx}
-            title={record.name ?? record.url}
             className={cns(csses.cell, onFileClick && csses.cell_clickable, classNames?.cell,)}
             onClick={e => {
               if (!onFileClick) return
@@ -71,7 +72,23 @@ export function Files(props: IFilePickerFilesProps) {
               }}>
               {typeof record.progress === 'number' ? <div className={csses.progress} title={record.name}
                 style={{ width: `${(100 * record.progress).toFixed(1)}%` }} /> : null}
-              {record.file?.size ? `(${file_size_txt(record.file.size)})` : null}{record.name}
+
+              {(record.url && !record.file) ?
+                <IconButton
+                  draggable={false}
+                  disabled={disabled}
+                  icon={img_download}
+                  href={record.url}
+                  title={`download from ${record.url}`}
+                  onClick={(e) => {
+                    interrupt_event(e);
+                  }} /> :
+                null
+              }
+              <span title={record.name ?? record.url}>
+                {record.file?.size ? `(${file_size_txt(record.file.size)})` : null}{record.name || record.url}
+              </span>
+
             </div>
           </div>
         )
