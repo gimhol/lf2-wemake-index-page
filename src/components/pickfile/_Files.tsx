@@ -1,7 +1,6 @@
 import img_download from "@/assets/svg/download.svg";
 import { file_size_txt } from "@/utils/file_size_txt";
 import { interrupt_event } from "@/utils/interrupt_event";
-import { open_link } from "@/utils/open_link";
 import cns from "classnames";
 import { useContext, type HTMLAttributes, type MouseEvent } from "react";
 import { IconButton } from "../button/IconButton";
