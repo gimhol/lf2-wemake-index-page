@@ -38,10 +38,8 @@ export function Tooltip(props: ITooltipProps) {
     const keyup = (e: KeyboardEvent) => {
       const k = e.key?.toLowerCase()
       if (k != 'alt' && k != 'escape') return
-
       e.preventDefault()
       e.stopPropagation()
-
       if (k == 'escape') set_viewing(false)
       if (k == 'alt') set_alt(false)
     }
@@ -78,7 +76,10 @@ export function Tooltip(props: ITooltipProps) {
         },
         onPointerLeave: e => {
           clearTimeout(ref_tid.current)
-          ref_tid.current = setTimeout(() => set_open(false), 300)
+          ref_tid.current = setTimeout(() => {
+            set_viewing(false);
+            set_open(false)
+          }, 300)
           return onPointerLeave?.(e)
         }
       }
@@ -108,7 +109,7 @@ export function Tooltip(props: ITooltipProps) {
           clearTimeout(ref_tid.current)
           ref_tid.current = setTimeout(() => {
             set_open(false);
-            set_viewing(false)
+            set_viewing(false);
           }, 300)
         }}>
         {
