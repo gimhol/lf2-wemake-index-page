@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/immutability */
 /* eslint-disable no-debugger */
-import Button from "@/gimd/Button";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import FPS from "./FPS";
 import { QuadTree } from "./QuadTree";
