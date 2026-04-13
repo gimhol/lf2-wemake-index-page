@@ -109,6 +109,7 @@ export default function MainPage() {
           nickname: r.data.nickname,
         }
       })
+      localStorage.setItem('last_admin', r.data.admin)
       set_location({})
     })
       .catch(ApiHttp.ignoreAbort)

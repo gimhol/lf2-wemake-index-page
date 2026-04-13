@@ -4,6 +4,7 @@ import { get_fingerprint } from "./fingerprint";
 let _prev_location = ''
 let _seq = -1
 export function submit_visit_event() {
+  if (localStorage.getItem('last_admin') == '255') return;
   const curr_location = location.toString();
   if (_prev_location == curr_location) return;
   _prev_location = curr_location
@@ -29,6 +30,7 @@ export function submit_event(type: string, event: any) {
 }
 
 export function submit_click_event<T extends IClickEventData>(target: HTMLElement, must?: Partial<T>) {
+  if (localStorage.getItem('last_admin') == '255') return;
   const el = target
   const el_a = el.closest(`a`);
   if (el_a) {
