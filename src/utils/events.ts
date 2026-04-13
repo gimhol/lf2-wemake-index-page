@@ -3,6 +3,8 @@ import { get_fingerprint } from "./fingerprint";
 
 let _prev_location = ''
 let _seq = -1
+
+
 export function submit_visit_event() {
   if (localStorage.getItem('last_admin') == '255') return;
   const curr_location = location.toString();
@@ -10,8 +12,8 @@ export function submit_visit_event() {
   _prev_location = curr_location
   console.log(curr_location)
   if (curr_location.endsWith(`/#/`)) return;
-  if (curr_location.indexOf('#') < 0) return
-  submit_event('visit', { uri: curr_location });
+  if (curr_location.indexOf('#') < 0) return;
+  submit_event('visit', {});
 }
 
 export function submit_event(type: string, event: any) {
@@ -23,7 +25,13 @@ export function submit_event(type: string, event: any) {
     fetch(`https://gim.ink/api/events/add?type=${type}`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ ...event, ua: navigator.userAgent, seq: ++_seq, time: new Date() }),
+      body: JSON.stringify({
+        ...event,
+        uri: location.toString(),
+        ua: navigator.userAgent,
+        seq: ++_seq,
+        time: new Date()
+      }),
       mode: 'cors',
     })
   })
