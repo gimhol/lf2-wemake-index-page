@@ -20,7 +20,7 @@ import dayjs from "dayjs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useImmer } from "use-immer";
-import { all_info_url_type, InfoUrlType } from "../yours/InfoUrlType";
+import { accept_files, all_info_url_type, InfoUrlType } from "../yours/InfoUrlType";
 import { ModPreview } from "../yours/ModPreviewModal";
 import { get_mod, type IMod } from "../yours/get_mod";
 import { replace_one } from "../yours/join_url";
@@ -186,6 +186,7 @@ export function ModFormView(props: IModFormViewProps) {
   }
 
   if (!mod && !loading) return <></>
+  const { url_type } = drafts['']
   return <>
     <div className={classnames(csses.mod_form_view, loading ? csses.loading : void 0)}>
       <div className={csses.head}>
@@ -268,14 +269,16 @@ export function ModFormView(props: IModFormViewProps) {
                 }} />
 
               <Dropdown.Select
-                value={drafts[''].url_type}
+                value={url_type}
                 placeholder={t('url_type')}
                 onChange={v => set_drafts(d => { d[''].url_type = v })}
                 options={all_info_url_type.map(v => ({ value: v, label: t(v) }))} />
-              {drafts[''].url_type === InfoUrlType.Download ?
+              {
+              url_type === InfoUrlType.Download || 
+              url_type === InfoUrlType.AndroidApk ?
                 <PickFile
                   max={1}
-                  accept=".zip"
+                  accept={accept_files[url_type]}
                   value={attachments}
                   whenChange={records => {
                     set_attachments(records)
@@ -285,6 +288,7 @@ export function ModFormView(props: IModFormViewProps) {
                       mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
                         'application/x-zip-compressed': { max_size: 150 * 1024 * 1024 },
                         'application/zip': { max_size: 150 * 1024 * 1024 },
+                        'application/vnd.android.package-archive': { max_size: 150 * 1024 * 1024 },
                       },
                       progress: (progress, { file }) => {
                         const record = uploaded_map.get(file);
