@@ -8,6 +8,8 @@ import { MarkdownButton } from "../main/MarkdownModal";
 import { icons, InfoUrlType } from "../yours/InfoUrlType";
 import { EditModButton } from "./EditModButton";
 import { Tooltip } from "@/gimd/Tooltip";
+import GlobalStore from "@/GlobalStore";
+import { useContext } from "react";
 
 export interface IInfoActionsProps {
   record?: IRecord | null;
@@ -17,6 +19,8 @@ export function InfoActions(props: IInfoActionsProps) {
   const { info, record } = props
   const { t } = useTranslation()
   const { url, url_type, more_urls } = info ?? {};
+  const { value: { user_id } } = useContext(GlobalStore.context);
+
   return <>
     <IconButton
       title={t('' + url_type)}
@@ -34,7 +38,7 @@ export function InfoActions(props: IInfoActionsProps) {
         )
       })
     }
-    <MarkdownButton info={info} />
+    {user_id ? <MarkdownButton info={info} /> : null}
     <ShareButton info={info} />
     <EditModButton me={record} />
   </>
@@ -44,7 +48,7 @@ export function IdLink(props: IInfoActionsProps) {
   const { info } = props;
   if (!info) return <></>
   const href = `${location.protocol}//${location.host}/#${Paths.All.Info.replace(':game_id', '' + info?.id)}`;
-  
+
   return (
     <Tooltip title='Open in New Page'>
       <a href={href} target='_blank' style={{ display: 'inline' }} onClick={e => e.stopPropagation()}>
