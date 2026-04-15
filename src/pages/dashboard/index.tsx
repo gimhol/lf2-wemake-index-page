@@ -131,7 +131,7 @@ export default function DashBoard() {
                         <span
                           onClick={() => set_picked(v.fingerprint)}
                           className={v.fingerprint == picked ? csses.picked : ''}>
-                          {i}. {v.short_fingerprint}
+                          {i}. {v.fingerprint}
                         </span>
                       </Tooltip>
                     </span>
