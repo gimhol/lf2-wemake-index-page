@@ -1,6 +1,7 @@
 import img_browser from "@/assets/svg/browser.svg"
 import img_download from "@/assets/svg/download.svg"
 import img_android from "@/assets/svg/android.svg"
+import img_gamepad from "@/assets/svg/gamepad.svg"
 import type { ReactNode } from "react"
 
 export enum InfoUrlType {
@@ -15,7 +16,7 @@ export const all_info_url_type: InfoUrlType[] = Object.keys(InfoUrlType).map(k =
 export const icons: Record<InfoUrlType, ReactNode> = {
   [InfoUrlType.Download]: img_download,
   [InfoUrlType.OpenInBrowser]: img_browser,
-  [InfoUrlType.GameInBrowser]: img_browser,
+  [InfoUrlType.GameInBrowser]: img_gamepad,
   [InfoUrlType.AndroidApk]: img_android
 }
 export const accept_files: Record<InfoUrlType, string | undefined> = {

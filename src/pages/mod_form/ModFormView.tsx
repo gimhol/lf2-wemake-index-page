@@ -63,7 +63,10 @@ export function ModFormView(props: IModFormViewProps) {
         set_mod(r)
         if (r.info.full_cover_url)
           set_covers([{ url: r.info.full_cover_url }])
-        if (r.info.url_type === InfoUrlType.Download && r.info.url)
+        if ((
+          r.info.url_type === InfoUrlType.Download ||
+          r.info.url_type === InfoUrlType.AndroidApk
+        ) && r.info.url)
           set_attachments([{ url: r.info.url }])
         set_drafts({ '': r.info.raw, zh: r.info.raw.i18n?.['zh'] ?? {} })
       }).catch(e => {
@@ -274,54 +277,54 @@ export function ModFormView(props: IModFormViewProps) {
                 onChange={v => set_drafts(d => { d[''].url_type = v })}
                 options={all_info_url_type.map(v => ({ value: v, label: t(v) }))} />
               {
-              url_type === InfoUrlType.Download || 
-              url_type === InfoUrlType.AndroidApk ?
-                <PickFile
-                  max={1}
-                  accept={accept_files[url_type]}
-                  value={attachments}
-                  whenChange={records => {
-                    set_attachments(records)
-                    if (!records?.length) return;
-                    set_attachment_uploading(true);
-                    ossUploadModRecords({
-                      mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
-                        'application/x-zip-compressed': { max_size: 150 * 1024 * 1024 },
-                        'application/zip': { max_size: 150 * 1024 * 1024 },
-                        'application/vnd.android.package-archive': { max_size: 150 * 1024 * 1024 },
-                      },
-                      progress: (progress, { file }) => {
-                        const record = uploaded_map.get(file);
-                        if (!record) uploaded_map.set(file, { file, url: "", progress, name: file.name });
-                        else uploaded_map.set(file, { ...record, progress })
-                        set_attachments(prev => replace_one(prev, v => {
-                          return v.file == file ? { ...v, progress } : null
-                        }))
-                      }
-                    }).then(r => {
-                      if (!r.length) throw 'upload nothings'
-                      set_drafts(d => {
-                        d[lang].url = r[0].url;
-                        d[lang].url_type = 'download'
+                url_type === InfoUrlType.Download ||
+                  url_type === InfoUrlType.AndroidApk ?
+                  <PickFile
+                    max={1}
+                    accept={accept_files[url_type]}
+                    value={attachments}
+                    whenChange={records => {
+                      set_attachments(records)
+                      if (!records?.length) return;
+                      set_attachment_uploading(true);
+                      ossUploadModRecords({
+                        mod_id, files: records.map(v => v.file!).filter(Boolean), oss, sts, limits: {
+                          'application/x-zip-compressed': { max_size: 150 * 1024 * 1024 },
+                          'application/zip': { max_size: 150 * 1024 * 1024 },
+                          'application/vnd.android.package-archive': { max_size: 150 * 1024 * 1024 },
+                        },
+                        progress: (progress, { file }) => {
+                          const record = uploaded_map.get(file);
+                          if (!record) uploaded_map.set(file, { file, url: "", progress, name: file.name });
+                          else uploaded_map.set(file, { ...record, progress })
+                          set_attachments(prev => replace_one(prev, v => {
+                            return v.file == file ? { ...v, progress } : null
+                          }))
+                        }
+                      }).then(r => {
+                        if (!r.length) throw 'upload nothings'
+                        set_drafts(d => {
+                          d[lang].url = r[0].url;
+                          d[lang].url_type = 'download'
+                        })
+                      }).catch((err) => {
+                        Toast.error(err)
+                      }).finally(() => {
+                        set_attachment_uploading(false);
                       })
-                    }).catch((err) => {
-                      Toast.error(err)
-                    }).finally(() => {
-                      set_attachment_uploading(false);
-                    })
-                  }}>
-                  <PickFile.Files />
-                </PickFile> :
-                <input
-                  className={csses.long}
-                  value={drafts[''].url}
-                  type="text"
-                  onChange={e => {
-                    interrupt_event(e);
-                    set_drafts(d => { d[''].url = e.target.value.trim() })
-                  }}
-                  placeholder={`https://....`}
-                  maxLength={255} />
+                    }}>
+                    <PickFile.Files />
+                  </PickFile> :
+                  <input
+                    className={csses.long}
+                    value={drafts[''].url}
+                    type="text"
+                    onChange={e => {
+                      interrupt_event(e);
+                      set_drafts(d => { d[''].url = e.target.value.trim() })
+                    }}
+                    placeholder={`https://....`}
+                    maxLength={255} />
               }
             </div>
           </div>
