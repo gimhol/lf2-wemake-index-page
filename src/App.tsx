@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import { createHashRouter, RouterProvider } from "react-router";
@@ -7,38 +8,57 @@ import { Paths } from "./Paths";
 import { Calendar } from "./gimd/Calendar/Calendar";
 import Toast from "./gimd/Toast";
 import { Tooltip } from "./gimd/Tooltip";
-const viewer = new Viewer(document.body, {
-  filter: (img: unknown) => {
-    if (!img) return false;
-    if (!(img instanceof HTMLImageElement)) return false
-    const parent = img.parentElement
-    if (parent?.classList.contains('viewer-canvas')) return false
-    if (parent?.getAttribute('data-viewer-action') == 'view') return false;
-    if (img.src.startsWith('data:')) return false;
-    if (img.src.startsWith(location.protocol + '//' + location.host))
-      return false;
-    return true;
-  },
-})
+
 const router = createHashRouter(Paths.Routes);
 export default function App() {
   const [ranges, setRanges] = useState<[Dayjs, Dayjs][]>();
 
   useEffect(() => {
+    const filter = (img: unknown) => {
+      if (!img) return false;
+      if (!(img instanceof HTMLImageElement)) return false
+      const parent = img.parentElement
+      if (parent?.classList.contains('viewer-canvas')) return false
+      if (parent?.getAttribute('data-viewer-action') == 'view') return false;
+      if (img.src.startsWith('data:')) return false;
+      if (img.src.startsWith(location.protocol + '//' + location.host))
+        return false;
+      return true;
+    }
+    const viewer = new Viewer(document.body, {
+      filter: (img: unknown) => {
+        if (!img) return false;
+        if (!(img instanceof HTMLImageElement)) return false
+        const parent = img.parentElement
+        if (parent?.classList.contains('viewer-canvas')) return false
+        if (parent?.getAttribute('data-viewer-action') == 'view') return false;
+        if (img.src.startsWith('data:')) return false;
+        if (img.src.startsWith(location.protocol + '//' + location.host))
+          return false;
+        return true;
+      },
+    })
     const click = (e: PointerEvent) => {
-      alert(e.button)
+      if (e.button != 0) return;
       const img = e.target
+      if (!filter(img)) return;
       if (!(img instanceof HTMLImageElement)) return
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (!(viewer as any).images.some((v: any) => v == img)) {
+
+      let images = (viewer as any).images as HTMLImageElement[];
+      if (!images.some(v => v == img))
         viewer.update();
-        img.click();
-      }
+      images = (viewer as any).images as HTMLImageElement[];
+      viewer.view(images.indexOf(img))
+      viewer.show()
       e.stopPropagation();
       e.preventDefault();
+      e.stopImmediatePropagation()
     }
-    document.addEventListener('click', click)
-    return () => document.removeEventListener('click', click)
+    document.addEventListener('click', click, { capture: true })
+    return () => {
+      document.removeEventListener('click', click)
+      viewer.destroy();
+    }
   }, [])
   if (!window) {
     return (
