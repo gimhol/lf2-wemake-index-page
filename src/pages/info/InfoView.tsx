@@ -19,7 +19,6 @@ import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import Viewer from 'viewerjs';
 import 'viewerjs/dist/viewer.min.css';
 import { IdLink, InfoActions } from "./InfoActions";
 import csses from "./InfoView.module.scss";
@@ -85,18 +84,6 @@ export function InfoView(props: IInfoViewProps) {
   const __next_list_like = next_list_like(__listLike)
   const cls_root = classnames(csses.info_view_root, className)
   const ref_article = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ele = ref_article.current;
-    if (!ele) return;
-    const gallery = new Viewer(ele, {
-      filter: (img: HTMLImageElement) => {
-        const ok = img.parentElement?.tagName !== 'BUTTON' && img.parentElement?.tagName !== 'A'
-        return ok
-      }
-    })
-    return () => { gallery.destroy(); }
-  }, [children, info, open])
 
   if (!info) return <></>;
 
