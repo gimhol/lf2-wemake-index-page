@@ -26,6 +26,7 @@ export default function App() {
 
   useEffect(() => {
     const click = (e: PointerEvent) => {
+      alert(e.button)
       const img = e.target
       if (!(img instanceof HTMLImageElement)) return
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,6 +34,8 @@ export default function App() {
         viewer.update();
         img.click();
       }
+      e.stopPropagation();
+      e.preventDefault();
     }
     document.addEventListener('click', click)
     return () => document.removeEventListener('click', click)
