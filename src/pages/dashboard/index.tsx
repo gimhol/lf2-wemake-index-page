@@ -120,7 +120,7 @@ export default function DashBoard() {
                       <div style={{ paddingLeft: 30 }}> {v.long_place} </div>
                       <div style={{ paddingLeft: 30 }}>
                         <Tooltip title={v.uri}>
-                          {v.uri.substring(19, 30)}
+                          <span>{v.uri.substring(19, 40)}</span>
                         </Tooltip>
                       </div>
                       <div style={{ paddingLeft: 30 }}> {v.time.substring(0, 20)} </div>
@@ -150,7 +150,7 @@ export default function DashBoard() {
                   </td>
                   <td >
                     <Tooltip title={v.uri}>
-                      {v.uri.substring(19, 30)}
+                      <span>{v.uri.substring(19, 40)}</span>
                     </Tooltip>
                   </td>
                   <td > {v.time.substring(0, 20)} </td>
