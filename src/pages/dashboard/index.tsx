@@ -118,7 +118,11 @@ export default function DashBoard() {
                       </Tooltip>
                       <div style={{ paddingLeft: 30 }}> {v.seq}: {v.ip} </div>
                       <div style={{ paddingLeft: 30 }}> {v.long_place} </div>
-                      <div style={{ paddingLeft: 30 }}> {v.uri} </div>
+                      <div style={{ paddingLeft: 30 }}>
+                        <Tooltip title={v.uri}>
+                          {v.uri.substring(19, 30)}
+                        </Tooltip>
+                      </div>
                       <div style={{ paddingLeft: 30 }}> {v.time.substring(0, 20)} </div>
                     </div>
                   </td>
@@ -144,7 +148,11 @@ export default function DashBoard() {
                   <td onClick={() => set_picked(v.long_place)}>
                     <span className={v.long_place == picked ? csses.picked : ''}>{v.long_place}</span>
                   </td>
-                  <td > {v.uri} </td>
+                  <td >
+                    <Tooltip title={v.uri}>
+                      {v.uri.substring(19, 30)}
+                    </Tooltip>
+                  </td>
                   <td > {v.time.substring(0, 20)} </td>
                 </tr>
             })}

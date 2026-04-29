@@ -48,19 +48,19 @@
     height     : 0;
 
     .game_list {
-      position      : relative;
-      overflow      : auto;
-      overflow-x    : hidden;
-      display       : flex;
-      flex-direction: column;
-      border-right  : 1px var(--color-divider) dashed;
-      padding       : 5px;
-      box-sizing    : border-box;
-      flex-shrink   : 1;
+      position         : relative;
+      overflow         : auto;
+      overflow-x       : hidden;
+      display          : flex;
+      flex-direction   : column;
+      border-right     : 1px var(--color-divider) dashed;
+      padding          : 5px;
+      box-sizing       : border-box;
+      flex-shrink      : 1;
       // flex-basis    : 100px;
-      flex-grow     : 0;
+      flex-grow        : 0;
       // width         : 100%;
-      transition    : flex-basis 255ms, padding 255ms;
+      transition       : flex-basis 255ms, padding 255ms;
     }
 
     .game_list.close {
@@ -79,7 +79,33 @@
     display        : flex;
     justify-content: flex-end;
     align-items    : center;
-    padding        : 5px;
+    padding        : 2px 5px;
+    font-size      : 9;
+    display        : flex;
+    align-items    : center;
+    flex-wrap      : wrap;
+    text-overflow  : hidden;
+    white-space    : nowrap;
+
+    .discussions {
+      color: var(--color-secondary);
+
+      &:hover {
+        color: var(--color-txt);
+      }
+
+      img {
+        pointer-events: none;
+        height        : 15px;
+        margin-right  : 2px;
+      }
+    }
+
+    &>.right_zone {
+      display       : flex;
+      flex-direction: column;
+      align-items   : flex-end;
+    }
   }
 }
 
@@ -161,8 +187,6 @@
   display        : flex;
   flex-direction : row;
   flex-wrap      : wrap;
-
-
 }
 
 .version_list {

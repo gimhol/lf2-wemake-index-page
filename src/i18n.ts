@@ -64,6 +64,8 @@ const en = {
   "delete": "Delete",
   "detail": "Detail",
   "publish": "Publish",
+  "unstable_wip_buggy": "🚧==Unstable/WIP/Buggy",
+  "suggest_ask_feedback": "Suggest/Ask/Feedback?"
 }
 const zh: Record<keyof typeof en, string> = {
   "author": "作者",
@@ -127,6 +129,8 @@ const zh: Record<keyof typeof en, string> = {
   "rename": "重命名",
   "delete": "删除",
   "detail": "详情",
+  "unstable_wip_buggy": "🚧==开发中/不稳定/有缺陷",
+  "suggest_ask_feedback": "建议/提问/反馈?",
 }
 const resources = {
   "zh": { translation: zh },

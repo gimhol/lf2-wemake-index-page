@@ -29,6 +29,7 @@ import { fetch_infos, type IRecordInfo } from "./fetch_info_list";
 import { MainContext } from "./main_context";
 import { NavButton } from "./NavButton";
 import csses from "./styles.module.scss";
+import dayjs from "dayjs";
 
 const a_mappings: { [x in string]?: string } = {
   'origin': `1`,
@@ -191,6 +192,14 @@ export default function MainPage() {
       </div>
     )
   }, [game_list_open, pathname, _games, loading, set_location, small, real_game_id])
+
+  const build_time = dayjs(BUILD_TIME)
+
+  const build_time_text = build_time.isSame(dayjs(), 'day') ?
+    build_time.format('YYYY-MM-DD HH:mm:ss') :
+    build_time.format('HH:mm:ss')
+
+
   return <>
     <MainContext.Provider value={{ info: actived?.info, record: actived }}>
       <div className={csses.main_page}
@@ -257,9 +266,18 @@ export default function MainPage() {
           <Outlet />
         </div>
         <div className={csses.foot}>
-          <span className={csses.foot}>
-            {t('latest_build_time')}: {BUILD_TIME}
-          </span>
+          <a target='_blank' className={csses.discussions} href="https://github.com/gimhol/little-fighter-2-WEMAKE/discussions">
+            <img src={img_github} /> {t('suggest_ask_feedback')}
+          </a>
+          <div style={{ flex: 1 }}></div>
+          <div className={csses.right_zone}>
+            <span>
+              {t('unstable_wip_buggy')}
+            </span>
+            <span>
+              {t('latest_build_time')}: {build_time_text}
+            </span>
+          </div>
         </div>
       </div >
       <Loading big loading={loading} style={{ position: 'absolute', margin: 'auto auto' }} />

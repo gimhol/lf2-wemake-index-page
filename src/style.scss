@@ -1,5 +1,5 @@
 :root {
-  font-family                 : Consolas, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family                 : "Mona Sans VF", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   font-synthesis              : none;
   text-rendering              : optimizeLegibility;
   -webkit-font-smoothing      : antialiased;
@@ -39,8 +39,8 @@
   --padding-l-align-w-icon-btn: var(--size-w-icon-btn);
   --gimd_main_bg_color        : rgb(44, 44, 44);
   --gimd_main_color           : #FFFFFF;
-
-  color: var(--color-txt)
+  touch-action                : none;
+  color                       : var(--color-txt)
 }
 
 html.small-screen {
