@@ -146,13 +146,13 @@ export function InfoView(props: IInfoViewProps) {
       {
         children.length ?
           <div className={csses.children_title_div} style={{ height: 0 }}>
-            <span className={csses.children_title}>
-              <IconButton icon={img_to_top} size={8} title={`scroll ${children_title} to top`}
+            <div className={csses.children_title}>
+              <IconButton icon={img_to_top} size={8} title={`scroll to top`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: 0, behavior: 'smooth' })} />
-              <span>{children_title}</span>
-              <IconButton icon={img_to_bottom} size={8} title={`scroll ${children_title} to bottom`}
+              {children_title ? <span>{children_title}</span> : null}
+              <IconButton icon={img_to_bottom} size={8} title={`scroll to bottom`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: ref_el_children.current.scrollHeight, behavior: 'smooth' })} />
-            </span>
+            </div>
           </div> : null
       }
       {
