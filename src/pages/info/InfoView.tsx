@@ -24,6 +24,7 @@ import { IdLink, InfoActions } from "./InfoActions";
 import csses from "./InfoView.module.scss";
 import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
+import { ewents } from "@/utils/ewents";
 
 type ListLike = 'cards' | 'list';
 function curr_list_like(v: string | undefined | null): ListLike {
@@ -93,7 +94,7 @@ export function InfoView(props: IInfoViewProps) {
         <BackButton
           gone={!backable}
           onClick={onClickBack}
-          ewents-click={`GoBack?id=${info.id}`}
+          {...ewents.click('InfoView.GoBack', { id: info?.id, title: info?.title, })}
         />
         <CollapseButton
           gone={!foldable}
@@ -101,14 +102,17 @@ export function InfoView(props: IInfoViewProps) {
           whenChange={__set_open}
           className={!has_content ? csses.collapse_btn_hide : void 0} />
         <h3 className={csses.title}>
-          <Link className={csses.title_link} href={url}>
+          <Link
+            className={csses.title_link}
+            {...ewents.click('InfoView.Author', { id: info?.id, title: info?.title, author: info.author, author_url: info?.author_url })}
+            href={url}>
             {title}
           </Link>
           <Tags info={info} />
         </h3>
         <div className={csses.head_right_zone}>
           <IconButton
-            ewents-click={`ToggleCardsOrList`}
+            {...ewents.click('ToggleCardsOrList')}
             gone={!(children?.length)}
             onClick={() => __set_listLike(__next_list_like)}
             title="Cards or List"
@@ -149,10 +153,14 @@ export function InfoView(props: IInfoViewProps) {
         children.length ?
           <div className={csses.children_title_div} style={{ height: 0 }}>
             <div className={csses.children_title}>
-              <IconButton ewents-click={`ScrollToBottom?id=${info.id}`} icon={img_to_top} size={8} title={`scroll to top`}
+              <IconButton
+                {...ewents.click('ScrollToTop', { id: info?.id, title: info?.title, })}
+                icon={img_to_top} size={8} title={`scroll to top`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: 0, behavior: 'smooth' })} />
               {children_title ? <span>{children_title}</span> : null}
-              <IconButton ewents-click={`ScrollToBottom?id=${info.id}`} icon={img_to_bottom} size={8} title={`scroll to bottom`}
+              <IconButton
+                {...ewents.click('ScrollToBottom', { id: info?.id, title: info?.title, })}
+                icon={img_to_bottom} size={8} title={`scroll to bottom`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: ref_el_children.current.scrollHeight, behavior: 'smooth' })} />
             </div>
           </div> : null

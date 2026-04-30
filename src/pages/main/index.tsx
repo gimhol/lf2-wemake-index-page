@@ -29,6 +29,7 @@ import { fetch_infos, type IRecordInfo } from "./fetch_info_list";
 import { MainContext } from "./main_context";
 import { NavButton } from "./NavButton";
 import csses from "./styles.module.scss";
+import { ewents } from "@/utils/ewents";
 
 const a_mappings: { [x in string]?: string } = {
   'origin': `1`,
@@ -174,11 +175,11 @@ export default function MainPage() {
           return (
             <NavButton
               key={v.id}
+              {...ewents.click('NavButton', { id: v.info.id, title: v.info.short_title })}
               actived={real_game_id === v.info.id || pathname === v.info.id}
               children={v.info.short_title}
               onClick={e => {
                 const game = b_mappings['' + v.info.id] ?? v.info.id
-                console.log({ game })
                 interrupt_event(e);
                 set_location({ game });
                 if (small) set_game_list_open(false)
@@ -206,7 +207,7 @@ export default function MainPage() {
         <div className={csses.head}>
           <IconButton
             icon={img_menu}
-            ewents-click='toggle_menu'
+            {...ewents.click('ToggleGameList')}
             onClick={() => set_game_list_open(!game_list_open)} />
           <h1 className={csses.main_title}>
             {t("main_title")}
@@ -236,7 +237,7 @@ export default function MainPage() {
                   }]
                 }}>
                 <IconButton
-                  ewents-click='login'
+                  {...ewents.click('login')}
                   title={t('login')}
                   icon={img_login} />
               </Dropdown>
@@ -250,12 +251,12 @@ export default function MainPage() {
                 }} />
             </Show>
             <IconButton
-              ewents-click='goto_github'
+              {...ewents.click('goto_github')}
               href="https://github.com/gimhol/little-fighter-2-WEMAKE"
               title={t('goto_github')}
               icon={img_github} />
             <IconButton
-              ewents-click='goto_gimink'
+              {...ewents.click('goto_gimink')}
               href="https://gim.ink"
               title={t('goto_gimink')}
               icon={img_gimink} />
@@ -268,7 +269,11 @@ export default function MainPage() {
           <Outlet />
         </div>
         <div className={csses.foot}>
-          <a target='_blank' className={csses.discussions} href="https://github.com/gimhol/little-fighter-2-WEMAKE/discussions">
+          <a
+            {...ewents.click('goto_discussions')}
+            target='_blank'
+            className={csses.discussions}
+            href="https://github.com/gimhol/little-fighter-2-WEMAKE/discussions">
             <img src={img_github} /> {t('suggest_ask_feedback')}
           </a>
           <div style={{ flex: 1 }}></div>

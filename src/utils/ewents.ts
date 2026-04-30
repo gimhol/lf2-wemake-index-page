@@ -2,6 +2,7 @@
 import FingerprintJS, { type GetResult } from '@fingerprintjs/fingerprintjs';
 
 export class Ewents {
+
   static readonly TAG: string = 'Events'
   static readonly VERSION: string = '1'
   static readonly VERSION_KEY: string = `events_fingerprint#version`
@@ -12,7 +13,11 @@ export class Ewents {
   private _seq: number = -1
   private _src_history_push_state: typeof history.pushState | null = null;
   private _new_history_push_state: typeof history.pushState | null = null;
-  private _handle_click = (e: MouseEvent) => (e instanceof HTMLElement) && this.submit_click(e)
+  private _handle_click = (e: MouseEvent) => {
+    if (e.target instanceof HTMLElement) {
+      this.submit_click(e.target)
+    }
+  }
   private _handle_popstate = () => this.submit_visit()
   private _fingerprint: GetResult | null = null;
 
@@ -94,10 +99,21 @@ export class Ewents {
   }
 
   submit_click(el: HTMLElement) {
-    if (!(el instanceof HTMLElement)) return;
-    const click_signal = el.getAttribute(Ewents.CLICK_SIGNAL)
-    if (!click_signal) return;
-    return this.submit_any('click', { what: click_signal })
+    let ele: HTMLElement | null = el
+    while (ele) {
+      const what_text = ele.getAttribute(Ewents.CLICK_SIGNAL)
+      if (!what_text) {
+        ele = ele.parentElement
+        continue;
+      }
+      let what: object = {}
+      try {
+        what = JSON.stringify(what_text) as unknown as object
+      } catch (e: unknown) {
+        console.warn(`[${Ewents.TAG}::submit_click] failed, ${Ewents.CLICK_SIGNAL} is not an json string`, e)
+      }
+      if (what) return this.submit_any('click', { what })
+    }
   }
 
   submit_any<T extends object>(type: string, event: T) {
@@ -109,13 +125,26 @@ export class Ewents {
       fetch(`https://gim.ink/api/events/add?type=${type}`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ ...event, seq: ++this._seq, time: new Date() }),
+        body: JSON.stringify({
+          seq: ++this._seq,
+          time: new Date(),
+          ...event,
+        }),
         mode: 'cors',
       })
     }).catch((e: unknown) => {
       console.error(`[${Ewents.TAG}::submit_any] failed, cant no get fingerprint, reason: `, e)
     })
   }
+  click(name: string, data: object = {}) {
+    return {
+      [Ewents.CLICK_SIGNAL]: JSON.stringify({
+        name,
+        ...data
+      })
+    }
+  }
+
 }
 
 export const ewents = new Ewents()

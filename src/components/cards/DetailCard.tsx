@@ -12,6 +12,7 @@ import { Viewer } from "../markdown/Viewer";
 import { CardBase, type ICardBaseProps } from "./CardBase";
 import csses from "./DetailCard.module.scss";
 import { InfoDate } from "./InfoDate";
+import { ewents } from "@/utils/ewents";
 
 export interface IDetailCardProps extends ICardBaseProps {
   info?: Info | null;
@@ -37,7 +38,10 @@ export function DetailCard(props: IDetailCardProps) {
       <div className={csses.detail_card_inner}>
         <div className={csses.detail_card_head}>
           <div className={csses.left}>
-            <Link href={url} style={{ padding: `0px 5px` }}>
+            <Link
+              href={url}
+              {...ewents.click('DetailCard.Title', { id: info?.id, url, title: info?.title })}
+              style={{ padding: `0px 5px` }}>
               {info?.title}
             </Link>
             <Tags info={info} />
@@ -75,6 +79,7 @@ export function DetailCard(props: IDetailCardProps) {
               {t('author')}
             </span>
             <Link
+              {...ewents.click('DetailCard.Author', { id: info?.id, title: info?.title, author: info?.author, author_url: info?.author_url })}
               href={info?.author_url}
               title={t('visit_author_link')}>
               {info?.author}

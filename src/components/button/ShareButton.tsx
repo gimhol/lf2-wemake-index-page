@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { IconButton } from "./IconButton";
 import img_share from "@/assets/svg/share.svg";
 import Toast from "@/gimd/Toast";
+import { ewents } from "@/utils/ewents";
 
 export function ShareButton(props: { info: Info | undefined | null }) {
   const { t } = useTranslation()
@@ -23,7 +24,7 @@ export function ShareButton(props: { info: Info | undefined | null }) {
   }, [id])
   return (
     <IconButton
-      ewents-click={`ShareButton?info.id=${id}`}
+      {...ewents.click('ShareButton', { id, title: info?.title })}
       gone={!id}
       title={t('share')}
       icon={img_share}

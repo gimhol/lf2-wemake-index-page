@@ -15,6 +15,7 @@ import { CardBase, type ICardBaseProps } from "./CardBase";
 import { DetailCard } from "./DetailCard";
 import csses from "./InfoCard.module.scss";
 import { InfoDate } from "./InfoDate";
+import { ewents } from "@/utils/ewents";
 
 export interface IInfoCardProps extends ICardBaseProps {
   info?: Info;
@@ -60,11 +61,14 @@ export function InfoCard(props: IInfoCardProps) {
       key={info.id}
       onClick={open_detail}
       classNames={classNames}
-      ewents-click={`open_detail?info.id=${info.id}`}
+      {...ewents.click('InfoCard', { id: info.id, title: info.title })}
       __ref={ref_el}>
       <div className={csses.info_card_inner}>
         <div className={csses.info_card_head}>
-          <Link className={csses.title} href={url}>
+          <Link
+            {...ewents.click('InfoCard.Title', { url, title: info?.title })}
+            className={csses.title}
+            href={url}>
             {info.title}
           </Link>
           <Tags info={info} />
@@ -105,6 +109,7 @@ export function InfoCard(props: IInfoCardProps) {
               {t('author')}
             </span>
             <Link
+              {...ewents.click('DetailCard.Author', { id: info?.id, title: info?.title, author: info?.author, author_url: info?.author_url })}
               href={info.author_url}
               title={t('visit_author_link')}>
               {info.author}

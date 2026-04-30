@@ -2,6 +2,7 @@ import { IconButton } from "@/components/button/IconButton";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
 import csses from "./LangButton.module.scss";
+import { ewents } from "@/utils/ewents";
 
 export function LangButton(props: { whenClick?(next: 'zh' | 'en'): void }) {
   const { whenClick } = props;
@@ -10,7 +11,7 @@ export function LangButton(props: { whenClick?(next: 'zh' | 'en'): void }) {
   return (
     <IconButton
       className={csses.lang_btn}
-      ewents-click='LangButton'
+      {...ewents.click('LangButton')}
       onClick={(e) => {
         e.stopPropagation();
         const is_en = !i18n.language.toLowerCase().startsWith('zh');
