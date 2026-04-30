@@ -108,7 +108,7 @@ export class Ewents {
       }
       let what: object = {}
       try {
-        what = JSON.stringify(what_text) as unknown as object
+        what = JSON.parse(what_text) as unknown as object
       } catch (e: unknown) {
         console.warn(`[${Ewents.TAG}::submit_click] failed, ${Ewents.CLICK_SIGNAL} is not an json string`, e)
       }
