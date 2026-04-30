@@ -10,6 +10,7 @@ export function LangButton(props: { whenClick?(next: 'zh' | 'en'): void }) {
   return (
     <IconButton
       className={csses.lang_btn}
+      ewents-click='LangButton'
       onClick={(e) => {
         e.stopPropagation();
         const is_en = !i18n.language.toLowerCase().startsWith('zh');

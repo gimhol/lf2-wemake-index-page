@@ -18,10 +18,10 @@ import { ApiHttp } from "@/network/ApiHttp";
 import * as KnownError from "@/network/KnownError";
 import { Paths } from "@/Paths";
 import { useSmallScreen } from "@/useSmallScreen";
-import { submit_visit_event } from "@/utils/events";
 import { interrupt_event } from "@/utils/interrupt_event";
 import { LocationParams } from "@/utils/LocationParams";
 import cns from "classnames";
+import dayjs from "dayjs";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
@@ -29,7 +29,6 @@ import { fetch_infos, type IRecordInfo } from "./fetch_info_list";
 import { MainContext } from "./main_context";
 import { NavButton } from "./NavButton";
 import csses from "./styles.module.scss";
-import dayjs from "dayjs";
 
 const a_mappings: { [x in string]?: string } = {
   'origin': `1`,
@@ -41,7 +40,6 @@ const b_mappings: { [x in string]?: string } = {};
 for (const k in a_mappings) b_mappings[a_mappings[k]!] = k
 
 export default function MainPage() {
-  useEffect(() => { submit_visit_event(); })
   useMovingBg(document.documentElement)
   const { t, i18n } = useTranslation()
   const lang = i18n.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
@@ -208,6 +206,7 @@ export default function MainPage() {
         <div className={csses.head}>
           <IconButton
             icon={img_menu}
+            ewents-click='toggle_menu'
             onClick={() => set_game_list_open(!game_list_open)} />
           <h1 className={csses.main_title}>
             {t("main_title")}
@@ -237,6 +236,7 @@ export default function MainPage() {
                   }]
                 }}>
                 <IconButton
+                  ewents-click='login'
                   title={t('login')}
                   icon={img_login} />
               </Dropdown>
@@ -250,10 +250,12 @@ export default function MainPage() {
                 }} />
             </Show>
             <IconButton
+              ewents-click='goto_github'
               href="https://github.com/gimhol/little-fighter-2-WEMAKE"
               title={t('goto_github')}
               icon={img_github} />
             <IconButton
+              ewents-click='goto_gimink'
               href="https://gim.ink"
               title={t('goto_gimink')}
               icon={img_gimink} />

@@ -1,16 +1,16 @@
 import 'current-device';
+import dayjs from 'dayjs';
+import weekday from "dayjs/plugin/weekday";
 import { GlobalStore } from "./GlobalStore";
 import './i18n';
 import { ApiHttp } from "./network/ApiHttp";
 import * as Compat from "./network/Compat";
 import * as KnownError from './network/KnownError';
 import './style.scss';
-import './utils/events';
-import './utils/fingerprint';
-import weekday from "dayjs/plugin/weekday";
-import dayjs from 'dayjs';
+import { ewents } from './utils/ewents';
 dayjs.extend(weekday);
 dayjs.locale('zh-cn');
+
 ApiHttp.addRequestInterceptor((url, opts) => {
   if (!API_BASE) return [url, opts];
   if (!url.startsWith('http')) {
@@ -54,3 +54,7 @@ window.addEventListener('resize', on_resize)
 on_resize()
 
 
+
+
+ewents.mount()
+ewents.submit_visit()

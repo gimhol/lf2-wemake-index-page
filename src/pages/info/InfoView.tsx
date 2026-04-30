@@ -93,6 +93,7 @@ export function InfoView(props: IInfoViewProps) {
         <BackButton
           gone={!backable}
           onClick={onClickBack}
+          ewents-click={`GoBack?id=${info.id}`}
         />
         <CollapseButton
           gone={!foldable}
@@ -107,6 +108,7 @@ export function InfoView(props: IInfoViewProps) {
         </h3>
         <div className={csses.head_right_zone}>
           <IconButton
+            ewents-click={`ToggleCardsOrList`}
             gone={!(children?.length)}
             onClick={() => __set_listLike(__next_list_like)}
             title="Cards or List"
@@ -147,10 +149,10 @@ export function InfoView(props: IInfoViewProps) {
         children.length ?
           <div className={csses.children_title_div} style={{ height: 0 }}>
             <div className={csses.children_title}>
-              <IconButton icon={img_to_top} size={8} title={`scroll to top`}
+              <IconButton ewents-click={`ScrollToBottom?id=${info.id}`} icon={img_to_top} size={8} title={`scroll to top`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: 0, behavior: 'smooth' })} />
               {children_title ? <span>{children_title}</span> : null}
-              <IconButton icon={img_to_bottom} size={8} title={`scroll to bottom`}
+              <IconButton ewents-click={`ScrollToBottom?id=${info.id}`} icon={img_to_bottom} size={8} title={`scroll to bottom`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: ref_el_children.current.scrollHeight, behavior: 'smooth' })} />
             </div>
           </div> : null

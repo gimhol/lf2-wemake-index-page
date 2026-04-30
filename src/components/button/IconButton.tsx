@@ -17,7 +17,10 @@ export interface IIconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonE
   styles?: Styles<'icon'>
 }
 export function IconButton(props: IIconButtonProps) {
-  const { container, className, href, onClick, icon, children, size = 20, gone, title, stopPropagation, classNames, styles, ..._p } = props;
+  const { 
+    container, className, href, onClick, icon, children, size = 20, gone, 
+    title, stopPropagation, classNames, styles, ..._p 
+  } = props;
   const _on_click: typeof onClick = (e) => {
     if (stopPropagation) e.stopPropagation();
     onClick?.(e);

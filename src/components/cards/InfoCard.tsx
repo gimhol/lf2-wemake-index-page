@@ -2,7 +2,7 @@ import type { IRecord } from "@/api/listModRecords";
 import { Info } from "@/base/Info";
 import { IdLink, InfoActions } from "@/pages/info/InfoActions";
 import { Tags } from "@/pages/info/Tags";
-import { submit_click_event } from "@/utils/events";
+import { submit_click_event } from "@/utils/ewents";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";

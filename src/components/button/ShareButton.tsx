@@ -23,6 +23,7 @@ export function ShareButton(props: { info: Info | undefined | null }) {
   }, [id])
   return (
     <IconButton
+      ewents-click={`ShareButton?info.id=${id}`}
       gone={!id}
       title={t('share')}
       icon={img_share}
