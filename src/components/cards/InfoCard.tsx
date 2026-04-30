@@ -2,10 +2,12 @@ import type { IRecord } from "@/api/listModRecords";
 import { Info } from "@/base/Info";
 import { IdLink, InfoActions } from "@/pages/info/InfoActions";
 import { Tags } from "@/pages/info/Tags";
-import { submit_click_event } from "@/utils/ewents";
+import { Paths } from "@/Paths";
+import { useSmallScreen } from "@/useSmallScreen";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { Link } from "../link";
 import { Viewer } from "../markdown/Viewer";
 import { Mask } from "../mask";
@@ -13,9 +15,6 @@ import { CardBase, type ICardBaseProps } from "./CardBase";
 import { DetailCard } from "./DetailCard";
 import csses from "./InfoCard.module.scss";
 import { InfoDate } from "./InfoDate";
-import { useNavigate } from "react-router";
-import { useSmallScreen } from "@/useSmallScreen";
-import { Paths } from "@/Paths";
 
 export interface IInfoCardProps extends ICardBaseProps {
   info?: Info;
@@ -54,9 +53,6 @@ export function InfoCard(props: IInfoCardProps) {
     set_detail_open(true)
     const { width, height, left, top } = ref_el.current!.firstElementChild!.getBoundingClientRect()
     set_detail_style({ width, height, left, top })
-    submit_click_event(e.target as HTMLElement, {
-      title: info.title
-    })
   }
   return <>
     <CardBase
@@ -64,6 +60,7 @@ export function InfoCard(props: IInfoCardProps) {
       key={info.id}
       onClick={open_detail}
       classNames={classNames}
+      ewents-click={`open_detail?info.id=${info.id}`}
       __ref={ref_el}>
       <div className={csses.info_card_inner}>
         <div className={csses.info_card_head}>
