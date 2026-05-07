@@ -9,20 +9,21 @@ import { icons, InfoUrlType } from "../yours/InfoUrlType";
 import { EditModButton } from "./EditModButton";
 import { Tooltip } from "@/gimd/Tooltip";
 import GlobalStore from "@/GlobalStore";
-import { useContext } from "react";
+import { useContext, type PropsWithChildren } from "react";
 import { ewents } from "@/utils/ewents";
 
-export interface IInfoActionsProps {
+export interface IInfoActionsProps extends PropsWithChildren {
   record?: IRecord | null;
   info?: Info | null;
 }
 export function InfoActions(props: IInfoActionsProps) {
-  const { info, record } = props
+  const { info, record, children } = props
   const { t } = useTranslation()
   const { url, url_type, more_urls } = info ?? {};
   const { value: { user_id } } = useContext(GlobalStore.context);
 
   return <>
+    {children}
     <IconButton
       {...ewents.click('InfoAction', { url_type, url, id: info?.id, title: info?.title })}
       title={t('' + url_type)}

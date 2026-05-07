@@ -1,11 +1,13 @@
 @use "@/theme/common.module.scss"as *;
 
 .info_view_root {
+  @extend .scrollview;
   overflow      : hidden;
   display       : flex;
   flex-direction: column;
   flex-shrink   : 0;
   box-sizing    : border-box;
+  position      : relative;
 
   &>* {
     flex-shrink: 0;
@@ -100,39 +102,36 @@
     align-items    : center;
     justify-content: center;
     position       : relative;
-    height         : 0;
     user-select    : none;
     pointer-events : none;
-
-    button {
-      pointer-events         : all;
-      --icon-letter-color    : var(--color-txt);
-      --icon-letter-font-size: 12px;
-      height                 : 16px;
-      width                  : 16px;
-
-      >* {
-        pointer-events: none;
-      }
-    }
-
-    &:not(:last-child) {
-      border-bottom: 1px var(--color-divider) dashed;
-    }
+    border-top     : 1px var(--color-divider) dashed;
 
     .children_title {
+
       &>span {
         background-color: var(--color-primary);
       }
 
-      font-size   : 12px;
-      line-height : 12px;
-      height      : 12px;
-      position    : absolute;
-      z-index     : 1;
-      display     : flex;
-      align-items : center;
-      gap         : 20px;
+      button {
+        pointer-events         : all;
+        --icon-letter-color    : var(--color-txt);
+        --icon-letter-font-size: 12px;
+        height                 : 16px;
+        width                  : 16px;
+
+        >* {
+          pointer-events: none;
+        }
+      }
+
+      font-size    : 12px;
+      line-height  : 12px;
+      height       : 12px;
+      position     : absolute;
+      z-index      : 1;
+      display      : flex;
+      align-items  : center;
+      gap          : 20px;
     }
 
   }

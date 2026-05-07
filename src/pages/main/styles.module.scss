@@ -7,6 +7,11 @@
   height        : 100%;
   width         : 100%;
 
+  max-width   : 1000px;
+  border-left : 1px var(--color-divider) dashed;
+  border-right: 1px var(--color-divider) dashed;
+  margin      : auto;
+
   &>.head {
     border-bottom: 1px var(--color-divider) dashed;
     display      : flex;

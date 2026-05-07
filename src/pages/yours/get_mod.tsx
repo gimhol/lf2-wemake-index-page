@@ -25,11 +25,13 @@ export function get_mod_paths_names(owner_id: number, mod_id: number) {
 export interface IGetModFormOpts {
   mod_id?: number;
   signal?: AbortSignal;
+  lang?: string;
 }
 export interface IMod {
   info: Info;
   record: IRecord;
   owner: IUserInfo;
+  oss_url?: string;
   strings: ReturnType<typeof get_mod_paths_names>,
 }
 const TAG = '[get_mod]'
@@ -60,10 +62,10 @@ export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
   }
   const strings = get_mod_paths_names(owner.id, mod_id);
   console.debug(`[get_mod] oss_url: ${oss_url}`)
-  const info = new Info(raw_info, '', null, oss_url ?? null);
+  const info = new Info(raw_info, opts.lang ?? '', null, oss_url ?? null);
   if (oss_url) await info.load_desc({ signal })
 
   info.id = '' + mod_id;
-  return { strings, info, record, owner };
+  return { strings, info, record, owner, oss_url };
 }
 

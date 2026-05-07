@@ -18,7 +18,7 @@ import { useSmallScreen } from "@/useSmallScreen";
 import { ewents } from "@/utils/ewents";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import 'viewerjs/dist/viewer.min.css';
 import { IdLink, InfoActions } from "./InfoActions";
@@ -26,8 +26,9 @@ import csses from "./InfoView.module.scss";
 import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
 
-type ListLike = 'cards' | 'list';
-function curr_list_like(v: string | undefined | null): ListLike {
+export type ListLike = 'cards' | 'list';
+// eslint-disable-next-line react-refresh/only-export-components
+export function curr_list_like(v: string | undefined | null): ListLike {
   return v === 'cards' ? 'cards' : 'list'
 }
 function next_list_like(v: string | undefined | null): ListLike {
@@ -43,6 +44,7 @@ export interface IInfoViewProps extends React.HTMLAttributes<HTMLDivElement> {
   onClickBack?: React.MouseEventHandler<HTMLButtonElement>;
   listLike?: ListLike;
   whenListLike?(v?: ListLike): void;
+  actions?: ReactNode;
 }
 
 export function InfoView(props: IInfoViewProps) {
@@ -57,6 +59,7 @@ export function InfoView(props: IInfoViewProps) {
     foldable = true,
     onClickBack,
     record,
+    actions,
     ..._p
   } = props;
   const [__open, __set_open] = usePropState(open, whenOpen)
@@ -117,7 +120,9 @@ export function InfoView(props: IInfoViewProps) {
             onClick={() => __set_listLike(__next_list_like)}
             title="Cards or List"
             icon={__next_list_like === 'cards' ? img_cards_view : img_list_view} />
-          <InfoActions info={info} record={record} />
+          <InfoActions info={info} record={record}>
+            {actions}
+          </InfoActions>
           <div className={csses.item} >
             <IdLink info={info} />
           </div>
@@ -135,32 +140,43 @@ export function InfoView(props: IInfoViewProps) {
           </div>
         </div>
       </div>
-      <MDViewer className={csses.content_zone} emptyAsGone content={brief} />
-      <Collapse open={!foldable || (__open && has_content)} >
-        <Show yes={!!info.full_cover_url}>
-          <MDViewer className={csses.content_zone}>
-            <img src={info.full_cover_url} style={{ maxWidth: '100%' }} />
-          </MDViewer>
-        </Show>
-        <MDViewer
-          emptyAsGone
-          className={csses.content_zone}
-          content={desc}
-          url={full_desc_url}
-          whenLoaded={t => info?.set_desc(t)} />
-      </Collapse>
+      {
+        !foldable ? null : <>
+          <MDViewer
+            className={csses.content_zone}
+            emptyAsGone
+            content={brief} />
+          <Collapse open={!foldable || (__open && has_content)} >
+            <Show yes={!!info.full_cover_url}>
+              <MDViewer className={csses.content_zone}>
+                <img src={info.full_cover_url} style={{ maxWidth: '100%' }} />
+              </MDViewer>
+            </Show>
+            <MDViewer
+              emptyAsGone
+              className={csses.content_zone}
+              content={desc}
+              url={full_desc_url}
+              whenLoaded={t => info?.set_desc(t)} />
+          </Collapse>
+        </>
+      }
       {
         children.length ?
-          <div className={csses.children_title_div} style={{ height: 0 }}>
+          <div className={csses.children_title_div}>
             <div className={csses.children_title}>
               <IconButton
                 {...ewents.click('ScrollToTop', { id: info?.id, title: info?.title, })}
-                icon={img_to_top} size={8} title={`scroll to top`}
+                icon={img_to_top}
+                size={12}
+                title={`scroll to top`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: 0, behavior: 'smooth' })} />
               {children_title ? <span>{children_title}</span> : null}
               <IconButton
                 {...ewents.click('ScrollToBottom', { id: info?.id, title: info?.title, })}
-                icon={img_to_bottom} size={8} title={`scroll to bottom`}
+                icon={img_to_bottom}
+                size={12}
+                title={`scroll to bottom`}
                 onClick={() => ref_el_children.current?.scrollTo({ top: ref_el_children.current.scrollHeight, behavior: 'smooth' })} />
             </div>
           </div> : null
@@ -168,12 +184,36 @@ export function InfoView(props: IInfoViewProps) {
       {
         (__listLike !== 'cards' || !children?.length) ? null :
           <div className={classnames(csses.card_list, csses.scrollview)} ref={ref_el_children}>
+            {
+              foldable ? null : <>
+                <MDViewer
+                  emptyAsGone
+                  content={brief} />
+                <MDViewer
+                  emptyAsGone
+                  content={desc}
+                  url={full_desc_url}
+                  whenLoaded={t => info?.set_desc(t)} />
+              </>
+            }
             {children?.map(child => <InfoCard info={child.info} record={child} key={child.id} />)}
           </div>
       }
       {
         (__listLike !== 'list' || !children?.length) ? null :
           <div className={classnames(csses.version_list, csses.scrollview)} ref={ref_el_children}>
+            {
+              foldable ? null : <>
+                <MDViewer
+                  emptyAsGone
+                  content={brief} />
+                <MDViewer
+                  emptyAsGone
+                  content={desc}
+                  url={full_desc_url}
+                  whenLoaded={t => info?.set_desc(t)} />
+              </>
+            }
             {
               children.map((child, idx) => {
                 return <InfoView info={child.info} record={child} key={child.id} open={idx === 0} />

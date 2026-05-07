@@ -1,21 +1,24 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { Paths } from "@/Paths"
+import { LangButton } from "@/components/LangButton"
 import { Loading } from "@/components/loading"
 import Toast from "@/gimd/Toast"
 import { useCanGoBack } from "@/hooks/useCanGoBack"
 import { useContext, useEffect, useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate, useParams } from "react-router"
 import { useImmer } from "use-immer"
 import { MainContext } from "../main/main_context"
 import { get_mod, type IMod } from "../yours/get_mod"
-import { InfoView } from "./InfoView"
+import { curr_list_like, InfoView, type ListLike } from "./InfoView"
 import csses from "./index.module.scss"
 
 export default function InfoViewPage() {
+  const { i18n } = useTranslation()
+  const lang = i18n.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
   const { info, record } = useContext(MainContext)
   const { game_id: mod_id } = useParams()
   const location = useLocation();
-  const { pathname } = location;
   const is_root = Paths.All.Info.replace(':game_id', '' + mod_id) === location.pathname
   const open = is_root || !(info?.subs?.length)
   const [loading, set_loading] = useState(false)
@@ -30,7 +33,7 @@ export default function InfoViewPage() {
     }
     const ab = new AbortController();
     set_loading(true)
-    get_mod({ mod_id: Number(mod_id), signal: ab.signal }).then(r => {
+    get_mod({ mod_id: Number(mod_id), lang, signal: ab.signal }).then(r => {
       if (ab.signal.aborted) return;
       set_mod(r)
     }).catch(e => {
@@ -41,7 +44,8 @@ export default function InfoViewPage() {
       set_loading(false)
     })
     return () => ab.abort('[page/info] useEffect leave')
-  }, [mod_id, set_mod, is_root])
+  }, [mod_id, set_mod, lang, is_root])
+
   const nav = useNavigate();
   const [margin_top, set_margin_top] = useState(0)
   // eslint-disable-next-line react-hooks/purity
@@ -63,20 +67,35 @@ export default function InfoViewPage() {
     resize()
     return () => { r.disconnect() }
   }, [id, mod])
+
+  const [listLike, set_listLike] = useState<ListLike | undefined>(void 0)
+  useEffect(() => {
+    if (is_root) {
+      set_listLike('list')
+      return;
+    }
+    set_listLike(curr_list_like(info?.children_look))
+  }, [info, is_root])
+
   return <>
     <InfoView
       id={is_root ? id : void 0}
       backable={is_root}
-      foldable={!pathname.startsWith('/info/')}
+      foldable={!is_root}
       onClickBack={async () => {
         if (canGoBack) nav(-1)
         else nav(Paths.All.Main)
       }}
-      info={is_root ? mod?.info : info}
-      record={is_root ? mod?.record : record}
+      info={info ?? mod?.info}
+      record={record ?? mod?.record}
       className={is_root ? csses.main : csses.main_right}
+      listLike={listLike}
+      whenListLike={set_listLike}
       open={open}
-      style={{ marginTop: margin_top }} />
+      actions={is_root ? <LangButton /> : void 0}
+      style={{
+        paddingTop: margin_top
+      }} />
     <Loading fixed center loading={loading} big />
   </>
 }

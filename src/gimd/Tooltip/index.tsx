@@ -15,7 +15,7 @@ export interface ITooltipProps extends PropsWithChildren {
   open?: boolean;
   onOpen?(v?: boolean): void;
   container?: Element | DocumentFragment | (() => Element | DocumentFragment);
-  style?: CSSProperties
+  style?: CSSProperties;
 }
 export function Tooltip(props: ITooltipProps) {
   const { children, title, open: _open, container = document.body, style: _style, onOpen } = props;
@@ -97,7 +97,7 @@ export function Tooltip(props: ITooltipProps) {
     {
       gone ? null : createPortal(<div
         className={cls}
-        style={{ ...style, ..._style }}
+        style={{ pointerEvents: alt || pinned ? 'none' : void 0, ...style, ..._style }}
         draggable={false}
         onDragStart={e => e.preventDefault()}
         onPointerEnter={e => {
@@ -114,7 +114,7 @@ export function Tooltip(props: ITooltipProps) {
           }, 300)
         }}>
         {
-          alt || pinned ?
+          (alt || pinned) ?
             <button className={pinned ? csses.pin_btn_active : csses.pin_btn} onClick={() => set_pinned(!pinned)}>
               📌
             </button> : null
