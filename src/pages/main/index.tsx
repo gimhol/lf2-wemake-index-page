@@ -171,6 +171,13 @@ export default function MainPage() {
       }, lang, null, null)
     }, 'divider']
     head.forEach((v, i) => v && ret.splice(i, 0, v))
+    ret.push('divider')
+    ret.push({
+      info: new Info({
+        id: Paths.All.Demo,
+        short_title: t('Demo')
+      }, lang, null, null)
+    })
     return ret
   }, [games, session_id, admin, t, lang])
 

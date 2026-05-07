@@ -131,7 +131,6 @@ export function Modal(props: IModalProps) {
 
   useEventListener(ele_modal, 'pointerdown', on_pointerdown, void 0, draggable)
 
-
   return (
     <Mask {..._p} open={open} className={_mask_class_name} style={_mask_style}>
       <div className={_modal_class_name} style={_modal_style} ref={r => set_ele_modal(r)}>

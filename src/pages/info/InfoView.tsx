@@ -4,7 +4,7 @@ import img_to_top from "@/assets/svg/arrow-to-top.svg";
 import img_list_view from "@/assets/svg/database.svg";
 import img_cards_view from "@/assets/svg/gallery-view.svg";
 import { Info } from "@/base/Info";
-import { BackButton } from "@/components/button/BackButton";
+import { CloseButton } from "@/components/button/BackButton";
 import { CollapseButton } from "@/components/button/CollapseButton";
 import { IconButton } from "@/components/button/IconButton";
 import { InfoCard } from "@/components/cards/InfoCard";
@@ -15,6 +15,7 @@ import { Viewer as MDViewer } from "@/components/markdown/Viewer";
 import Show from "@/gimd/Show";
 import Toast from "@/gimd/Toast";
 import { useSmallScreen } from "@/useSmallScreen";
+import { ewents } from "@/utils/ewents";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
 import { useEffect, useRef } from "react";
@@ -24,7 +25,6 @@ import { IdLink, InfoActions } from "./InfoActions";
 import csses from "./InfoView.module.scss";
 import { Tags } from "./Tags";
 import { useInfoChildren } from "./useInfoChildren";
-import { ewents } from "@/utils/ewents";
 
 type ListLike = 'cards' | 'list';
 function curr_list_like(v: string | undefined | null): ListLike {
@@ -91,7 +91,7 @@ export function InfoView(props: IInfoViewProps) {
   return (
     <div className={cls_root} {..._p} ref={ref_article}>
       <div className={csses.head}>
-        <BackButton
+        <CloseButton
           gone={!backable}
           onClick={onClickBack}
           {...ewents.click('InfoView.GoBack', { id: info?.id, title: info?.title, })}
@@ -136,7 +136,7 @@ export function InfoView(props: IInfoViewProps) {
         </div>
       </div>
       <MDViewer className={csses.content_zone} emptyAsGone content={brief} />
-      <Collapse open={__open && has_content} >
+      <Collapse open={!foldable || (__open && has_content)} >
         <Show yes={!!info.full_cover_url}>
           <MDViewer className={csses.content_zone}>
             <img src={info.full_cover_url} style={{ maxWidth: '100%' }} />

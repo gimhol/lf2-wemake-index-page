@@ -15,7 +15,8 @@ export namespace Paths {
     _Editor = '/_editor',
     InnerInfo = '/:game_id',
     ModForm = '/mod_form/:id',
-    QuadTreeTest = '/quad_tree_test'
+    QuadTreeTest = '/quad_tree_test',
+    Demo = "/Demo",
   }
   export const Components: Record<All, React.ComponentType | null> = {
     [All._]: null,
@@ -28,6 +29,7 @@ export namespace Paths {
     [All.Editor]: React.lazy(() => import("./pages/editor")),
     [All._Editor]: React.lazy(() => import("./pages/editor")),
     [All.QuadTreeTest]: React.lazy(() => import("./pages/QuadTree")),
+    [All.Demo]: React.lazy(() => import("./pages/demo")),
   }
   export const Relations: { [x in All]?: All[] } = {
     [All._]: [
@@ -42,6 +44,7 @@ export namespace Paths {
       All.InnerInfo,
       All.Editor,
       All.QuadTreeTest,
+      All.Demo,
     ]
   }
   export enum Permission {
@@ -57,7 +60,8 @@ export namespace Paths {
     [All.InnerInfo]: null,
     [All.ModForm]: Permission.Login,
     [All._Editor]: null,
-    [All.QuadTreeTest]: null
+    [All.QuadTreeTest]: null,
+    [All.Demo]: null
   }
   export function has_permission(pathname: string) {
     if (!(pathname in Paths.Permissions)) return false;

@@ -14,11 +14,10 @@ import csses from "./index.module.scss"
 export default function InfoViewPage() {
   const { info, record } = useContext(MainContext)
   const { game_id: mod_id } = useParams()
-  const location = useLocation()
-
+  const location = useLocation();
+  const { pathname } = location;
   const is_root = Paths.All.Info.replace(':game_id', '' + mod_id) === location.pathname
   const open = is_root || !(info?.subs?.length)
-
   const [loading, set_loading] = useState(false)
   const [mod, set_mod] = useImmer<IMod | undefined>(void 0)
   const canGoBack = useCanGoBack()
@@ -64,12 +63,11 @@ export default function InfoViewPage() {
     resize()
     return () => { r.disconnect() }
   }, [id, mod])
-
   return <>
     <InfoView
       id={is_root ? id : void 0}
       backable={is_root}
-      foldable
+      foldable={!pathname.startsWith('/info/')}
       onClickBack={async () => {
         if (canGoBack) nav(-1)
         else nav(Paths.All.Main)

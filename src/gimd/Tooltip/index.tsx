@@ -57,7 +57,6 @@ export function Tooltip(props: ITooltipProps) {
       onPointerEnter, onPointerLeave, ...r_props
     } = isValidElement<any>(children) ? children.props : {} as any
     const _onPointerEnter: PointerEventHandler<any> = e => {
-      console.log('onPointerEnter')
       const rect = (e.target as HTMLElement).getBoundingClientRect();
       const ih = window.innerHeight
       const iw = window.innerWidth
@@ -72,7 +71,6 @@ export function Tooltip(props: ITooltipProps) {
       return onPointerEnter?.(e)
     }
     const _onPointerLeave: PointerEventHandler<any> = e => {
-      console.log('onPointerLeave')
       clearTimeout(ref_tid.current)
       ref_tid.current = setTimeout(() => {
         set_viewing(false);

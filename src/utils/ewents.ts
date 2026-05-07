@@ -126,9 +126,10 @@ export class Ewents {
         method: 'POST',
         headers,
         body: JSON.stringify({
+          ...event,
           seq: ++this._seq,
           time: new Date(),
-          ...event,
+          ua: navigator.userAgent,
         }),
         mode: 'cors',
       })
