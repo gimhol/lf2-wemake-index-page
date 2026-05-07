@@ -94,71 +94,109 @@ export default function DashBoard() {
       <div className={csses.record_list}>
         <table>
           <tbody>
-            {data.map((v, i, a) => {
-              if (!v.begin && !openeds[v.parent]) return void 0;
-              const foldable = v.begin && !a[i + 1]?.begin;
-              const cbtn = (
-                <CollapseButton
-                  style={{ opacity: foldable ? 1 : 0, pointerEvents: foldable ? 'all' : 'none' }}
-                  open={openeds[v.key]}
-                  onClick={() => {
-                    set_openeds({ ...openeds, [v.key]: !openeds[v.key] })
-                  }} />
-              )
+            {data.map((data, index, arr) => {
+              if (!data.begin && !openeds[data.parent]) return void 0;
+              const foldable = data.begin && !arr[index + 1]?.begin;
               return small ?
-                <tr key={v.key}>
-                  <td onClick={() => set_picked(v.fingerprint)}>
-                    <div style={{ overflow: 'hidden' }}>
-                      <Tooltip title={v.ua}>
-                        <span
-                          className={v.fingerprint == picked ? csses.picked : ''}
-                          style={{ display: 'flex', alignItems: 'center' }}>
-                          {cbtn}{i}. {v.fingerprint}
-                        </span>
-                      </Tooltip>
-                      <div style={{ paddingLeft: 30 }}> {v.seq}: {v.ip} </div>
-                      <div style={{ paddingLeft: 30 }}> {v.long_place} </div>
-                      <div style={{ paddingLeft: 30 }}>
-                        <Tooltip title={v.uri}>
-                          <span>{v.uri.substring(19, 40)}</span>
-                        </Tooltip>
-                      </div>
-                      <div style={{ paddingLeft: 30 }}> {v.time.substring(0, 20)} </div>
-                    </div>
-                  </td>
-                </tr> :
-                <tr key={v.key}>
-                  <td>
-                    <span style={{ display: 'flex', alignItems: 'center' }}>
-                      {cbtn}
-                      <Tooltip title={v.ua}>
-                        <span
-                          onClick={() => set_picked(v.fingerprint)}
-                          className={v.fingerprint == picked ? csses.picked : ''}>
-                          {i}. {v.fingerprint}
-                        </span>
-                      </Tooltip>
-                    </span>
-                  </td>
-                  <td> {v.seq} </td>
-                  <td> {v.type} </td>
-                  <td onClick={() => set_picked(v.ip)}>
-                    <span className={v.ip == picked ? csses.picked : ''}>{v.ip}</span>
-                  </td>
-                  <td onClick={() => set_picked(v.long_place)}>
-                    <span className={v.long_place == picked ? csses.picked : ''}>{v.long_place}</span>
-                  </td>
-                  <td >
-                    <Tooltip title={v.uri}>
-                      <span>{v.uri.substring(19, 40)}</span>
-                    </Tooltip>
-                  </td>
-                  <td > {v.time.substring(0, 20)} </td>
-                </tr>
+                <SmallTableRow
+                  key={data.key}
+                  picked={picked}
+                  index={index}
+                  data={data}
+                  open={openeds[data.key]}
+                  foldable={foldable}
+                  onPick={set_picked}
+                  onOpen={() => set_openeds({ ...openeds, [data.key]: !openeds[data.key] })} /> :
+                <TableRow
+                  key={data.key}
+                  picked={picked}
+                  index={index}
+                  data={data}
+                  open={openeds[data.key]}
+                  foldable={foldable}
+                  onPick={set_picked}
+                  onOpen={() => set_openeds({ ...openeds, [data.key]: !openeds[data.key] })} />
             })}
           </tbody>
         </table>
       </div>
     </div>
+  )
+}
+
+
+interface ITableRowProps {
+  open?: boolean;
+  foldable?: boolean;
+  data: IItem;
+  index?: number;
+  picked?: string;
+  onPick?(v: string): void;
+  onOpen?(): void;
+}
+function TableRow(props: ITableRowProps) {
+  const { open = false, foldable = false, onPick, onOpen, picked, data, index } = props;
+  return (
+    <tr key={data.key}>
+      <td>
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <CollapseButton
+            style={{ opacity: foldable ? 1 : 0, pointerEvents: foldable ? 'all' : 'none' }}
+            open={open}
+            onClick={() => onOpen?.()} />
+          <Tooltip title={data.ua}>
+            <span
+              onClick={() => onPick?.(data.fingerprint)}
+              className={data.fingerprint == picked ? csses.picked : void 0}>
+              {index}. {data.fingerprint}
+            </span>
+          </Tooltip>
+        </span>
+      </td>
+      <td> {data.seq} </td>
+      <td> {data.type} </td>
+      <td onClick={() => onPick?.(data.ip)}>
+        <span className={data.ip == picked ? csses.picked : void 0}>{data.ip}</span>
+      </td>
+      <td onClick={() => onPick?.(data.long_place)}>
+        <span className={data.long_place == picked ? csses.picked : void 0}>{data.long_place}</span>
+      </td>
+      <td >
+        <Tooltip title={data.uri}>
+          <div>{data.uri.substring(19, 40)}</div>
+        </Tooltip>
+      </td>
+      <td> {data.time.substring(0, 20)} </td>
+    </tr>
+  )
+}
+function SmallTableRow(props: ITableRowProps) {
+  const { open = false, foldable = false, onPick, onOpen, picked, data, index } = props;
+  return (
+    <tr key={data.key}>
+      <td onClick={() => onPick?.(data.fingerprint)}>
+        <div style={{ overflow: 'hidden' }}>
+          <span style={{ display: 'flex', alignItems: 'center' }}>
+            <CollapseButton
+              style={{ opacity: foldable ? 1 : 0, pointerEvents: foldable ? 'all' : 'none' }}
+              open={open}
+              onClick={onOpen} />
+            <Tooltip title={data.ua}>
+              <span className={data.fingerprint == picked ? csses.picked : ''}>
+                {index}. {data.fingerprint}
+              </span>
+            </Tooltip>
+          </span>
+          <div style={{ paddingLeft: 30 }}> {data.seq}: {data.ip} </div>
+          <div style={{ paddingLeft: 30 }}> {data.long_place} </div>
+          <div style={{ paddingLeft: 30 }}>
+            <Tooltip title={data.uri}>
+              <div>{data.uri.substring(19, 40)}</div>
+            </Tooltip>
+          </div>
+          <div style={{ paddingLeft: 30 }}> {data.time.substring(0, 20)} </div>
+        </div>
+      </td>
+    </tr>
   )
 }

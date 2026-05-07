@@ -30,7 +30,6 @@ import { MainContext } from "./main_context";
 import { NavButton } from "./NavButton";
 import csses from "./styles.module.scss";
 import { ewents } from "@/utils/ewents";
-
 const a_mappings: { [x in string]?: string } = {
   'origin': `1`,
   'wmods': `2`,
@@ -94,12 +93,12 @@ export default function MainPage() {
 
   useEffect(() => {
     if (!session_id) return;
-    const c = new AbortController()
+    const ab = new AbortController()
     ApiHttp.post<any, any>(`user/info`, void 0, void 0, {
       headers: { authorization: session_id },
-      signal: c.signal
+      signal: ab.signal
     }).then(r => {
-      if (c.signal.aborted) return;
+      if (ab.signal.aborted) return;
       dispatch({
         type: 'merge', value: {
           session_id: session_id,
@@ -111,19 +110,28 @@ export default function MainPage() {
       })
       localStorage.setItem('last_admin', r.data.admin)
       set_location({})
+    }).catch(e => {
+      if (ab.signal.aborted) return;
+      ApiHttp.ignoreAbort(e)
+    }).catch(e => {
+      if (ab.signal.aborted) return;
+      KnownError.is(e)
+    }).catch((e) => {
+      if (ab.signal.aborted) return;
+      Toast.show(e)
     })
-      .catch(ApiHttp.ignoreAbort)
-      .catch(e => {
-        KnownError.is(e)
-      }).catch((e) => {
-        Toast.show(e)
-      })
-    return () => c.abort()
+    return () => ab.abort('[pages/main] 1. useEffect leave')
   }, [session_id, dispatch, set_location])
 
   const actived: IRecordInfo | undefined = useMemo(() => games?.find(v => v.info.id == real_game_id), [real_game_id, games])
   const small = useSmallScreen()
-  const [game_list_open, set_game_list_open] = useState(!small);
+  const [small_game_list_open, set_small_game_list_open] = useState(false);
+  const [main_game_list_open, set_main_game_list_open] = useState(true);
+
+  const game_list_open = small ? small_game_list_open : main_game_list_open;
+  const set_game_list_open = small ? set_small_game_list_open : set_main_game_list_open;
+
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     set_loading(true)
@@ -139,7 +147,7 @@ export default function MainPage() {
         if (ab.signal.aborted) return;
         set_loading(false)
       })
-    return () => ab.abort()
+    return () => ab.abort('[pages/main] 2.useEffect leave')
   }, [lang])
 
   const _games = useMemo<('divider' | IRecordInfo)[] | undefined>(() => {
@@ -169,17 +177,16 @@ export default function MainPage() {
   const game_list = useMemo(() => {
     return (
       <div className={cns(csses.game_list, game_list_open ? void 0 : csses.close, csses.scrollview)}>
-        {_games?.map((v) => {
-          if (!v) return <></>
-          if (v === 'divider') return <div className={csses.divider_h} />
+        {_games?.map((info, idx) => {
+          if (info === 'divider') return <div className={csses.divider_h} key={`divider_${idx}`} />
           return (
             <NavButton
-              key={v.id}
-              {...ewents.click('NavButton', { id: v.info.id, title: v.info.short_title })}
-              actived={real_game_id === v.info.id || pathname === v.info.id}
-              children={v.info.short_title}
+              key={info.id}
+              {...ewents.click('NavButton', { id: info.info.id, title: info.info.short_title })}
+              actived={real_game_id === info.info.id || pathname === info.info.id}
+              children={info.info.short_title}
               onClick={e => {
-                const game = b_mappings['' + v.info.id] ?? v.info.id
+                const game = b_mappings['' + info.info.id] ?? info.info.id
                 interrupt_event(e);
                 set_location({ game });
                 if (small) set_game_list_open(false)
@@ -190,14 +197,13 @@ export default function MainPage() {
         <Loading loading={loading} center absolute />
       </div>
     )
-  }, [game_list_open, pathname, _games, loading, set_location, small, real_game_id])
+  }, [game_list_open, _games, loading, real_game_id, pathname, set_location, small, set_game_list_open])
 
   const build_time = dayjs(BUILD_TIME)
 
   const build_time_text = build_time.isSame(dayjs(), 'day') ?
     build_time.format('YYYY-MM-DD HH:mm:ss') :
     build_time.format('HH:mm:ss')
-
 
   return <>
     <MainContext.Provider value={{ info: actived?.info, record: actived }}>
@@ -293,7 +299,7 @@ export default function MainPage() {
           className={csses.game_list_mask}
           container={() => document.body}
           closeOnMask
-          open={game_list_open && small}
+          open={game_list_open}
           whenChange={() => set_game_list_open(false)}>
           {game_list}
         </Mask>

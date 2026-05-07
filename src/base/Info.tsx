@@ -224,21 +224,21 @@ const { Cls, Str } = makeI18N();
       return join_url(STORAGE_URL_BASE, _url)
     return url
   }
-  async load_desc() {
+  async load_desc(opts: RequestInit = {}) {
     do {
       const { desc_url } = this.raw
-      if (desc_url) this.raw.desc = await this.fetch(desc_url).then(r => r.text());
+      if (desc_url) this.raw.desc = await this.fetch(desc_url, opts).then(r => r.text());
       if (!this.raw.i18n) break;
       for (const key in this.raw.i18n) {
         const { desc_url } = this.raw.i18n[key] ?? {}
         if (!desc_url) continue;
-        this.raw.i18n[key].desc = await this.fetch(desc_url).then(r => r.text());
+        this.raw.i18n[key].desc = await this.fetch(desc_url, opts).then(r => r.text());
       }
     } while (false);
     return this.desc;
   }
-  private async fetch(url: string): Promise<Response> {
-    return fetch(this.full_url(url), { mode: 'cors' })
+  private async fetch(url: string, opts: RequestInit = {}): Promise<Response> {
+    return fetch(this.full_url(url), { mode: 'cors', ...opts })
   }
 
   clearup(): this {

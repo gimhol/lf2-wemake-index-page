@@ -10,13 +10,16 @@ export function OSSProvider(props: PropsWithChildren) {
 
   useEffect(() => {
     if (!session_id) return;
-    const c = new AbortController();
+    const ab = new AbortController();
     getSTSToken()
-      .then(sts => dispatch({ type: 'merge', value: { sts } }))
-      .catch(e => ApiHttp.ignore401(e));
-    return () => {
-      c.abort(new Error('useEffect leave'))
-    };
+      .then(sts => {
+        if (ab.signal.aborted) return;
+        dispatch({ type: 'merge', value: { sts } })
+      }).catch(e => {
+        if (ab.signal.aborted) return
+        ApiHttp.ignore401(e);
+      });
+    return () => ab.abort('[OSSProvider] useEffect leave');
   }, [dispatch, session_id]);
 
   const oss = useMemo(() => {

@@ -57,26 +57,25 @@ export function ModFormView(props: IModFormViewProps) {
     }
     set_loading(true);
     const ab = new AbortController();
-    get_mod({ mod_id })
-      .then(r => {
-        if (ab.signal.aborted) return;
-        set_mod(r)
-        if (r.info.full_cover_url)
-          set_covers([{ url: r.info.full_cover_url }])
-        if ((
-          r.info.url_type === InfoUrlType.Download ||
-          r.info.url_type === InfoUrlType.AndroidApk
-        ) && r.info.url)
-          set_attachments([{ url: r.info.url }])
-        set_drafts({ '': r.info.raw, zh: r.info.raw.i18n?.['zh'] ?? {} })
-      }).catch(e => {
-        if (ab.signal.aborted) return;
-        Toast.error(e)
-      }).finally(() => {
-        if (ab.signal.aborted) return;
-        set_loading(false)
-      })
-    return () => ab.abort()
+    get_mod({ mod_id, signal: ab.signal }).then(r => {
+      if (ab.signal.aborted) return;
+      set_mod(r)
+      if (r.info.full_cover_url)
+        set_covers([{ url: r.info.full_cover_url }])
+      if ((
+        r.info.url_type === InfoUrlType.Download ||
+        r.info.url_type === InfoUrlType.AndroidApk
+      ) && r.info.url)
+        set_attachments([{ url: r.info.url }])
+      set_drafts({ '': r.info.raw, zh: r.info.raw.i18n?.['zh'] ?? {} })
+    }).catch(e => {
+      if (ab.signal.aborted) return;
+      Toast.error(e)
+    }).finally(() => {
+      if (ab.signal.aborted) return;
+      set_loading(false)
+    })
+    return () => ab.abort('[ModFormView] useEffect leave')
   }, [mod_id, oss, sts, set_mod, set_drafts])
 
   const tool_tips_container = () => document.getElementsByClassName(csses.mod_form_view).item(0)!

@@ -24,22 +24,23 @@ export function get_mod_paths_names(owner_id: number, mod_id: number) {
 }
 export interface IGetModFormOpts {
   mod_id?: number;
+  signal?: AbortSignal;
 }
 export interface IMod {
   info: Info;
   record: IRecord;
   owner: IUserInfo;
-  strings: ReturnType<typeof get_mod_paths_names>
+  strings: ReturnType<typeof get_mod_paths_names>,
 }
 const TAG = '[get_mod]'
 export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
   console.debug(`${TAG} opts:`, opts)
-  const { mod_id } = opts;
+  const { mod_id, signal } = opts;
   if (!mod_id) throw new Error(`${TAG} mod_id got ${mod_id}`);
-  const record = await findModRecord({ id: mod_id });
+  const record = await findModRecord({ id: mod_id }, { signal });
   const { owner_id, oss_name } = record;
   if (!owner_id) throw new Error('mod not found!');
-  const owner = await getUserInfo({ id: record.owner_id });
+  const owner = await getUserInfo({ id: record.owner_id }, { signal });
   const raw_info: IInfo = {
     author_url: owner?.home_url || owner?.gitee_url || owner?.github_url,
     author: owner.nickname || owner.username,
@@ -48,7 +49,7 @@ export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
   }
   const oss_url = oss_name ? join_url(STORAGE_URL_BASE, oss_name) : void 0
   if (oss_url) {
-    const exists_info = await fetch(oss_url).then<IInfo>(r => {
+    const exists_info = await fetch(oss_url, { signal }).then<IInfo>(r => {
       if (!r.ok) throw new Error(`[${r.status}]${r.statusText}`)
       return r.json()
     })
@@ -60,7 +61,7 @@ export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
   const strings = get_mod_paths_names(owner.id, mod_id);
   console.debug(`[get_mod] oss_url: ${oss_url}`)
   const info = new Info(raw_info, '', null, oss_url ?? null);
-  if (oss_url) await info.load_desc()
+  if (oss_url) await info.load_desc({ signal })
 
   info.id = '' + mod_id;
   return { strings, info, record, owner };

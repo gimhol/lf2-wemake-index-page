@@ -38,15 +38,21 @@ export function IconButton(props: IIconButtonProps) {
     return 'letter'
   }, [icon])
 
-  return gone ? <></> : (
-    <Tooltip title={title} container={container} >
-      <button className={cls_root} onClick={_on_click} data-icon={icon} data-title={title} {..._p} >
-        {icon_type == 'img' && <img className={cns(csses.icon_img, classNames?.icon)} src={icon as string} width={size} style={styles?.icon} draggable={false} alt={title} />}
-        {icon_type == 'letter' && <span className={cns(csses.letter, classNames?.icon)} style={styles?.icon}>{icon as string}</span>}
-        {icon_type == 'custom' && icon}
-        {children}
-        {href ? <a href={href} className={csses.icon_button_href} /> : null}
-      </button>
+  if (gone) return <></>;
+
+  const main = (
+    <button className={cls_root} onClick={_on_click} data-icon={icon} data-title={title} {..._p} >
+      {icon_type == 'img' && <img className={cns(csses.icon_img, classNames?.icon)} src={icon as string} width={size} style={styles?.icon} draggable={false} alt={title} />}
+      {icon_type == 'letter' && <span className={cns(csses.letter, classNames?.icon)} style={styles?.icon}>{icon as string}</span>}
+      {icon_type == 'custom' && icon}
+      {children}
+      {href ? <a href={href} className={csses.icon_button_href} /> : null}
+    </button>
+  )
+  if (!title) return <>{main}</>
+  return (
+    <Tooltip title={title} container={container}>
+      {main}
     </Tooltip>
   )
 }

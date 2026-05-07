@@ -47,14 +47,21 @@ export function Viewer(props: IViewerProps) {
     }
     const ab = new AbortController()
     fetch(url, { signal: ab.signal, mode: 'cors' })
-      .then(r => r.text())
-      .then((txt) => {
+      .then(r => {
+        if (ab.signal.aborted) throw Error('aborted');
+        return r.text()
+      }).then((txt) => {
+        if (ab.signal.aborted) throw Error('aborted');
         whenLoaded?.(txt);
         return marked.parse(txt)
+      }).then((v) => {
+        if (ab.signal.aborted) throw Error('aborted');
+        set_html(v)
+      }).catch(e => {
+        if (ab.signal.aborted) return;
+        console.warn(e)
       })
-      .then((v) => set_html(v))
-      .catch(e => console.warn(e))
-    return () => ab.abort();
+    return () => ab.abort('[Viewer] useEffect leave');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url, content])
 

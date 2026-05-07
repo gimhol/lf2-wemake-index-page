@@ -31,7 +31,7 @@ export function useInfoChildren(info: Info | undefined | null) {
         if (ab.signal.aborted) return;
         set_loading(false);
       });
-    return () => ab.abort();
+    return () => ab.abort('[useInfoChildren] useEffect leave');
   }, [info]);
   
   return [children, loading, error] as const;

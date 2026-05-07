@@ -57,16 +57,17 @@ export function ModPreview(props: IInfoViewProps) {
     }
     const ab = new AbortController();
     set_loading(true)
-    get_mod({ mod_id }).then(r => {
+    get_mod({ mod_id, signal: ab.signal }).then(r => {
       if (ab.signal.aborted) return;
       set_mod(r)
     }).catch(e => {
       if (ab.signal.aborted) return;
       Toast.error(e)
     }).finally(() => {
+      if (ab.signal.aborted) return;
       set_loading(false)
     })
-    return () => ab.abort()
+    return () => ab.abort('useEffect leave')
   }, [mod_id, set_mod])
 
   return (

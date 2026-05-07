@@ -4,6 +4,7 @@ export interface OSS extends _OSS {
   debugging_options: _OSS.Options;
 }
 export interface IOSSContextValue {
+  loading?: boolean;
   oss?: OSS;
   sts?: IOSSStsInfo;
 }

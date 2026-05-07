@@ -76,7 +76,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
     if (!path.length) {
       set_path([])
       refresh_files(0, { signal: ab.signal })
-      return () => ab.abort()
+      return () => ab.abort('[pages/yours] 1.useEffect leave')
     }
     listModPath({ path }, { signal: ab.signal }).then(r => {
       if (ab.signal.aborted) return;
@@ -93,7 +93,7 @@ export default function YoursPage(props: React.HTMLAttributes<HTMLDivElement>) {
       if (ab.signal.aborted) return;
       set_pending(false)
     })
-    return () => ab.abort()
+    return () => ab.abort('[pages/yours] 2.useEffect leave')
   }, [nav, refresh_files, search])
 
   useEffect(() => {
