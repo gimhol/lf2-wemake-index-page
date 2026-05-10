@@ -43,7 +43,7 @@ export function InfoCard(props: IInfoCardProps) {
   const small = useSmallScreen();
   const open_detail = (e: React.MouseEvent) => {
     if (small) {
-      nav(Paths.All.Info.replace(':game_id', '' + record?.id))
+      nav(Paths.All.Info.replace(':id', '' + record?.id))
     }
     const el = ref_el.current;
     if (!el) return;

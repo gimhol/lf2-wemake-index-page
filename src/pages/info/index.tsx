@@ -12,28 +12,28 @@ import { MainContext } from "../main/main_context"
 import { get_mod, type IMod } from "../yours/get_mod"
 import { curr_list_like, InfoView, type ListLike } from "./InfoView"
 import csses from "./index.module.scss"
-
+let __id = 0;
 export default function InfoViewPage() {
   const { i18n } = useTranslation()
   const lang = i18n.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
   const { info, record } = useContext(MainContext)
-  const { game_id: mod_id } = useParams()
+  const { id: info_id } = useParams()
   const location = useLocation();
-  const is_root = Paths.All.Info.replace(':game_id', '' + mod_id) === location.pathname
+  const is_root = Paths.All.Info.replace(':id', '' + info_id) === location.pathname
   const open = is_root || !(info?.subs?.length)
   const [loading, set_loading] = useState(false)
   const [mod, set_mod] = useImmer<IMod | undefined>(void 0)
   const canGoBack = useCanGoBack()
 
   useEffect(() => {
-    if (!mod_id || !is_root) {
+    if (!info_id || !is_root) {
       set_mod(void 0);
       set_loading(false);
       return
     }
     const ab = new AbortController();
     set_loading(true)
-    get_mod({ mod_id: Number(mod_id), lang, signal: ab.signal }).then(r => {
+    get_mod({ mod_id: Number(info_id), lang, signal: ab.signal }).then(r => {
       if (ab.signal.aborted) return;
       set_mod(r)
     }).catch(e => {
@@ -44,18 +44,19 @@ export default function InfoViewPage() {
       set_loading(false)
     })
     return () => ab.abort('[page/info] useEffect leave')
-  }, [mod_id, set_mod, lang, is_root])
+  }, [info_id, set_mod, lang, is_root])
 
   const nav = useNavigate();
-  const [margin_top, set_margin_top] = useState(0)
-  // eslint-disable-next-line react-hooks/purity
-  const id = useMemo(() => `root_info_view_${Date.now()}`, [])
+  const [margin_top, set_margin_top] = useState(0);
+
+  const el_id = useMemo(() => `root_info_view_${++__id}`, [])
+
   useEffect(() => {
     if (!mod?.info) return;
-    const el = document.getElementById(id)
+    const el = document.getElementById(el_id)
     const head = el?.firstElementChild;
     if (!el || !head) {
-      console.log(id, el, head)
+      console.log(el_id, el, head)
       set_margin_top(0)
       return;
     }
@@ -66,7 +67,7 @@ export default function InfoViewPage() {
     r.observe(head)
     resize()
     return () => { r.disconnect() }
-  }, [id, mod])
+  }, [el_id, mod])
 
   const [listLike, set_listLike] = useState<ListLike | undefined>(void 0)
   useEffect(() => {
@@ -77,17 +78,18 @@ export default function InfoViewPage() {
     set_listLike(curr_list_like(info?.children_look))
   }, [info, is_root])
 
+
   return <>
     <InfoView
-      id={is_root ? id : void 0}
+      id={is_root ? el_id : void 0}
       backable={is_root}
       foldable={!is_root}
       onClickBack={async () => {
         if (canGoBack) nav(-1)
         else nav(Paths.All.Main)
       }}
-      info={info ?? mod?.info}
-      record={record ?? mod?.record}
+      info={is_root ? mod?.info : info}
+      record={is_root ? mod?.record : record}
       className={is_root ? csses.main : csses.main_right}
       listLike={listLike}
       whenListLike={set_listLike}

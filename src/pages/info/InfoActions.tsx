@@ -54,7 +54,7 @@ export function InfoActions(props: IInfoActionsProps) {
 export function IdLink(props: IInfoActionsProps) {
   const { info } = props;
   if (!info) return <></>
-  const href = `${location.protocol}//${location.host}/#${Paths.All.Info.replace(':game_id', '' + info?.id)}`;
+  const href = `${location.protocol}//${location.host}/#${Paths.All.Info.replace(':id', '' + info?.id)}`;
 
   return (
     <Tooltip title='Open in New Page'>

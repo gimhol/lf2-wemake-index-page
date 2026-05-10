@@ -15,7 +15,7 @@ export function ShareButton(props: { info: Info | undefined | null }) {
   const on_click = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     interrupt_event(e);
     if (!id) return;
-    const url = `${location.protocol}//${location.host}/#${Paths.All.Info.replace(':game_id', '' + id)}`
+    const url = `${location.protocol}//${location.host}/#${Paths.All.Info.replace(':id', '' + id)}`
     navigator.clipboard.writeText(url).then(() => {
       Toast.success(`URL has been copied: \n ${url}`)
     }).catch(e => {

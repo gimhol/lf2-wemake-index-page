@@ -141,7 +141,7 @@ export function InfoView(props: IInfoViewProps) {
         </div>
       </div>
       {
-        !foldable ? null : <>
+        !foldable && children.length ? null : <>
           <MDViewer
             className={csses.content_zone}
             emptyAsGone
@@ -149,7 +149,9 @@ export function InfoView(props: IInfoViewProps) {
           <Collapse open={!foldable || (__open && has_content)} >
             <Show yes={!!info.full_cover_url}>
               <MDViewer className={csses.content_zone}>
-                <img src={info.full_cover_url} style={{ maxWidth: '100%' }} />
+                <img
+                  src={info.full_cover_url}
+                  style={{ maxWidth: '100%' }} />
               </MDViewer>
             </Show>
             <MDViewer

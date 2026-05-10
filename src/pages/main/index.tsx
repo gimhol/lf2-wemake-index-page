@@ -50,7 +50,7 @@ export default function MainPage() {
   const { value: { session_id, nickname, username, admin }, dispatch } = useContext(GlobalStore.context);
   const {
     search, hash,
-    params: { raw: { game_id } }
+    params: { raw: { id: game_id } }
   } = LocationParams.useAll()
 
   const real_game_id = useMemo(() => {
@@ -62,7 +62,7 @@ export default function MainPage() {
   const set_location = useCallback((opts: { game?: string }) => {
     const { game } = opts
     const pathname = typeof game === 'string' ?
-      Paths.All.InnerInfo.replace(':game_id', game) :
+      Paths.All.InnerInfo.replace(':id', game) :
       void 0;
     const next_search = search.clone();
     next_search.delele('session');
