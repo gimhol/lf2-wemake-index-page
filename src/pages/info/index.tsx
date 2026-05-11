@@ -4,17 +4,20 @@ import { LangButton } from "@/components/LangButton"
 import { Loading } from "@/components/loading"
 import Toast from "@/gimd/Toast"
 import { useCanGoBack } from "@/hooks/useCanGoBack"
-import { useContext, useEffect, useMemo, useState } from "react"
+import { useContext, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate, useParams } from "react-router"
 import { useImmer } from "use-immer"
 import { MainContext } from "../main/main_context"
 import { get_mod, type IMod } from "../yours/get_mod"
 import { curr_list_like, InfoView, type ListLike } from "./InfoView"
-import csses from "./index.module.scss"
+import csses from "./style.module.scss"
+import { ewents } from "@/utils/ewents"
+import dayjs from "dayjs"
+import img_github from "@/assets/svg/github.svg";
 let __id = 0;
 export default function InfoViewPage() {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const lang = i18n.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
   const { info, record } = useContext(MainContext)
   const { id: info_id } = useParams()
@@ -48,23 +51,27 @@ export default function InfoViewPage() {
 
   const nav = useNavigate();
   const [margin_top, set_margin_top] = useState(0);
-
+  const [margin_bottom, set_margin_bottom] = useState(0);
   const el_id = useMemo(() => `root_info_view_${++__id}`, [])
+  const ref_foot = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!mod?.info) return;
     const el = document.getElementById(el_id)
     const head = el?.firstElementChild;
-    if (!el || !head) {
-      console.log(el_id, el, head)
+    const foot = ref_foot.current;
+    if (!el || !head || !foot) {
       set_margin_top(0)
+      set_margin_bottom(0)
       return;
     }
     const resize = () => {
       set_margin_top(head.getBoundingClientRect().height)
+      set_margin_bottom(foot.getBoundingClientRect().height)
     }
     const r = new ResizeObserver(resize);
     r.observe(head)
+    r.observe(foot)
     resize()
     return () => { r.disconnect() }
   }, [el_id, mod])
@@ -77,6 +84,11 @@ export default function InfoViewPage() {
     }
     set_listLike(curr_list_like(info?.children_look))
   }, [info, is_root])
+
+  const build_time = dayjs(BUILD_TIME)
+  const build_time_text = build_time.isSame(dayjs(), 'day') ?
+    build_time.format('YYYY-MM-DD HH:mm:ss') :
+    build_time.format('HH:mm:ss')
 
 
   return <>
@@ -95,9 +107,33 @@ export default function InfoViewPage() {
       whenListLike={set_listLike}
       open={open}
       actions={is_root ? <LangButton /> : void 0}
-      style={{
-        paddingTop: margin_top
-      }} />
-    <Loading fixed center loading={loading} big />
+      style={is_root ? {
+        marginTop: margin_top,
+        height: `calc(100% - ${margin_top}px - ${margin_bottom}px)`
+      } : void 0} >
+      <Loading fixed center loading={loading} big />
+      {
+        is_root ?
+          <div className={csses.foot} ref={ref_foot}>
+            <a
+              {...ewents.click('goto_discussions')}
+              target='_blank'
+              className={csses.discussions}
+              href="https://github.com/gimhol/little-fighter-2-WEMAKE/discussions">
+              <img src={img_github} /> {t('suggest_ask_feedback')}
+            </a>
+            <div style={{ flex: 1 }}></div>
+            <div className={csses.right_zone}>
+              <span>
+                {t('unstable_wip_buggy')}
+              </span>
+              <span>
+                {t('latest_build_time')}: {build_time_text}
+              </span>
+            </div>
+          </div> : void 0
+      }
+    </InfoView>
+
   </>
 }

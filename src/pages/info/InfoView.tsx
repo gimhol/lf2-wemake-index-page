@@ -18,7 +18,7 @@ import { useSmallScreen } from "@/useSmallScreen";
 import { ewents } from "@/utils/ewents";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
-import { useEffect, useRef, type ReactNode } from "react";
+import { forwardRef, useEffect, useRef, type ForwardedRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import 'viewerjs/dist/viewer.min.css';
 import { IdLink, InfoActions } from "./InfoActions";
@@ -47,7 +47,7 @@ export interface IInfoViewProps extends React.HTMLAttributes<HTMLDivElement> {
   actions?: ReactNode;
 }
 
-export function InfoView(props: IInfoViewProps) {
+function RenderInfoView(props: IInfoViewProps, forwardedRef: ForwardedRef<HTMLDivElement>) {
   const {
     info,
     className,
@@ -87,12 +87,11 @@ export function InfoView(props: IInfoViewProps) {
   Toast.useError(children_error)
   const __next_list_like = next_list_like(__listLike)
   const cls_root = classnames(csses.info_view_root, className)
-  const ref_article = useRef<HTMLDivElement>(null);
 
   if (!info) return <></>;
 
   return (
-    <div className={cls_root} {..._p} ref={ref_article}>
+    <div className={cls_root} {..._p} ref={forwardedRef}>
       <div className={csses.head}>
         <CloseButton
           gone={!backable}
@@ -223,6 +222,9 @@ export function InfoView(props: IInfoViewProps) {
             }
           </div>
       }
+      {_p.children}
     </div>
   )
 }
+
+export const InfoView = forwardRef<HTMLDivElement, IInfoViewProps>(RenderInfoView)
