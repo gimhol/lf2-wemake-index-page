@@ -1,21 +1,25 @@
-:global {
-  .bytemd {
-    .bytemd-status-right {
-      >label {
-        display: flex !important;
-      }
+.markdown_editor_view {
 
+  :global(.bytemd) {
+    height: 100%;
+  }
+
+  :global(.bytemd-status-right) {
+    display: flex !important;
+
+    &>label {
       display: flex !important;
-    }
-
-    .bytemd-preview {
-      a {
-        color: inherit;
-      }
     }
   }
 
-  .bytemd-fullscreen {
+  :global(.bytemd-preview) {
+    a {
+      color: inherit;
+    }
+  }
+
+  :global(.bytemd-fullscreen) {
     z-index: 100;
+    height : unset;
   }
 }

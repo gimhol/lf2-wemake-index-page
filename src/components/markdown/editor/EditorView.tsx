@@ -9,7 +9,7 @@ import mermaid from '@bytemd/plugin-mermaid';
 import { Editor, type EditorProps } from '@bytemd/react';
 import 'bytemd/dist/index.css';
 import { useState } from 'react';
-import "./bytemd.module.scss";
+import csses from "./bytemd.module.scss";
 
 
 const default_plugins = [
@@ -31,12 +31,14 @@ export function EditorView(props: IEditorViewProps) {
   const __value = onChange ? value : _value;
   const __setValue = onChange ? onChange : _setValue;
   return (
-    <Editor
-      value={__value}
-      plugins={plugins}
-      onChange={__setValue}
-      {..._p}
-    />
+    <div className={csses.markdown_editor_view}>
+      <Editor
+        value={__value}
+        plugins={plugins}
+        onChange={__setValue}
+        {..._p}
+      />
+    </div>
   )
 }
 EditorView.DefaultPlugins = default_plugins
