@@ -52,6 +52,6 @@ const on_resize = () => {
 }
 window.addEventListener('resize', on_resize)
 on_resize()
-
+ewents.filter = () => Promise.resolve(localStorage.getItem('last_admin') !== '255')
 ewents.mount()
 ewents.submit_visit()

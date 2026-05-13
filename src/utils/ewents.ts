@@ -20,6 +20,7 @@ export class Ewents {
   }
   private _handle_popstate = () => this.submit_visit()
   private _fingerprint: GetResult | null = null;
+  filter: <T extends object>(type: string, event: T) => Promise<boolean> = () => Promise.resolve(true);
 
   constructor() {
     this.init()
@@ -117,7 +118,9 @@ export class Ewents {
   }
 
   submit_any<T extends object>(type: string, event: T) {
-    this.get_fingerprint().then(r => {
+    this.filter(type, event).then(() => {
+      return this.get_fingerprint()
+    }).then((r) => {
       const headers = {
         'Content-Type': 'application/json',
         "Fingerprint": r.visitorId,
