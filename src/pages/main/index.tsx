@@ -153,12 +153,15 @@ export default function MainPage() {
   const _games = useMemo<('divider' | IRecordInfo)[] | undefined>(() => {
     const ret: ('divider' | IRecordInfo)[] = []
     if (session_id) {
-      const head: ('divider' | IRecordInfo | null)[] = [admin == 255 ? {
-        info: new Info({
-          id: Paths.All.Dashboard,
-          short_title: t('Dashboard')
-        }, lang, null, null)
-      } : null, {
+      if (admin == 255) {
+        ret.push({
+          info: new Info({
+            id: Paths.All.Dashboard,
+            short_title: t('Dashboard')
+          }, lang, null, null)
+        })
+      }
+      ret.push({
         info: new Info({
           id: Paths.All.Workspace,
           short_title: t('workspace')
@@ -168,10 +171,8 @@ export default function MainPage() {
           id: Paths.All.Editor,
           short_title: t('Editor')
         }, lang, null, null)
-      }, 'divider']
-      head.forEach((v, i) => v && ret.splice(i, 0, v))
+      }, 'divider')
     }
-
     if (games?.length) {
       ret.push(...games, 'divider')
     }
