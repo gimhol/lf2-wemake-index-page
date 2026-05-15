@@ -151,27 +151,30 @@ export default function MainPage() {
   }, [lang])
 
   const _games = useMemo<('divider' | IRecordInfo)[] | undefined>(() => {
-    if (!games) return games
-    if (!session_id) return games;
-    const ret: ('divider' | IRecordInfo)[] = [...games]
-    const head: ('divider' | IRecordInfo | null)[] = [admin == 255 ? {
-      info: new Info({
-        id: Paths.All.Dashboard,
-        short_title: t('Dashboard')
-      }, lang, null, null)
-    } : null, {
-      info: new Info({
-        id: Paths.All.Workspace,
-        short_title: t('workspace')
-      }, lang, null, null)
-    }, {
-      info: new Info({
-        id: Paths.All.Editor,
-        short_title: t('Editor')
-      }, lang, null, null)
-    }, 'divider']
-    head.forEach((v, i) => v && ret.splice(i, 0, v))
-    ret.push('divider')
+    const ret: ('divider' | IRecordInfo)[] = []
+    if (session_id) {
+      const head: ('divider' | IRecordInfo | null)[] = [admin == 255 ? {
+        info: new Info({
+          id: Paths.All.Dashboard,
+          short_title: t('Dashboard')
+        }, lang, null, null)
+      } : null, {
+        info: new Info({
+          id: Paths.All.Workspace,
+          short_title: t('workspace')
+        }, lang, null, null)
+      }, {
+        info: new Info({
+          id: Paths.All.Editor,
+          short_title: t('Editor')
+        }, lang, null, null)
+      }, 'divider']
+      head.forEach((v, i) => v && ret.splice(i, 0, v))
+    }
+
+    if (games?.length) {
+      ret.push(...games, 'divider')
+    }
     ret.push({
       info: new Info({
         id: Paths.All.Demo,
