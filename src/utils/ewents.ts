@@ -118,9 +118,11 @@ export class Ewents {
   }
 
   submit_any<T extends object>(type: string, event: T) {
-    this.filter(type, event).then(() => {
+    this.filter(type, event).then((filted) => {
+      if (!filted) return null
       return this.get_fingerprint()
     }).then((r) => {
+      if (!r) return
       const headers = {
         'Content-Type': 'application/json',
         "Fingerprint": r.visitorId,

@@ -5,11 +5,12 @@ const style: React.CSSProperties = {
   flex: 1,
 
 }
+const date = Date.now();
 export default function Demo() {
   return (
     <iframe
       style={style}
-      src='https://lf.gim.ink/demo'
+      src={'https://lf.gim.ink/demo?time=' + date}
     />
   )
 }
