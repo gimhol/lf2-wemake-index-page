@@ -17,7 +17,7 @@
   overflow      : auto;
   flex-shrink   : 0;
   height        : 100%;
-  max-width     : 1000px;
+  max-width     : var(--content-zone-width);
   margin        : auto;
   border-left   : 1px var(--color-divider) dashed;
   border-right  : 1px var(--color-divider) dashed;
@@ -25,7 +25,7 @@
   &>*:first-child {
     @extend .bg;
     margin          : auto;
-    max-width       : 1000px;
+    max-width       : var(--content-zone-width);
     width           : 100%;
     position        : fixed;
     top             : 0px;
@@ -48,7 +48,7 @@
 .foot {
   @extend .bg;
   margin         : auto;
-  max-width      : 1000px;
+  max-width      : var(--content-zone-width);
   width          : 100%;
   position       : fixed;
   bottom         : 0;
