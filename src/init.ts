@@ -52,6 +52,17 @@ const on_resize = () => {
 }
 window.addEventListener('resize', on_resize)
 on_resize()
-ewents.filter = () => Promise.resolve(localStorage.getItem('last_admin') !== '255')
+ewents.filter = async (type: string, event: object) => {
+  if (localStorage.getItem('last_admin') == '255')
+    return false
+  if (type == 'visit') {
+    if (!('uri' in event)) return false;
+    const { uri } = event;
+    if (typeof uri !== 'string') return false;
+    if (uri.endsWith(`/#/`)) return false;
+    if (uri.indexOf('#') < 0) return false
+  }
+  return true
+}
 ewents.mount()
 ewents.submit_visit()
