@@ -5,6 +5,7 @@
     max-width: 100%;
     display  : block;
     outline  : none;
+    margin   : 5px 0px;
   }
 
   video {
@@ -34,8 +35,12 @@
   }
 
   ul {
-    padding: 0px;
-    margin : 0px 15px;
+    padding: 0px 0px 0px 6px;
+    margin : 0px 0px 0px 6px;
+  }
+
+  &>ul {
+    margin: 0px 0px 0px 20px !important;
   }
 
   :global {

@@ -90,23 +90,35 @@
     }
   }
 
-  .info_zone {
+  .md_viewer {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-top   : 2px;
+      margin-bottom: 2px;
+    }
+  }
+
+  .brief_viewer {
+    @extend .md_viewer;
+    user-select: text;
+    box-sizing : border-box;
+  }
+
+  .desc_viewer {
+    @extend .md_viewer;
     border-radius: 5px;
     overflow     : auto;
     user-select  : text;
     flex         : 1;
+    height       : 0px;
     box-sizing   : border-box;
-
-    .info_md_viewer {
-      box-sizing: border-box;
-      min-height: 100%;
-      min-width : 100%;
-    }
   }
 
-  .info_zone_half {
-    @extend .info_zone;
-  }
 
   .no_content {
     position  : absolute;

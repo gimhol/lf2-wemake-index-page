@@ -81,23 +81,21 @@ export function InfoCard(props: IInfoCardProps) {
             !full_cover_url ? null : <img className={classnames(csses.pic_zone)} draggable={false} src={full_cover_url} />
           }
           <Viewer
-            className={csses.content_zone}
             emptyAsGone
+            className={csses.brief_viewer}
             content={info.brief} />
           {
             !(info.desc || info.full_desc_url) ? null :
-              <div className={classnames(full_cover_url ? csses.info_zone_half : csses.info_zone, csses.scrollview)}>
-                <Viewer
-                  className={csses.info_md_viewer}
-                  emptyAsGone
-                  plain
-                  content={info.desc}
-                  url={info.full_desc_url}
-                  whenLoaded={v => info.set_desc(v)} />
-              </div>
+              <Viewer
+                className={classnames(csses.desc_viewer, csses.scrollview)}
+                emptyAsGone
+                content={info.desc}
+                url={info.full_desc_url}
+                whenLoaded={v => info.set_desc(v)} />
+
           }
           {
-            (full_cover_url || info.desc || info.full_desc_url) ? null :
+            (full_cover_url || info.desc || info.full_desc_url || info.brief) ? null :
               <div className={classnames(csses.no_content)}>
                 {t('no_content')}
               </div>
