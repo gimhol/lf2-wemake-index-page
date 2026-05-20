@@ -94,7 +94,7 @@ export class Ewents {
     const curr_location = location.toString();
     if (this._location == curr_location) return;
     this._location = curr_location;
-    this.submit_any('visit', { uri: curr_location });
+    this.submit_any('visit', { uri: this._location });
   }
 
   submit_click(el: HTMLElement) {
@@ -111,7 +111,7 @@ export class Ewents {
       } catch (e: unknown) {
         console.warn(`[${Ewents.TAG}::submit_click] failed, ${Ewents.CLICK_SIGNAL} is not an json string`, e)
       }
-      if (what) return this.submit_any('click', { what })
+      if (what) return this.submit_any('click', { uri: this._location, what })
     }
   }
 
