@@ -3,7 +3,7 @@ import { Info } from "@/base/Info";
 import { IdLink, InfoActions } from "@/pages/info/InfoActions";
 import { Tags } from "@/pages/info/Tags";
 import { Paths } from "@/Paths";
-import { useSmallScreen } from "@/useSmallScreen";
+import { useScreenType } from "@/useScreenType";
 import classnames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -40,7 +40,7 @@ export function InfoCard(props: IInfoCardProps) {
     set_detail_style({ width, height, left, top })
   }
   const nav = useNavigate();
-  const small = useSmallScreen();
+  const small = useScreenType();
   const open_detail = (e: React.MouseEvent) => {
     if (small) {
       nav(Paths.All.Info.replace(':id', '' + record?.id))

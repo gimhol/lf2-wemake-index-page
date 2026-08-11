@@ -1,0 +1,162 @@
+.commits {
+  border-left-width: 1px;
+  border-left-style: dashed;
+  border-left-color: var(--color-divider);
+  display          : flex;
+  flex-direction   : column;
+  box-sizing       : border-box;
+  height           : 100%;
+}
+
+.title {
+  flex-shrink   : 0;
+  padding       : 6px 8px;
+  font-size     : 13px;
+  font-weight   : bold;
+  border-bottom : 1px var(--color-divider) dashed;
+}
+
+.list {
+  flex           : 1;
+  min-height     : 0;
+  overflow-y     : auto;
+  overflow-x     : hidden;
+
+  &::-webkit-scrollbar {
+    width           : 8px;
+    height          : 8px;
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-track {
+    background   : transparent;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background   : var(--color-divider);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #FFFFFF88;
+  }
+}
+
+.item {
+  display        : flex;
+  align-items    : flex-start;
+  gap            : 8px;
+  padding        : 8px;
+  color          : var(--color-txt);
+  text-decoration: none;
+  border-bottom  : 1px var(--color-divider) dashed;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--color-primary-hover) 30%, transparent);
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.avatar {
+  width        : 28px;
+  height       : 28px;
+  border-radius: 50%;
+  flex-shrink  : 0;
+  background   : var(--color-primary-actived);
+}
+
+.body {
+  display        : flex;
+  flex-direction : column;
+  gap            : 3px;
+  flex           : 1;
+  min-width      : 0;
+}
+
+.msg {
+  display    : flex;
+  align-items: flex-start;
+  gap        : 6px;
+  font-size  : 12px;
+  line-height: 1.4;
+
+  .msg_text {
+    flex             : 1;
+    min-width        : 0;
+    word-break       : break-all;
+    overflow         : hidden;
+    display          : -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp       : 2;
+  }
+
+  .view {
+    flex-shrink   : 0;
+    margin-top    : 1px;
+    font-size     : 11px;
+    color         : var(--color-link);
+    text-decoration: underline;
+    cursor        : pointer;
+
+    &:hover {
+      color: var(--color-link-hover);
+    }
+  }
+}
+
+.meta {
+  display    : flex;
+  align-items: center;
+  gap        : 6px;
+  font-size  : 10px;
+  color      : var(--color-secondary);
+
+  .commit_id {
+    flex-shrink : 0;
+    font-family : monospace;
+    font-size   : 10px;
+    color       : var(--color-secondary);
+  }
+
+  .name {
+    overflow     : hidden;
+    text-overflow: ellipsis;
+    white-space  : nowrap;
+    flex-shrink  : 1;
+  }
+
+  .date {
+    flex-shrink: 0;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+}
+
+.empty {
+  padding    : 24px 8px;
+  text-align : center;
+  font-size  : 12px;
+  color      : var(--color-secondary);
+}
+
+.pager {
+  flex-shrink    : 0;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  gap            : 8px;
+  padding        : 6px 8px;
+  border-top     : 1px var(--color-divider) dashed;
+
+  .page_no {
+    min-width : 2em;
+    text-align: center;
+    font-size : 12px;
+    color     : var(--color-secondary);
+  }
+}

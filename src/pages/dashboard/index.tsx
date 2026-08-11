@@ -4,7 +4,7 @@ import { IconButton } from "@/components/button/IconButton";
 import { Calendar } from "@/gimd/Calendar/Calendar";
 import { Tooltip } from "@/gimd/Tooltip";
 import { ApiHttp } from "@/network/ApiHttp";
-import { useSmallScreen } from "@/useSmallScreen";
+import { useScreenType } from "@/useScreenType";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import csses from "./index.module.scss";
@@ -61,7 +61,7 @@ export default function DashBoard() {
     ranges[0][0].diff(ranges[0][1], 'day') == 0 ?
       `${ranges[0][0].format('YYYY-MM-DD')}` :
       `${ranges[0][0].format('YYYY-MM-DD')} ~ ${ranges[0][1].format('YYYY-MM-DD')}`
-  const small = useSmallScreen()
+  const screen_type = useScreenType();
   return (
     <div className={csses.dashboard} >
       <div className={csses.head}>
@@ -97,7 +97,18 @@ export default function DashBoard() {
             {data.map((data, index, arr) => {
               if (!data.begin && !openeds[data.parent]) return void 0;
               const foldable = data.begin && !arr[index + 1]?.begin;
-              return small ?
+              // return (
+              //   <SmallTableRow
+              //     key={data.key}
+              //     picked={picked}
+              //     index={index}
+              //     data={data}
+              //     open={openeds[data.key]}
+              //     foldable={foldable}
+              //     onPick={set_picked}
+              //     onOpen={() => set_openeds({ ...openeds, [data.key]: !openeds[data.key] })} />
+              // )
+              return 's' == screen_type ?
                 <SmallTableRow
                   key={data.key}
                   picked={picked}
@@ -173,27 +184,21 @@ function TableRow(props: ITableRowProps) {
 function SmallTableRow(props: ITableRowProps) {
   const { open = false, foldable = false, onPick, onOpen, picked, data, index } = props;
   return (
-    <tr key={data.key}>
-      <td onClick={() => onPick?.(data.fingerprint)}>
-        <div style={{ overflow: 'hidden' }}>
+    <tr key={data.key} >
+      <td className={csses.small_td} onClick={() => onPick?.(data.fingerprint)}>
+        <div >
           <span style={{ display: 'flex', alignItems: 'center' }}>
             <CollapseButton
               style={{ opacity: foldable ? 1 : 0, pointerEvents: foldable ? 'all' : 'none' }}
               open={open}
               onClick={onOpen} />
-            <Tooltip title={data.ua}>
-              <span className={data.fingerprint == picked ? csses.picked : ''}>
-                {index}. {data.fingerprint}
-              </span>
-            </Tooltip>
+            <span className={data.fingerprint == picked ? csses.picked : ''}>
+              {index}. {data.fingerprint}
+            </span>
           </span>
-          <div style={{ paddingLeft: 30 }}> {data.seq}: {data.ip} </div>
-          <div style={{ paddingLeft: 30 }}> {data.long_place} </div>
-          <div style={{ paddingLeft: 30 }}>
-            <Tooltip title={data.uri}>
-              <div>{data.uri.substring(19, 40)}</div>
-            </Tooltip>
-          </div>
+          <div style={{ paddingLeft: 30 }}> {data.seq}: {data.ip} {data.long_place} </div>
+          <div style={{ paddingLeft: 30 }}> {data.ua} </div>
+          <div style={{ paddingLeft: 30 }}> {data.uri} </div>
           <div style={{ paddingLeft: 30 }}> {data.time.substring(0, 20)} </div>
         </div>
       </td>

@@ -15,6 +15,7 @@ export default function App() {
       const parent = img.parentElement
       if (parent?.classList.contains('viewer-canvas')) return false
       if (parent?.getAttribute('data-viewer-action') == 'view') return false;
+      if (img.dataset.preview === 'false') return false;
       if (img.src.startsWith('data:')) return false;
       if (img.src.startsWith(location.protocol + '//' + location.host))
         return false;
@@ -27,6 +28,7 @@ export default function App() {
         const parent = img.parentElement
         if (parent?.classList.contains('viewer-canvas')) return false
         if (parent?.getAttribute('data-viewer-action') == 'view') return false;
+        if (img.dataset.preview === 'false') return false;
         if (img.src.startsWith('data:')) return false;
         if (img.src.startsWith(location.protocol + '//' + location.host))
           return false;

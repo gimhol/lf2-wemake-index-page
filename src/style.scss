@@ -47,6 +47,9 @@
 html.small-screen {
   --padding-l-align-w-icon-btn: var(--padding-l)
 }
+html.large-screen {
+  --content-zone-width        : 1600px;
+}
 
 
 #root {
