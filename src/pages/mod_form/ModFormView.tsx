@@ -67,7 +67,8 @@ export function ModFormView(props: IModFormViewProps) {
         r.info.url_type === InfoUrlType.AndroidApk
       ) && r.info.url)
         set_attachments([{ url: r.info.url }])
-      set_drafts({ '': r.info.raw, zh: r.info.raw.i18n?.['zh'] ?? {} })
+      const info_raw = r.info.raw
+      set_drafts({ '': info_raw, zh: info_raw.i18n?.['zh'] ?? {} })
     }).catch(e => {
       if (ab.signal.aborted) return;
       Toast.error(e)
@@ -115,7 +116,7 @@ export function ModFormView(props: IModFormViewProps) {
     }
     const next = mod.info.clone().load(raw).set_id('' + mod_id).clearup()
 
-    if (JSON.stringify(mod.info.raw) === JSON.stringify(next.raw)) {
+    if (mod.info.equals(next)) {
       Toast.show('Nothings Changed.')
       return false;
     }
@@ -127,7 +128,8 @@ export function ModFormView(props: IModFormViewProps) {
       }).then(r => {
         if (r.info.full_cover_url)
           set_covers([{ url: r.info.full_cover_url }])
-        set_drafts({ '': r.info.raw, zh: r.info.raw.i18n?.['zh'] ?? {} })
+        const info_raw = r.info.raw
+        set_drafts({ '': info_raw, zh: info_raw.i18n?.['zh'] ?? {} })
         set_mod(r)
         return true
       }).catch(e => {

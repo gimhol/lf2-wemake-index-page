@@ -43,6 +43,31 @@ export interface IInfo {
 }
 
 const { Cls, Str } = makeI18N();
+
+/** 深度比较两个 JSON 值（数组/对象递归，与键顺序无关）。 */
+function deep_equal(a: unknown, b: unknown): boolean {
+  if (Object.is(a, b)) return true;
+  if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (Array.isArray(a)) {
+    const arr_b = b as unknown[];
+    if (a.length !== arr_b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (!deep_equal(a[i], arr_b[i])) return false;
+    }
+    return true;
+  }
+  const obj_a = a as Record<string, unknown>;
+  const obj_b = b as Record<string, unknown>;
+  const ka = Object.keys(obj_a);
+  if (ka.length !== Object.keys(obj_b).length) return false;
+  for (const k of ka) {
+    if (!Object.prototype.hasOwnProperty.call(obj_b, k)) return false;
+    if (!deep_equal(obj_a[k], obj_b[k])) return false;
+  }
+  return true;
+}
+
 @Cls export class Info implements IInfo {
 
   static readonly OPEN_IN_BROWSER = 'open_in_browser';
@@ -54,23 +79,30 @@ const { Cls, Str } = makeI18N();
   }
   readonly parent: Info | null = null;
   src: string | null;
-  raw!: IInfo;
-  set id(v: string | undefined) { this.raw.id = v }
-  get id(): string | undefined { return this.raw.id }
+  #raw!: IInfo;
+  /**
+   * 只读快照：返回内部原始数据的深拷贝。
+   * 对返回值所做的任何修改都不会影响本实例；如需改数据，请使用 setter 或 load()。
+   */
+  get raw(): IInfo {
+    return JSON.parse(JSON.stringify(this.#raw)) as IInfo;
+  }
+  set id(v: string | undefined) { this.#raw.id = v }
+  get id(): string | undefined { return this.#raw.id }
   set_id(v: string | undefined) { this.id = v; return this; }
-  set type(v: RecordType | undefined) { this.raw.type = v }
-  get type(): RecordType | undefined { return this.raw.type }
+  set type(v: RecordType | undefined) { this.#raw.type = v }
+  get type(): RecordType | undefined { return this.#raw.type }
   set_type(v: RecordType | undefined) { this.type = v; return this; }
-  set more_urls(v: IUrl[] | undefined) { this.raw.more_urls = v }
-  get more_urls(): IUrl[] | undefined { return this.raw.more_urls }
+  set more_urls(v: IUrl[] | undefined) { this.#raw.more_urls = v }
+  get more_urls(): IUrl[] | undefined { return this.#raw.more_urls }
   set_more_urls(v: IUrl[] | undefined) { this.more_urls = v; return this; }
 
-  get raw_desc(): string | undefined { return this.raw.desc; }
+  get raw_desc(): string | undefined { return this.#raw.desc; }
   get all_desc(): Map<string, string> {
     const ret = new Map<string, string>();
-    if (this.raw.desc?.trim())
-      ret.set('', this.raw.desc.trim());
-    const subs = this.raw.i18n
+    if (this.#raw.desc?.trim())
+      ret.set('', this.#raw.desc.trim());
+    const subs = this.#raw.i18n
     if (subs) for (const key in subs) {
       const desc = subs[key].desc?.trim();
       if (desc) ret.set(key, desc);
@@ -116,10 +148,10 @@ const { Cls, Str } = makeI18N();
   }
 
   load(raw: IInfo): this {
-    this.raw = JSON.parse(JSON.stringify(raw));
+    this.#raw = JSON.parse(JSON.stringify(raw));
     const alias_paths = new Set<string>()
-    const bros = this.raw.i18n;
-    const bro_keys = this.raw.i18n && Object.keys(this.raw.i18n)
+    const bros = this.#raw.i18n;
+    const bro_keys = this.#raw.i18n && Object.keys(this.#raw.i18n)
     if (bros && bro_keys?.length) {
       for (const bro_key of bro_keys) {
         let bro: any = bros[bro_key]
@@ -136,15 +168,15 @@ const { Cls, Str } = makeI18N();
         this._bros[bro_key] = new Info(bro, bro_key, this.parent, this.src)
       }
     } else {
-      delete this.raw.i18n
+      delete this.#raw.i18n
     }
-    const { subs: children } = this.raw
+    const { subs: children } = this.#raw
     if (Array.isArray(children))
       this._subs = children.map(c => new Info(c, this.lang, this, this.src))
 
     if (this._bros['']) {
-      Object.assign(this.raw, this._bros[''].raw);
-      delete this.raw.i18n?.[''];
+      Object.assign(this.#raw, this._bros[''].raw);
+      delete this.#raw.i18n?.[''];
       delete this._bros[''];
     }
     return this;
@@ -152,26 +184,30 @@ const { Cls, Str } = makeI18N();
   get_str<K extends keyof IInfo>(key: K): string | undefined {
     const value =
       this._bros[this.lang]?.get_str(key) ||
-      this.raw[key];
+      this.#raw[key];
     if (value === void 0 || value === null) return void 0
     if (Array.isArray(value)) return value.join('\n')
     return '' + value;
   }
   set_str<K extends keyof IInfo, V extends IInfo[K]>(key: K, v: V) {
-    return this.raw[key] = v;
+    return this.#raw[key] = v;
   }
   with_lang(lang: string): Info {
-    const ret = new Info(this.raw, lang, this.parent, this.src);
+    const ret = new Info(this.#raw, lang, this.parent, this.src);
     return ret;
   }
   clone(): Info {
-    const ret = new Info(this.raw, this.lang, this.parent, this.src);
+    const ret = new Info(this.#raw, this.lang, this.parent, this.src);
     ret.subs = this.subs?.map(v => v.clone());
     return ret;
   }
+  /** 与另一个 Info 比较原始数据是否相同（深度比较，与键顺序无关）。 */
+  equals(other: Info): boolean {
+    return deep_equal(this.#raw, other.#raw);
+  }
   get_url_by_name(name: string) {
-    if (!Array.isArray(this.raw.more_urls)) return void 0;
-    return this.raw.more_urls.find(v => v.url_name == name)?.url || '';
+    if (!Array.isArray(this.#raw.more_urls)) return void 0;
+    return this.#raw.more_urls.find(v => v.url_name == name)?.url || '';
   }
   async markdown() {
     const md = this._md
@@ -226,13 +262,13 @@ const { Cls, Str } = makeI18N();
   }
   async load_desc(opts: RequestInit = {}) {
     do {
-      const { desc_url } = this.raw
-      if (desc_url) this.raw.desc = await this.fetch(desc_url, opts).then(r => r.text());
-      if (!this.raw.i18n) break;
-      for (const key in this.raw.i18n) {
-        const { desc_url } = this.raw.i18n[key] ?? {}
+      const { desc_url } = this.#raw
+      if (desc_url) this.#raw.desc = await this.fetch(desc_url, opts).then(r => r.text());
+      if (!this.#raw.i18n) break;
+      for (const key in this.#raw.i18n) {
+        const { desc_url } = this.#raw.i18n[key] ?? {}
         if (!desc_url) continue;
-        this.raw.i18n[key].desc = await this.fetch(desc_url, opts).then(r => r.text());
+        this.#raw.i18n[key].desc = await this.fetch(desc_url, opts).then(r => r.text());
       }
     } while (false);
     return this.desc;
