@@ -1,6 +1,6 @@
 /* eslint-disable no-constant-condition */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { storageHttp } from "@/network/storageHttp";
 import { join_url } from "@/pages/yours/join_url";
 import {
   makeI18N,
@@ -263,18 +263,15 @@ function deep_equal(a: unknown, b: unknown): boolean {
   async load_desc(opts: RequestInit = {}) {
     do {
       const { desc_url } = this.#raw
-      if (desc_url) this.#raw.desc = await this.fetch(desc_url, opts).then(r => r.text());
+      if (desc_url) this.#raw.desc = await storageHttp.text(this.full_url(desc_url), opts);
       if (!this.#raw.i18n) break;
       for (const key in this.#raw.i18n) {
         const { desc_url } = this.#raw.i18n[key] ?? {}
         if (!desc_url) continue;
-        this.#raw.i18n[key].desc = await this.fetch(desc_url, opts).then(r => r.text());
+        this.#raw.i18n[key].desc = await storageHttp.text(this.full_url(desc_url), opts);
       }
     } while (false);
     return this.desc;
-  }
-  private async fetch(url: string, opts: RequestInit = {}): Promise<Response> {
-    return fetch(this.full_url(url), { mode: 'cors', ...opts })
   }
 
   clearup(): this {

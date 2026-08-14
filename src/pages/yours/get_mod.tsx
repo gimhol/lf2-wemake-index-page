@@ -2,6 +2,7 @@ import { findModRecord } from "@/api/findModRecord";
 import { getUserInfo, type IUserInfo } from "@/api/getUserInfo";
 import { type IRecord } from "@/api/listModRecords";
 import { Info, type IInfo } from "@/base/Info";
+import { storageHttp } from "@/network/storageHttp";
 import { MD5 } from "crypto-js";
 import { join_url } from "./join_url";
 
@@ -51,10 +52,7 @@ export async function get_mod(opts: IGetModFormOpts): Promise<IMod> {
   }
   const oss_url = oss_name ? join_url(STORAGE_URL_BASE, oss_name) : void 0
   if (oss_url) {
-    const exists_info = await fetch(oss_url, { signal }).then<IInfo>(r => {
-      if (!r.ok) throw new Error(`[${r.status}]${r.statusText}`)
-      return r.json()
-    })
+    const exists_info = await storageHttp.json<IInfo>(oss_url, { signal })
     console.debug(`[get_mod] exists_info:`, exists_info)
     Object.assign(raw_info, exists_info)
   } else {
