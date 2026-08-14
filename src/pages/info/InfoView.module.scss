@@ -36,9 +36,9 @@
     padding      : 1px;
   }
 
-  &:not(:last-child) {
-    border-bottom: 1px var(--color-divider) dashed;
-  }
+  // &:not(:last-child) {
+  //   border-bottom: 1px var(--color-divider) dashed;
+  // }
 
   .collapse_btn_hide {
     opacity       : 0;

@@ -14,7 +14,7 @@ import { Link } from "@/components/link";
 import { Viewer as MDViewer } from "@/components/markdown/Viewer";
 import Show from "@/gimd/Show";
 import Toast from "@/gimd/Toast";
-import { useSmallScreen } from "@/useSmallScreen";
+import { useScreenType } from "@/useScreenType";
 import { ewents } from "@/utils/ewents";
 import { usePropState } from "@/utils/usePropState";
 import classnames from "classnames";
@@ -64,20 +64,20 @@ function RenderInfoView(props: IInfoViewProps, forwardedRef: ForwardedRef<HTMLDi
   } = props;
   const [__open, __set_open] = usePropState(open, whenOpen)
   const [__listLike, __set_listLike] = usePropState(listLike, whenListLike)
-  const small = useSmallScreen();
+  const screen_type = useScreenType();
   useEffect(() => {
     if (whenListLike) return;
-    if (small) { return __set_listLike('list') }
+    if ('s' == screen_type) { return __set_listLike('list') }
     const listlike = curr_list_like(info?.children_look)
     __set_listLike(listlike)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [info, small])
+  }, [info, 's' == screen_type])
 
 
   useEffect(() => {
-    if (!small) return;
+    if ('s' != screen_type) return;
     __set_open(false);
-  }, [__set_open, small])
+  }, [__set_open, screen_type])
 
   const { t } = useTranslation()
   const { children_title, url, desc, brief, full_desc_url, title } = info ?? {};

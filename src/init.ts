@@ -44,11 +44,23 @@ ApiHttp.addErrorInterceptor((e: Error) => {
   return e
 })
 
+let size_type: 'small-screen' | 'middle-screen' | 'large-screen' | '' = '';
+
 const on_resize = () => {
+  const cl = document.firstElementChild?.classList;
+  if (!cl) return;
+
   if (window.innerWidth <= 480)
-    document.firstElementChild?.classList.add('small-screen')
+    size_type = 'small-screen'
+  else if (window.innerWidth <= 1600)
+    size_type = 'middle-screen'
   else
-    document.firstElementChild?.classList.remove('small-screen')
+    size_type = 'large-screen'
+
+  if (cl.contains(size_type)) return;
+
+  cl.remove('small-screen', 'middle-screen', 'large-screen')
+  cl.add(size_type)
 }
 window.addEventListener('resize', on_resize)
 on_resize()

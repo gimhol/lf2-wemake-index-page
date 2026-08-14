@@ -17,7 +17,8 @@ import { useMovingBg } from "@/hooks/useMovingBg";
 import { ApiHttp } from "@/network/ApiHttp";
 import * as KnownError from "@/network/KnownError";
 import { Paths } from "@/Paths";
-import { useSmallScreen } from "@/useSmallScreen";
+import { useScreenType } from "@/useScreenType";
+import { ewents } from "@/utils/ewents";
 import { interrupt_event } from "@/utils/interrupt_event";
 import { LocationParams } from "@/utils/LocationParams";
 import cns from "classnames";
@@ -29,7 +30,7 @@ import { fetch_infos, type IRecordInfo } from "./fetch_info_list";
 import { MainContext } from "./main_context";
 import { NavButton } from "./NavButton";
 import csses from "./styles.module.scss";
-import { ewents } from "@/utils/ewents";
+import { Commits } from "./Commits";
 const a_mappings: { [x in string]?: string } = {
   'origin': `1`,
   'wmods': `2`,
@@ -124,12 +125,12 @@ export default function MainPage() {
   }, [session_id, dispatch, set_location])
 
   const actived: IRecordInfo | undefined = useMemo(() => games?.find(v => v.info.id == real_game_id), [real_game_id, games])
-  const small = useSmallScreen()
+  const screen_type = useScreenType()
   const [small_game_list_open, set_small_game_list_open] = useState(false);
   const [main_game_list_open, set_main_game_list_open] = useState(true);
 
-  const game_list_open = small ? small_game_list_open : main_game_list_open;
-  const set_game_list_open = small ? set_small_game_list_open : set_main_game_list_open;
+  const game_list_open = screen_type == 's' ? small_game_list_open : main_game_list_open;
+  const set_game_list_open = screen_type == 's' ? set_small_game_list_open : set_main_game_list_open;
 
 
   useEffect(() => {
@@ -200,7 +201,7 @@ export default function MainPage() {
                 const game = b_mappings['' + info.info.id] ?? info.info.id
                 interrupt_event(e);
                 set_location({ game });
-                if (small) set_game_list_open(false)
+                if (screen_type == 's') set_game_list_open(false)
               }} />
           )
         }
@@ -208,7 +209,7 @@ export default function MainPage() {
         <Loading loading={loading} center absolute />
       </div>
     )
-  }, [game_list_open, _games, loading, real_game_id, pathname, set_location, small, set_game_list_open])
+  }, [game_list_open, _games, loading, real_game_id, pathname, set_location, screen_type, set_game_list_open])
 
   const build_time = dayjs(BUILD_TIME)
 
@@ -280,10 +281,13 @@ export default function MainPage() {
           </div>
         </div>
         <div className={csses.main}>
-          <Show yes={!small}>
+          <Show yes={screen_type != 's'}>
             {game_list}
           </Show>
           <Outlet />
+          <Show yes={screen_type == 'l'}>
+            <Commits style={{ width: 400 }} />
+          </Show>
         </div>
         <div className={csses.foot}>
           <a
@@ -305,7 +309,7 @@ export default function MainPage() {
         </div>
       </div >
       <Loading big loading={loading} style={{ position: 'absolute', margin: 'auto auto' }} />
-      <Show yes={small}>
+      <Show yes={screen_type == 's'}>
         <Mask
           className={csses.game_list_mask}
           container={() => document.body}
