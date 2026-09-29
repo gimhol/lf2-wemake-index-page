@@ -6,6 +6,9 @@ import 'viewerjs/dist/viewer.min.css';
 import { Paths } from "./Paths";
 import Toast from "./gimd/Toast";
 
+if (import.meta.env.DEV && !location.hash.startsWith('#/dashboard')) {
+  location.replace('#/dashboard')
+}
 const router = createHashRouter(Paths.Routes);
 export default function App() {
   useEffect(() => {

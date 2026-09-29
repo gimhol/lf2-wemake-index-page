@@ -63,7 +63,9 @@ export default function MainPage() {
   const set_location = useCallback((opts: { game?: string }) => {
     const { game } = opts
     const pathname = typeof game === 'string' ?
-      Paths.All.InnerInfo.replace(':id', game) :
+      game.startsWith('/') ?
+        game :
+        Paths.All.InnerInfo.replace(':id', game) :
       void 0;
     const next_search = search.clone();
     next_search.delele('session');
@@ -153,15 +155,15 @@ export default function MainPage() {
 
   const _games = useMemo<('divider' | IRecordInfo)[] | undefined>(() => {
     const ret: ('divider' | IRecordInfo)[] = []
+    if (admin == 255 || import.meta.env.DEV) {
+      ret.push({
+        info: new Info({
+          id: Paths.All.Dashboard,
+          short_title: t('Dashboard')
+        }, lang, null, null)
+      })
+    }
     if (session_id) {
-      if (admin == 255) {
-        ret.push({
-          info: new Info({
-            id: Paths.All.Dashboard,
-            short_title: t('Dashboard')
-          }, lang, null, null)
-        })
-      }
       ret.push({
         info: new Info({
           id: Paths.All.Workspace,
@@ -193,7 +195,7 @@ export default function MainPage() {
           if (info === 'divider') return <div className={csses.divider_h} key={`divider_${idx}`} />
           return (
             <NavButton
-              key={info.id}
+              key={info.info.id}
               {...ewents.click('NavButton', { id: info.info.id, title: info.info.short_title })}
               actived={real_game_id === info.info.id || pathname === info.info.id}
               children={info.info.short_title}

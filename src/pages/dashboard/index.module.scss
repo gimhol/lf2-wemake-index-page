@@ -10,6 +10,9 @@
 
   .head {
     display      : flex;
+    align-items  : center;
+    gap          : 5px;
+    padding      : 5px;
     border-bottom: 1px dashed var(--color-divider);
 
     .input {
@@ -34,6 +37,7 @@
     align-items   : stretch;
 
     table {
+      width          : 100%;
       border-collapse: collapse;
 
       tr {
@@ -49,7 +53,7 @@
         }
 
         td {
-          padding    : 5px 10px;
+          padding    : 5px 8px;
           white-space: nowrap;
 
           span.picked {
@@ -57,8 +61,16 @@
           }
         }
 
-        .small_tr {
-          white-space: wrap;
+        .small_td {
+          overflow-wrap: anywhere;
+          white-space  : normal;
+        }
+
+        .uri_cell {
+          max-width    : 220px;
+          overflow     : hidden;
+          text-overflow: ellipsis;
+          white-space  : nowrap;
         }
 
       }
