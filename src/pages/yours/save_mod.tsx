@@ -47,7 +47,7 @@ export async function save_mod(opts: ISaveModFormOpts) {
     })
     m.set(l, oss_name)
   }
-  const raw: IInfo = JSON.parse(JSON.stringify(info.raw))
+  const raw: IInfo = info.raw
   for (const [l, oss_name] of m) {
     if (l === '') {
       delete raw.desc;
