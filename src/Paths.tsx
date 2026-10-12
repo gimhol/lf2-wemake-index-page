@@ -64,6 +64,7 @@ export namespace Paths {
     [All.Demo]: null
   }
   export function has_permission(pathname: string) {
+    if (import.meta.env.DEV && pathname == Paths.All.Dashboard) return true;
     if (!(pathname in Paths.Permissions)) return false;
     const p = Paths.Permissions[pathname as Paths.All];
     if (p === void 0 || p === null) return true

@@ -10,6 +10,9 @@
 
   .head {
     display      : flex;
+    align-items  : center;
+    gap          : 5px;
+    padding      : 5px;
     border-bottom: 1px dashed var(--color-divider);
 
     .input {
@@ -34,6 +37,7 @@
     align-items   : stretch;
 
     table {
+      width          : fit-content;
       border-collapse: collapse;
 
       tr {
@@ -49,7 +53,7 @@
         }
 
         td {
-          padding    : 5px 10px;
+          padding    : 5px 8px;
           white-space: nowrap;
 
           span.picked {
@@ -57,10 +61,79 @@
           }
         }
 
-        .small_tr {
-          white-space: wrap;
+        .small_td {
+          overflow-wrap: anywhere;
+          white-space  : normal;
         }
 
+      }
+    }
+
+    .records {
+      display       : flex;
+      flex-direction: column;
+
+      .record {
+        box-sizing: border-box;
+        padding   : 5px 8px;
+
+        border-bottom   : 1px dashed var(--color-divider);
+        background-color: var(--color-table-row-bg-1);
+
+        &:nth-child(2n+1) {
+          background-color: var(--color-table-row-bg-2);
+        }
+
+        &:hover {
+          background-color: var(--color-table-row-bg-hover);
+        }
+
+        span.picked {
+          color: red;
+        }
+
+        .time {
+          opacity: 0.8;
+        }
+
+        .line_main {
+          display    : flex;
+          align-items: center;
+          gap        : 10px;
+          white-space: nowrap;
+        }
+
+        .line_sub {
+          display     : flex;
+          align-items : center;
+          gap         : 10px;
+          padding-left: 39px;
+          white-space : nowrap;
+          opacity     : 0.85;
+        }
+
+        .line_ua {
+          padding-left : 39px;
+          white-space  : normal;
+          overflow-wrap: anywhere;
+          opacity      : 0.85;
+        }
+
+        .host_cell {
+          min-width: 200px;
+        }
+
+        .seq_cell {
+          min-width: 60px;
+        }
+
+        .ip_cell {
+          min-width: 110px;
+        }
+
+        .place_cell {
+          min-width: 200px;
+        }
       }
     }
 
