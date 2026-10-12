@@ -9,7 +9,6 @@ import { IconButton } from "@/components/button/IconButton";
 import { LangButton } from "@/components/LangButton";
 import { Loading } from "@/components/loading";
 import { Mask } from "@/components/mask";
-import { Dropdown } from "@/gimd/Dropdown";
 import Show from "@/gimd/Show";
 import Toast from "@/gimd/Toast";
 import GlobalStore from "@/GlobalStore";
@@ -21,6 +20,7 @@ import { useScreenType } from "@/useScreenType";
 import { ewents } from "@/utils/ewents";
 import { interrupt_event } from "@/utils/interrupt_event";
 import { LocationParams } from "@/utils/LocationParams";
+import { oauth_login } from "@/utils/oauth_login";
 import cns from "classnames";
 import dayjs from "dayjs";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -238,27 +238,12 @@ export default function MainPage() {
             </Show>
             <LangButton />
             <Show yes={!session_id}>
-              <Dropdown
-                alignX={1}
-                anchorX={1}
-                menu={{
-                  // 没搞懂为什么此处 window.location.toString() 没有立刻变化，故在onClik才获取地址 -Gim
-                  items: [{
-                    children: t('github_login'),
-                    title: t('gitee_login'),
-                    onClick: () => document.location = `${API_BASE}user/github/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
-                  },
-                  {
-                    children: t('gitee_login'),
-                    title: t('gitee_login'),
-                    onClick: () => document.location = `${API_BASE}user/gitee/oauth?route_mode=hash&redirect=${encodeURIComponent(window.location.toString())}`
-                  }]
-                }}>
-                <IconButton
-                  {...ewents.click('login')}
-                  title={t('login')}
-                  icon={img_login} />
-              </Dropdown>
+              <IconButton
+                {...ewents.click('login')}
+                title={t('blogim_login')}
+                icon={img_login}
+                // 没搞懂为什么此处 window.location.toString() 没有立刻变化，故在onClik才获取地址 -Gim
+                onClick={() => { oauth_login().catch(e => Toast.error(e)) }} />
             </Show>
             <Show yes={!!session_id}>
               <IconButton

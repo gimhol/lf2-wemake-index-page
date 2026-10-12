@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>登录中 / Signing in</title>
+  <style>
+    html {
+      background: black;
+      color: white;
+      font-family: system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #msg {
+      max-width: 560px;
+      padding: 24px;
+      text-align: center;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+    }
+
+    a {
+      color: #7ab8ff;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="msg">登录中… / Signing in…</div>
+  <script>
+    const API_BASE = 'https://gim.ink/api/';
+    const msg = document.getElementById('msg');
+    const fail = (text) => {
+      const line = document.createElement('p');
+      line.textContent = text + '，3 秒后返回首页 / Back to home in 3s';
+      const link = document.createElement('a');
+      link.href = '/#/';
+      link.textContent = '返回首页 / Back to home';
+      msg.textContent = '';
+      msg.append(line, link);
+      setTimeout(() => location.replace('/#/'), 3000);
+    };
+    const query = new URLSearchParams(location.search);
+    const code = query.get('code');
+    const state = query.get('state');
+    const error = query.get('error');
+    let req = null;
+    try {
+      req = JSON.parse(localStorage.getItem('oauth_request') || 'null');
+    } catch (e) {
+      console.error(e);
+    }
+    localStorage.removeItem('oauth_request');
+    if (error) {
+      fail('授权失败 / Authorization failed: ' + error);
+    } else if (!code || !state || !req || state !== req.state) {
+      fail('登录校验失败，请重试 / Login state check failed');
+    } else {
+      fetch(API_BASE + 'oauth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: code,
+          redirect_uri: req.redirect_uri,
+          code_verifier: req.verifier,
+        }),
+      })
+        .then(r => r.json())
+        .then(r => {
+          if (!r || r.code !== 0 || !r.data || !r.data.session_id)
+            throw new Error((r && r.msg) || 'login failed');
+          const hash = typeof req.return_hash === 'string' && req.return_hash.startsWith('#') ? req.return_hash : '#/';
+          const parts = hash.split('?');
+          const params = new URLSearchParams(parts[1] || '');
+          params.set('session', r.data.session_id);
+          location.replace('/' + parts[0] + '?' + params.toString());
+        })
+        .catch(e => fail('登录失败 / Login failed: ' + ((e && e.message) || e)));
+    }
+  </script>
+</body>
+
+</html>
