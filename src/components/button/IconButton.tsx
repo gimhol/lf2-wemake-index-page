@@ -51,13 +51,16 @@ export function IconButton(props: IIconButtonProps) {
       {href ? <a href={href} className={csses.icon_button_href} /> : null}
     </button>
   )
-  if (yes) return <>{children}</>
+
+  if (yes) {
+    if (!title) return <>{main}</>
+    return (
+      <Tooltip title={title} container={container}>
+        {main}
+      </Tooltip>
+    )
+  }
   else if (not_null) return <></>
   return null
-  if (!title) return <>{main}</>
-  return (
-    <Tooltip title={title} container={container}>
-      {main}
-    </Tooltip>
-  )
+
 }

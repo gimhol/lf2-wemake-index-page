@@ -238,7 +238,7 @@ export default function MainPage() {
             </Show.Div>
             <LangButton />
             <IconButton
-              yes={!!session_id}
+              yes={!session_id}
               {...ewents.click('login')}
               title={t('blogim_login')}
               icon={img_login}
