@@ -233,28 +233,24 @@ export default function MainPage() {
             {t("main_title")}
           </h1>
           <div className={csses.right_zone}>
-            <Show yes={!!session_id}>
-              <div className={csses.hello}>
-                Hi, {nickname || username || 'Somebody'}
-              </div>
-            </Show>
+            <Show.Div yes={!!session_id} className={csses.hello}>
+              Hi, {nickname || username || 'Somebody'}
+            </Show.Div>
             <LangButton />
-            <Show yes={!session_id}>
-              <IconButton
-                {...ewents.click('login')}
-                title={t('blogim_login')}
-                icon={img_login}
-                // 没搞懂为什么此处 window.location.toString() 没有立刻变化，故在onClik才获取地址 -Gim
-                onClick={() => { oauth_login().catch(e => Toast.error(e)) }} />
-            </Show>
-            <Show yes={!!session_id}>
-              <IconButton
-                title={t('logout')}
-                icon={img_logout}
-                onClick={() => {
-                  dispatch({ type: 'reset' })
-                }} />
-            </Show>
+            <IconButton
+              yes={!!session_id}
+              {...ewents.click('login')}
+              title={t('blogim_login')}
+              icon={img_login}
+              // 没搞懂为什么此处 window.location.toString() 没有立刻变化，故在onClik才获取地址 -Gim
+              onClick={() => { oauth_login().catch(e => Toast.error(e)) }} />
+            <IconButton
+              yes={!!session_id}
+              title={t('logout')}
+              icon={img_logout}
+              onClick={() => {
+                dispatch({ type: 'reset' })
+              }} />
             <IconButton
               {...ewents.click('goto_github')}
               href="https://github.com/gimhol/Little-Fighter-WEMAKE"

@@ -14,12 +14,14 @@ export interface IIconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonE
   size?: number;
   container?: ITooltipProps['container'];
   classNames?: Classnames<'icon'>
-  styles?: Styles<'icon'>
+  styles?: Styles<'icon'>;
+  yes?: unknown;
+  not_null?: boolean;
 }
 export function IconButton(props: IIconButtonProps) {
-  const { 
-    container, className, href, onClick, icon, children, size = 20, gone, 
-    title, stopPropagation, classNames, styles, ..._p 
+  const {
+    container, className, href, onClick, icon, children, size = 20, gone,
+    title, stopPropagation, classNames, styles, yes = true, not_null = true, ..._p
   } = props;
   const _on_click: typeof onClick = (e) => {
     if (stopPropagation) e.stopPropagation();
@@ -49,6 +51,9 @@ export function IconButton(props: IIconButtonProps) {
       {href ? <a href={href} className={csses.icon_button_href} /> : null}
     </button>
   )
+  if (yes) return <>{children}</>
+  else if (not_null) return <></>
+  return null
   if (!title) return <>{main}</>
   return (
     <Tooltip title={title} container={container}>
@@ -56,4 +61,3 @@ export function IconButton(props: IIconButtonProps) {
     </Tooltip>
   )
 }
-
