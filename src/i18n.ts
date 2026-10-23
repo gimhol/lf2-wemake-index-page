@@ -5,7 +5,7 @@ import { initReactI18next } from "react-i18next";
 const en = {
   "author": "Author",
   "date": "Date",
-  "main_title": "LF-Wemakit",
+  "main_title": "Legacy Flame Web",
   "unavailable": "Unavailable",
   "dl_win_x64": "Download Window x64 Application",
   "open_in_browser": "Open in Browser",
@@ -73,7 +73,7 @@ const en = {
 const zh: Record<keyof typeof en, string> = {
   "author": "作者",
   "date": "日期",
-  "main_title": "LF-Wemakit",
+  "main_title": "Legacy Flame Web",
   "unavailable": "已停用",
   "dl_win_x64": "下载 Windows x64 应用",
   "open_in_browser": "浏览器中打开",

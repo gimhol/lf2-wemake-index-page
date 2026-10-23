@@ -257,7 +257,7 @@ export default function MainPage() {
             </Show>
             <IconButton
               {...ewents.click('goto_github')}
-              href="https://github.com/gimhol/little-fighter-2-WEMAKE"
+              href="https://github.com/gimhol/Little-Fighter-WEMAKE"
               title={t('goto_github')}
               icon={img_github} />
             <IconButton
@@ -271,7 +271,9 @@ export default function MainPage() {
           <Show yes={screen_type != 's'}>
             {game_list}
           </Show>
-          <Outlet />
+          <div className={csses.outlet_container}>
+            <Outlet />
+          </div>
           <Show yes={screen_type == 'l'}>
             <Commits style={{ width: 400 }} />
           </Show>
